@@ -6,6 +6,9 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -16,9 +19,29 @@ public class User {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id;
+    private Long id;
+
+    @Column(nullable = false)
     private String firstName;
+
+    @Column(nullable = false)
     private String lastName;
+
+    @Column(nullable = false,unique = true)
     private String email;
+
+    @Column(nullable = false)
     private String password;
+
+    //private List<?>roles=new ArrayList<>();
+
+
+    @ManyToMany(cascade = CascadeType.ALL,fetch = FetchType.LAZY)
+    @JoinTable(
+            name="user_trip",
+            joinColumns = @JoinColumn(name="user_id"),
+            inverseJoinColumns = @JoinColumn(name = "trip_id")
+    )
+    private List<Trip>trips;
+
 }

@@ -3,7 +3,6 @@ package com.soeztrip.travelplanner.service;
 import com.soeztrip.travelplanner.dto.UserDto;
 import com.soeztrip.travelplanner.model.User;
 import com.soeztrip.travelplanner.repository.UserRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -14,7 +13,6 @@ public class UserService {
 
     private UserRepository userRepository;
 
-   @Autowired
     public UserService(UserRepository userRepository) {
         this.userRepository = userRepository;
     }
@@ -35,4 +33,16 @@ public class UserService {
 
     }
 
+    public boolean userExists(Long id) {
+        return userRepository.existsById(id);
+    }
+
+    public User findUser(Long id) {
+        return userRepository.findById(id).get();
+    }
+
+    public User saveTrip(User user) {
+        userRepository.save(user);
+        return user;
+    }
 }

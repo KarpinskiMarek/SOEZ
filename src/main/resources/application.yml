@@ -3,7 +3,7 @@ spring:
     enabled: true
     path: '/console'
   datasource:
-    url:
+    url: 'jdbc:h2:file:../travel-planner/src/main/article-db'
   jpa:
     hibernate:
       ddl-auto: update

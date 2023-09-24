@@ -1,19 +1,32 @@
 package com.soeztrip.travelplanner.dto;
 
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotEmpty;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
 @Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class UserDto {
 
-    private Integer id;
+
+    private Long id;
+
+    @NotEmpty
     private String firstName;
+
+    @NotEmpty
     private String lastName;
+
+    @NotEmpty
+    @Email
     private String email;
+
+    @NotEmpty
     private String password;
 
 }
