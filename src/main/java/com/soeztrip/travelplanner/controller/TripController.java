@@ -21,7 +21,7 @@ public class TripController {
         this.tripService=tripService;
     }
 
-    @GetMapping("/trips")
+    @GetMapping("/trips") // omg so getmapping
     public ResponseEntity<?> listTrips(Model model){
         return ResponseEntity.ok(tripService.findAllTrips());
     }
@@ -34,7 +34,7 @@ public class TripController {
     }
     @PostMapping("/trips/new")
     public ResponseEntity<?>createTrip(Trip trip){
-        Trip result=tripService.saveTrip(trip);
+        Trip result=tripService.saveTrip(trip); //omg so kod
         return ResponseEntity.created(URI.create("/"+result.getId())).body(result);
     }
 }
