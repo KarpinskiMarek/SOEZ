@@ -1,12 +1,14 @@
 package com.soeztrip.travelplanner.repository;
 
+import com.soeztrip.travelplanner.model.Role;
 import com.soeztrip.travelplanner.model.UserEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
-@Repository
-public interface UserRepository extends JpaRepository<UserEntity,Long> {
+import java.util.Optional;
 
-    UserEntity findByEmail(String email);
-    Boolean existsByEmail(String email);
+
+@Repository
+public interface RoleRepository extends JpaRepository<Role,Long> {
+    Optional<Role> findByName(String name);
 }

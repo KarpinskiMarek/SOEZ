@@ -1,8 +1,9 @@
 package com.soeztrip.travelplanner.service;
 
 import com.soeztrip.travelplanner.dto.UserDto;
-import com.soeztrip.travelplanner.model.User;
+import com.soeztrip.travelplanner.model.UserEntity;
 import com.soeztrip.travelplanner.repository.UserRepository;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -13,22 +14,30 @@ public class UserService {
 
     private UserRepository userRepository;
 
-    public UserService(UserRepository userRepository) {
+    private PasswordEncoder passwordEncoder;
+
+
+
+    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
+        this.passwordEncoder = passwordEncoder;
+    }
+    public UserEntity findUserByEmail(String email){
+        return userRepository.findByEmail(email);
     }
 
     public List<UserDto> findAllUsers() {
-        List<User> users = userRepository.findAll();
-        return users.stream().map((user) -> mapUserDto(user)).collect(Collectors.toList());
+        List<UserEntity> userEntities = userRepository.findAll();
+        return userEntities.stream().map((user) -> mapUserDto(user)).collect(Collectors.toList());
     }
 
-    private UserDto mapUserDto(User user){
+    private UserDto mapUserDto(UserEntity userEntity){
         UserDto userDto=UserDto.builder()
-                .id(user.getId())
-                .firstName(user.getFirstName())
-                .lastName(user.getLastName())
-                .email(user.getEmail())
-                .password(user.getPassword()).build();
+                .id(userEntity.getId())
+                .firstName(userEntity.getFirstName())
+                .lastName(userEntity.getLastName())
+                .email(userEntity.getEmail())
+                .password(userEntity.getPassword()).build();
         return userDto;
 
     }
@@ -37,12 +46,17 @@ public class UserService {
         return userRepository.existsById(id);
     }
 
-    public User findUser(Long id) {
+    public UserEntity findUser(Long id) {
         return userRepository.findById(id).get();
     }
 
-    public User saveTrip(User user) {
-        userRepository.save(user);
-        return user;
+    public UserEntity saveUser(UserDto userDto) {
+        UserEntity userEntity =new UserEntity();
+        userEntity.setFirstName(userDto.getFirstName());
+        userEntity.setLastName(userDto.getLastName());
+        userEntity.setEmail(userDto.getEmail());
+        userEntity.setPassword(passwordEncoder.encode(userDto.getPassword()));
+        userRepository.save(userEntity);
+        return userEntity;
     }
 }

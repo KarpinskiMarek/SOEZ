@@ -21,7 +21,7 @@ public class TripController {
         this.tripService=tripService;
     }
 
-    @GetMapping("/trips") // omg so getmapping
+    @GetMapping("/trips")
     public ResponseEntity<?> listTrips(Model model){
         return ResponseEntity.ok(tripService.findAllTrips());
     }

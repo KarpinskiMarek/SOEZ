@@ -1,9 +1,18 @@
 spring:
-  h2.console:
-    enabled: true
-    path: '/console'
   datasource:
-    url: 'jdbc:h2:file:../travel-planner/src/main/article-db'
+    url: jdbc:postgresql://localhost:5432/soez
+    username: postgres
+    password: P@ssw0rd
+    driver-class-name: org.postgresql.Driver
   jpa:
     hibernate:
       ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+    database: postgresql
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+logging:
+  level:
+    org.springframework.security.web: DEBUG

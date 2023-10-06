@@ -16,17 +16,17 @@ public class UserDto {
 
     private Long id;
 
-    @NotEmpty
+    @NotEmpty(message = "first name can not be empty")
     private String firstName;
 
-    @NotEmpty
+    @NotEmpty(message = "last name can not be empty")
     private String lastName;
 
-    @NotEmpty
+    @NotEmpty(message = "email can not be empty")
     @Email
     private String email;
 
-    @NotEmpty
+    @NotEmpty(message = "password can not be empty")
     private String password;
 
 }
