@@ -32,5 +32,4 @@ public class Trip {
 
     @ManyToMany(mappedBy = "trips")
     private List<UserEntity> userEntities;
-
 }

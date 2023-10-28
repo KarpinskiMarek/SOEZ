@@ -14,17 +14,39 @@ public class TripService {
 
     private TripRepository tripRepository;
 
-    public TripService(TripRepository tripRepository){
-        this.tripRepository=tripRepository;
+    public TripService(TripRepository tripRepository) {
+        this.tripRepository = tripRepository;
     }
 
-    public List<TripDto> findAllTrips(){
-        List<Trip>trips=tripRepository.findAll();
-        return trips.stream().map((trip) -> mapTripDto(trip)).collect(Collectors.toList());
+    public void deleteTrip(Long id) {
+        tripRepository.deleteById(id);
     }
 
-    private TripDto mapTripDto(Trip trip) {
-        TripDto tripDto=TripDto.builder()
+    public TripDto findTrip(Long id) {
+        Trip trip = tripRepository.findById(id).get();
+        return mapToTripDto(trip);
+    }
+
+    public List<TripDto> findAllTrips() {
+        List<Trip> trips = tripRepository.findAll();
+        return trips.stream().map(this::mapToTripDto).collect(Collectors.toList());
+    }
+
+    private Trip mapToTrip(TripDto trip) {
+        Trip tripDto = Trip.builder()
+                .id(trip.getId())
+                .startingDate(trip.getStartingDate())
+                .endingDate(trip.getEndingDate())
+                .startingPoint(trip.getStartingPoint())
+                .destinationPoint(trip.getDestinationPoint())
+                .finished(trip.getFinished())
+                .title(trip.getTitle())
+                .build();
+        return tripDto;
+    }
+
+    private TripDto mapToTripDto(Trip trip) {
+        TripDto tripDto = TripDto.builder()
                 .id(trip.getId())
                 .startingDate(trip.getStartingDate())
                 .endingDate(trip.getEndingDate())
@@ -35,16 +57,17 @@ public class TripService {
         return tripDto;
     }
 
+    public Trip saveTrip(TripDto tripDto) {
+        Trip trip = mapToTrip(tripDto);
+        return tripRepository.save(trip);
+    }
+
     public boolean tripExists(Long id) {
         return tripRepository.existsById(id);
     }
 
-    public Trip findTrip(Long id) {
-        return tripRepository.findById(id).get();
-    }
-
-    public Trip saveTrip(Trip trip) {
+    public void updateTrip(TripDto tripDto) {
+        Trip trip = mapToTrip(tripDto);
         tripRepository.save(trip);
-        return trip;
     }
 }
