@@ -15,7 +15,7 @@ import java.util.List;
 @Builder
 @Entity
 @Table(name = "users")
-public class User {
+public class UserEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -33,7 +33,15 @@ public class User {
     @Column(nullable = false)
     private String password;
 
-    //private List<?>roles=new ArrayList<>();
+
+
+    @ManyToMany(cascade =CascadeType.ALL, fetch =FetchType.EAGER)
+    @JoinTable(
+            name="user_role",
+            joinColumns = @JoinColumn(name = "user_id"),
+            inverseJoinColumns = @JoinColumn(name = "role_id")
+    )
+    private List<Role>roles;
 
 
     @ManyToMany(cascade = CascadeType.ALL,fetch = FetchType.LAZY)
