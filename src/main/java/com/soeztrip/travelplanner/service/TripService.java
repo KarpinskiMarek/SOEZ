@@ -32,17 +32,17 @@ public class TripService {
         return trips.stream().map(this::mapToTripDto).collect(Collectors.toList());
     }
 
-    private Trip mapToTrip(TripDto trip) {
-        Trip tripDto = Trip.builder()
-                .id(trip.getId())
-                .startingDate(trip.getStartingDate())
-                .endingDate(trip.getEndingDate())
-                .startingPoint(trip.getStartingPoint())
-                .destinationPoint(trip.getDestinationPoint())
-                .finished(trip.getFinished())
-                .title(trip.getTitle())
+    private Trip mapToTrip(TripDto tripDto) {
+        Trip trip = Trip.builder()
+                .id(tripDto.getId())
+                .startingDate(tripDto.getStartingDate())
+                .endingDate(tripDto.getEndingDate())
+                .startingPoint(tripDto.getStartingPoint())
+                .destinationPoint(tripDto.getDestinationPoint())
+                .finished(tripDto.getFinished())
+                .title(tripDto.getTitle())
                 .build();
-        return tripDto;
+        return trip;
     }
 
     private TripDto mapToTripDto(Trip trip) {

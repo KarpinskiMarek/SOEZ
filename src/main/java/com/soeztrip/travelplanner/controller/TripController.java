@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.*;
 import java.net.URI;
 
 @Controller
+@CrossOrigin("http://localhost:3000/")
 public class TripController {
 
     private TripService tripService;
@@ -27,7 +28,7 @@ public class TripController {
         return ResponseEntity.created(URI.create("/" + result.getId())).body(result);
     }
 
-    @GetMapping("/trips/{id}/delete")
+    @DeleteMapping("/trips/{id}")
     public ResponseEntity<?> deleteTrip(@PathVariable Long id) {
         if (!tripService.tripExists(id)) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Trip not found");
@@ -36,7 +37,7 @@ public class TripController {
         return ResponseEntity.ok().build();
     }
 
-    @PutMapping("/trips/{id}/edit")
+    @PutMapping("/trips/{id}")
     public ResponseEntity<?> editTrip(@PathVariable Long id,
                                       @Valid @RequestBody TripDto tripDto,
                                       BindingResult bindingResult) {
