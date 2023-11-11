@@ -1,5 +1,6 @@
 package com.soeztrip.travelplanner.controller;
 
+import com.soeztrip.travelplanner.dto.TripDto;
 import com.soeztrip.travelplanner.dto.UserDto;
 import com.soeztrip.travelplanner.model.Role;
 import com.soeztrip.travelplanner.model.UserEntity;
@@ -62,6 +63,30 @@ public class UserController {
         logger.info(userDto.getPassword());
         userService.saveUser(userDto);
 
+        return ResponseEntity.ok().build();
+    }
+
+    @PutMapping("/trips/{id}")
+    public ResponseEntity<?> editUser(@PathVariable Long id,
+                                      @Valid @RequestBody UserDto userDto,
+                                      BindingResult bindingResult) {
+        if (bindingResult.hasErrors()) {
+            return ResponseEntity.status(HttpStatus.CONFLICT).body("data has errors");
+        }
+        if (!userService.userExists(id)) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found");
+        }
+        userDto.setId(id);
+        userService.updateUser(userDto);
+        return ResponseEntity.created(URI.create("/" + userDto.getId())).body(userDto);
+    }
+
+    @DeleteMapping("/users/{id}")
+    public ResponseEntity<?> deleteUser(@PathVariable Long id) {
+        if (!userService.userExists(id)) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found");
+        }
+        userService.deleteUser(id);
         return ResponseEntity.ok().build();
     }
 }
