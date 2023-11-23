@@ -45,7 +45,7 @@ public class UserController {
         return ResponseEntity.ok(userService.findUser(id));
     }
 
-    @PostMapping("/users/new")
+/*    @PostMapping("/users/new")
     public ResponseEntity<?> createUser(@RequestBody @Valid UserDto userDto, BindingResult bindingResult) {
 
         UserEntity existingUserEntity = userService.findUserByEmail(userDto.getEmail());
@@ -63,5 +63,5 @@ public class UserController {
         userService.saveUser(userDto);
 
         return ResponseEntity.ok().build();
-    }
+    }*/
 }
