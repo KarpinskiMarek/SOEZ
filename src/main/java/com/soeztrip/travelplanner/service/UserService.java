@@ -32,9 +32,6 @@ public class UserService {
         return userRepository.findById(id).get();
     }
 
-//    public UserEntity findUserByEmail(String email) {
-//        return userRepository.findByEmail(email);
-//    }
 
     private UserDto mapUserToDto(UserEntity userEntity) {
         UserDto userDto = UserDto.builder()
@@ -51,14 +48,4 @@ public class UserService {
         return userRepository.existsById(id);
     }
 
-/*    public void saveUser(UserDto userDto) {
-        UserEntity userEntity = new UserEntity();
-        userEntity.setFirstName(userDto.getFirstName());
-        userEntity.setLastName(userDto.getLastName());
-        userEntity.setEmail(userDto.getEmail());
-        userEntity.setPassword(userDto.getPassword());
-        Role role=roleRepository.findByName("USER");
-        userEntity.setRoles(Arrays.asList(role));
-        userRepository.save(userEntity);
-    }*/
 }

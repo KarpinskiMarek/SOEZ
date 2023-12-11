@@ -1,6 +1,5 @@
 package com.soeztrip.travelplanner.security;
 
-
 import com.soeztrip.travelplanner.model.Role;
 import com.soeztrip.travelplanner.model.UserEntity;
 import com.soeztrip.travelplanner.repository.UserRepository;

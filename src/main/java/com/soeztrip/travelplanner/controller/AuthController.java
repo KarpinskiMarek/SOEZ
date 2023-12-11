@@ -1,12 +1,14 @@
 package com.soeztrip.travelplanner.controller;
 
 
+import com.soeztrip.travelplanner.dto.AuthResponseDTO;
 import com.soeztrip.travelplanner.dto.LoginDto;
 import com.soeztrip.travelplanner.dto.RegisterDto;
 import com.soeztrip.travelplanner.model.Role;
 import com.soeztrip.travelplanner.model.UserEntity;
 import com.soeztrip.travelplanner.repository.RoleRepository;
 import com.soeztrip.travelplanner.repository.UserRepository;
+import com.soeztrip.travelplanner.security.JwtGenerator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -33,34 +35,37 @@ public class AuthController {
     private UserRepository userRepository;
     private RoleRepository roleRepository;
     private PasswordEncoder passwordEncoder;
+    private JwtGenerator jwtGenerator;
 
     @Autowired
     public AuthController(AuthenticationManager authenticationManager,
                           UserRepository userRepository,
                           RoleRepository roleRepository,
-                          PasswordEncoder passwordEncoder) {
+                          PasswordEncoder passwordEncoder, JwtGenerator jwtGenerator) {
         this.authenticationManager = authenticationManager;
         this.userRepository = userRepository;
         this.roleRepository = roleRepository;
         this.passwordEncoder = passwordEncoder;
-
+        this.jwtGenerator = jwtGenerator;
     }
 
     @PostMapping("login")
-    public ResponseEntity<String> login(@RequestBody LoginDto loginDto) {
+    public ResponseEntity<AuthResponseDTO> login(@RequestBody LoginDto loginDto) {
         Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
                         loginDto.getEmail(),
                         loginDto.getPassword()));
         SecurityContextHolder.getContext().setAuthentication(authentication);
-        return new ResponseEntity<>("User signed in", HttpStatus.OK);
+        String token = jwtGenerator.generateToken(authentication);
+        return new ResponseEntity<>(new AuthResponseDTO(token), HttpStatus.OK);
     }
 
     @PostMapping("register")
     public ResponseEntity<?> createUser(@RequestBody RegisterDto registerDto) {
 
         if (userRepository.existsByEmail(registerDto.getEmail())) {
-            return new ResponseEntity<>("Email is taken", HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>("Account registered with this email already exists",
+                    HttpStatus.BAD_REQUEST);
         }
 
         UserEntity user = new UserEntity();
