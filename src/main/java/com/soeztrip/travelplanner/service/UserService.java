@@ -67,7 +67,7 @@ public class UserService {
     public void updateUser(UserDto userDto) {
         UserEntity existingUser = userRepository.findById(userDto.getId()).orElse(null);
         if (existingUser == null) {
-            throw new EntityNotFoundException("Użytkownik o podanym identyfikatorze nie istnieje.");
+            throw new EntityNotFoundException("The user with the given ID does not exist.");
         }
         existingUser.setFirstName(userDto.getFirstName());
         existingUser.setLastName(userDto.getLastName());
