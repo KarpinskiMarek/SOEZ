@@ -66,7 +66,7 @@ public class UserController {
         return ResponseEntity.ok().build();
     }
 
-    @PutMapping("/trips/{id}")
+    @PutMapping("/users/{id}")
     public ResponseEntity<?> editUser(@PathVariable Long id,
                                       @Valid @RequestBody UserDto userDto,
                                       BindingResult bindingResult) {
