@@ -17,19 +17,19 @@ import java.util.List;
 @Table(name = "places")
 public class Place {
 
-@Id
-@GeneratedValue(strategy = GenerationType.IDENTITY)
-private Long id;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
-private String Name;
+    private String name;
 
-private Date Arrive;
+    private Date arrive;
 
-private Date Leave;
+    private Date leave;
 
-private String Ticket;
+    private String ticket;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "trip_id")
     private Trip trip;
 

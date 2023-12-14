@@ -6,8 +6,6 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 @Data
@@ -28,29 +26,28 @@ public class UserEntity {
     @Column(nullable = false)
     private String lastName;
 
-    @Column(nullable = false,unique = true)
+    @Column(nullable = false, unique = true)
     private String email;
 
     @Column(nullable = false)
     private String password;
 
 
-
-    @ManyToMany(cascade =CascadeType.ALL, fetch =FetchType.EAGER)
+    @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     @JoinTable(
-            name="user_role",
+            name = "user_role",
             joinColumns = @JoinColumn(name = "user_id", referencedColumnName = "id"),
             inverseJoinColumns = @JoinColumn(name = "role_id", referencedColumnName = "id")
     )
-    private List<Role>roles= new ArrayList<>();
+    private List<Role> roles;
 
 
-    @ManyToMany(cascade = CascadeType.ALL,fetch = FetchType.LAZY)
+    @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JoinTable(
-            name="user_trip",
-            joinColumns = @JoinColumn(name="user_id"),
+            name = "user_trip",
+            joinColumns = @JoinColumn(name = "user_id"),
             inverseJoinColumns = @JoinColumn(name = "trip_id")
     )
-    private List<Trip>trips;
+    private List<Trip> trips;
 
 }

@@ -18,11 +18,11 @@ public class Transport {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String Ticket;
+    private String ticket;
 
-    private String From;
+    private String from;
 
-    private String To;
+    private String to;
 
     @OneToOne(mappedBy = "transport", cascade = CascadeType.ALL)
     private Place place;

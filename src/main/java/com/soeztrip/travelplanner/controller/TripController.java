@@ -1,5 +1,6 @@
 package com.soeztrip.travelplanner.controller;
 
+import com.soeztrip.travelplanner.dto.PlaceDto;
 import com.soeztrip.travelplanner.dto.TripDto;
 import com.soeztrip.travelplanner.model.Trip;
 import com.soeztrip.travelplanner.service.TripService;
@@ -20,6 +21,12 @@ public class TripController {
 
     public TripController(TripService tripService) {
         this.tripService = tripService;
+    }
+
+    @PostMapping("/trips/{id}/places/new")
+    public ResponseEntity<?> addPlace(@PathVariable Long tripId, @RequestBody PlaceDto placedto){
+        Trip trip=tripService.addPlaceToTrip(tripId, placedto);
+        return ResponseEntity.created(URI.create("/"+trip.getId())).body(trip);
     }
 
     @PostMapping("/trips/new")

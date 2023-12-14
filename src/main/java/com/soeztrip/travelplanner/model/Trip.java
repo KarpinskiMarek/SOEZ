@@ -24,12 +24,13 @@ public class Trip {
     private Long id;
     private Date startingDate;
     private Date endingDate;
-    private String startingPoint;
-    private String destinationPoint;
     private Boolean finished;
     private String title;
 
 
     @ManyToMany(mappedBy = "trips")
     private List<UserEntity> userEntities;
+
+    @OneToMany(mappedBy = "trip", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Place> places;
 }

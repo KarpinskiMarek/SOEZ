@@ -1,9 +1,13 @@
 package com.soeztrip.travelplanner.service;
 
 
+import com.soeztrip.travelplanner.dto.PlaceDto;
 import com.soeztrip.travelplanner.dto.TripDto;
+import com.soeztrip.travelplanner.model.Place;
 import com.soeztrip.travelplanner.model.Trip;
 import com.soeztrip.travelplanner.repository.TripRepository;
+import com.soeztrip.travelplanner.service.PlaceService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -14,8 +18,19 @@ public class TripService {
 
     private TripRepository tripRepository;
 
-    public TripService(TripRepository tripRepository) {
+    private PlaceService placeService;
+
+    @Autowired
+    public TripService(TripRepository tripRepository, PlaceService placeService) {
         this.tripRepository = tripRepository;
+        this.placeService = placeService;
+    }
+
+    public Trip addPlaceToTrip(Long tripId, PlaceDto placeDto){
+        Trip trip=this.mapToTrip(this.findTrip(tripId));
+        trip.getPlaces().add(this.placeService.mapToPlace(placeDto));
+        tripRepository.save(trip);
+        return trip;
     }
 
     public void deleteTrip(Long id) {
@@ -37,8 +52,6 @@ public class TripService {
                 .id(tripDto.getId())
                 .startingDate(tripDto.getStartingDate())
                 .endingDate(tripDto.getEndingDate())
-                .startingPoint(tripDto.getStartingPoint())
-                .destinationPoint(tripDto.getDestinationPoint())
                 .finished(tripDto.getFinished())
                 .title(tripDto.getTitle())
                 .build();
@@ -50,8 +63,6 @@ public class TripService {
                 .id(trip.getId())
                 .startingDate(trip.getStartingDate())
                 .endingDate(trip.getEndingDate())
-                .startingPoint(trip.getStartingPoint())
-                .destinationPoint(trip.getDestinationPoint())
                 .finished(trip.getFinished())
                 .title(trip.getTitle()).build();
         return tripDto;
