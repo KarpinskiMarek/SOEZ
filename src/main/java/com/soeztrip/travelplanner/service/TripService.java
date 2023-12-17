@@ -1,9 +1,13 @@
 package com.soeztrip.travelplanner.service;
 
 
+import com.soeztrip.travelplanner.dto.PlaceDto;
 import com.soeztrip.travelplanner.dto.TripDto;
+import com.soeztrip.travelplanner.model.Place;
 import com.soeztrip.travelplanner.model.Trip;
 import com.soeztrip.travelplanner.repository.TripRepository;
+import com.soeztrip.travelplanner.service.PlaceService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -14,8 +18,12 @@ public class TripService {
 
     private TripRepository tripRepository;
 
-    public TripService(TripRepository tripRepository) {
+    private PlaceService placeService;
+
+    @Autowired
+    public TripService(TripRepository tripRepository, PlaceService placeService) {
         this.tripRepository = tripRepository;
+        this.placeService = placeService;
     }
 
     public void deleteTrip(Long id) {
@@ -32,33 +40,32 @@ public class TripService {
         return trips.stream().map(this::mapToTripDto).collect(Collectors.toList());
     }
 
-    private Trip mapToTrip(TripDto tripDto) {
+    public Trip mapToTrip(TripDto tripDto) {
         Trip trip = Trip.builder()
                 .id(tripDto.getId())
                 .startingDate(tripDto.getStartingDate())
                 .endingDate(tripDto.getEndingDate())
-                .startingPoint(tripDto.getStartingPoint())
-                .destinationPoint(tripDto.getDestinationPoint())
                 .finished(tripDto.getFinished())
                 .title(tripDto.getTitle())
+                .places(tripDto.getPlaces())
                 .build();
         return trip;
     }
 
-    private TripDto mapToTripDto(Trip trip) {
+    public TripDto mapToTripDto(Trip trip) {
         TripDto tripDto = TripDto.builder()
                 .id(trip.getId())
                 .startingDate(trip.getStartingDate())
                 .endingDate(trip.getEndingDate())
-                .startingPoint(trip.getStartingPoint())
-                .destinationPoint(trip.getDestinationPoint())
                 .finished(trip.getFinished())
-                .title(trip.getTitle()).build();
+                .title(trip.getTitle())
+                .places(trip.getPlaces())
+                .build();
         return tripDto;
     }
 
-    public Trip saveTrip(TripDto tripDto) {
-        Trip trip = mapToTrip(tripDto);
+    public Trip saveTrip(Trip trip) {
+        //Trip trip = mapToTrip(tripDto);
         return tripRepository.save(trip);
     }
 

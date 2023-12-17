@@ -1,7 +1,7 @@
 package com.soeztrip.travelplanner.controller;
 
 
-import com.soeztrip.travelplanner.dto.AuthResponseDTO;
+import com.soeztrip.travelplanner.dto.AuthResponseDto;
 import com.soeztrip.travelplanner.dto.LoginDto;
 import com.soeztrip.travelplanner.dto.RegisterDto;
 import com.soeztrip.travelplanner.model.Role;
@@ -50,14 +50,14 @@ public class AuthController {
     }
 
     @PostMapping("login")
-    public ResponseEntity<AuthResponseDTO> login(@RequestBody LoginDto loginDto) {
+    public ResponseEntity<AuthResponseDto> login(@RequestBody LoginDto loginDto) {
         Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
                         loginDto.getEmail(),
                         loginDto.getPassword()));
         SecurityContextHolder.getContext().setAuthentication(authentication);
         String token = jwtGenerator.generateToken(authentication);
-        return new ResponseEntity<>(new AuthResponseDTO(token), HttpStatus.OK);
+        return new ResponseEntity<>(new AuthResponseDto(token), HttpStatus.OK);
     }
 
     @PostMapping("register")

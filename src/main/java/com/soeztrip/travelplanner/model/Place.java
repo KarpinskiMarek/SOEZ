@@ -5,6 +5,8 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 
 import java.util.Date;
 import java.util.List;
@@ -17,24 +19,24 @@ import java.util.List;
 @Table(name = "places")
 public class Place {
 
-@Id
-@GeneratedValue(strategy = GenerationType.IDENTITY)
-private Long id;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
-private String Name;
+    private String name;
 
-private Date Arrive;
+    private Date arrive;
 
-private Date Leave;
+    private Date leave;
 
-private String Ticket;
+    private String ticket;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "trip_id")
     private Trip trip;
 
-    @OneToOne
-    @JoinColumn(name = "transport_id")
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "transport_id", referencedColumnName = "id")
     private Transport transport;
 
 
