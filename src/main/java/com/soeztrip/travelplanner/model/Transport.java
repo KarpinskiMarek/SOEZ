@@ -20,9 +20,9 @@ public class Transport {
 
     private String ticket;
 
-    private String from;
+    private String fromDate;
 
-    private String to;
+    private String toDate;
 
     @OneToOne(mappedBy = "transport", cascade = CascadeType.ALL)
     private Place place;

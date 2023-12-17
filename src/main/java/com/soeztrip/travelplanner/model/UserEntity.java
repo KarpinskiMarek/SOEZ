@@ -1,11 +1,13 @@
 package com.soeztrip.travelplanner.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Data
@@ -42,12 +44,9 @@ public class UserEntity {
     private List<Role> roles;
 
 
-    @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    @JoinTable(
-            name = "user_trip",
-            joinColumns = @JoinColumn(name = "user_id"),
-            inverseJoinColumns = @JoinColumn(name = "trip_id")
-    )
-    private List<Trip> trips;
+    @ManyToMany(mappedBy = "userEntities")
+    @JsonIgnore
+    private List<Trip> trips = new ArrayList<>();
+
 
 }

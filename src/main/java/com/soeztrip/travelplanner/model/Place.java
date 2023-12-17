@@ -5,6 +5,8 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 
 import java.util.Date;
 import java.util.List;
@@ -33,8 +35,8 @@ public class Place {
     @JoinColumn(name = "trip_id")
     private Trip trip;
 
-    @OneToOne
-    @JoinColumn(name = "transport_id")
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "transport_id", referencedColumnName = "id")
     private Transport transport;
 
 

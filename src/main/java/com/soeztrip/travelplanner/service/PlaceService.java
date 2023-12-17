@@ -42,7 +42,7 @@ public class PlaceService {
         return placeRepository.save(place);
     }
 
-    protected Place mapToPlace(PlaceDto placeDto){
+    public Place mapToPlace(PlaceDto placeDto){
         Place place=Place.builder()
                 .id(placeDto.getId())
                 .name(placeDto.getName())

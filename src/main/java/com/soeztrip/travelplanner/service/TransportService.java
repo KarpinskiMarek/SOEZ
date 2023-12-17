@@ -30,8 +30,8 @@ public class TransportService {
         TransportDto transportDto=TransportDto.builder()
                 .id(transport.getId())
                 .ticket(transport.getTicket())
-                .from(transport.getFrom())
-                .to(transport.getTo())
+                .fromDate(transport.getFromDate())
+                .toDate(transport.getToDate())
                 .build();
         return transportDto;
     }
@@ -44,8 +44,8 @@ public class TransportService {
         Transport transport=Transport.builder()
                 .id(transportDto.getId())
                 .ticket(transportDto.getTicket())
-                .from(transportDto.getFrom())
-                .to(transportDto.getTo())
+                .fromDate(transportDto.getFromDate())
+                .toDate(transportDto.getToDate())
                 .build();
         return transport;
     }

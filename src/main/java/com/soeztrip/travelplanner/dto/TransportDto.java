@@ -10,6 +10,6 @@ public class TransportDto {
 
     private Long id;
     private String ticket;
-    private String from;
-    private String to;
+    private String fromDate;
+    private String toDate;
 }

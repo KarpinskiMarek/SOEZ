@@ -26,13 +26,6 @@ public class TripService {
         this.placeService = placeService;
     }
 
-    public Trip addPlaceToTrip(Long tripId, PlaceDto placeDto){
-        Trip trip=this.mapToTrip(this.findTrip(tripId));
-        trip.getPlaces().add(this.placeService.mapToPlace(placeDto));
-        tripRepository.save(trip);
-        return trip;
-    }
-
     public void deleteTrip(Long id) {
         tripRepository.deleteById(id);
     }
@@ -47,29 +40,32 @@ public class TripService {
         return trips.stream().map(this::mapToTripDto).collect(Collectors.toList());
     }
 
-    private Trip mapToTrip(TripDto tripDto) {
+    public Trip mapToTrip(TripDto tripDto) {
         Trip trip = Trip.builder()
                 .id(tripDto.getId())
                 .startingDate(tripDto.getStartingDate())
                 .endingDate(tripDto.getEndingDate())
                 .finished(tripDto.getFinished())
                 .title(tripDto.getTitle())
+                .places(tripDto.getPlaces())
                 .build();
         return trip;
     }
 
-    private TripDto mapToTripDto(Trip trip) {
+    public TripDto mapToTripDto(Trip trip) {
         TripDto tripDto = TripDto.builder()
                 .id(trip.getId())
                 .startingDate(trip.getStartingDate())
                 .endingDate(trip.getEndingDate())
                 .finished(trip.getFinished())
-                .title(trip.getTitle()).build();
+                .title(trip.getTitle())
+                .places(trip.getPlaces())
+                .build();
         return tripDto;
     }
 
-    public Trip saveTrip(TripDto tripDto) {
-        Trip trip = mapToTrip(tripDto);
+    public Trip saveTrip(Trip trip) {
+        //Trip trip = mapToTrip(tripDto);
         return tripRepository.save(trip);
     }
 
