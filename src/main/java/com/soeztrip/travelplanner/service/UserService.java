@@ -6,7 +6,6 @@ import com.soeztrip.travelplanner.model.UserEntity;
 import com.soeztrip.travelplanner.repository.RoleRepository;
 import com.soeztrip.travelplanner.repository.UserRepository;
 import jakarta.persistence.EntityNotFoundException;
-import org.apache.catalina.User;
 import org.springframework.stereotype.Service;
 
 import java.util.Arrays;
@@ -34,9 +33,6 @@ public class UserService {
         return userRepository.findById(id).get();
     }
 
-    public UserEntity findUserByEmail(String email) {
-        return userRepository.findByEmail(email);
-    }
 
     private UserDto mapUserToDto(UserEntity userEntity) {
         UserDto userDto = UserDto.builder()
@@ -52,6 +48,7 @@ public class UserService {
     public boolean userExists(Long id) {
         return userRepository.existsById(id);
     }
+
 
     public void updateUser(UserDto userDto) {
         UserEntity existingUser = userRepository.findById(userDto.getId()).orElse(null);

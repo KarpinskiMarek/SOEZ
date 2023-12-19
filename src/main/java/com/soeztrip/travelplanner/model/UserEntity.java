@@ -1,5 +1,6 @@
 package com.soeztrip.travelplanner.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -27,29 +28,25 @@ public class UserEntity {
     @Column(nullable = false)
     private String lastName;
 
-    @Column(nullable = false,unique = true)
+    @Column(nullable = false, unique = true)
     private String email;
 
     @Column(nullable = false)
     private String password;
 
 
-
-    @ManyToMany(cascade =CascadeType.ALL, fetch =FetchType.EAGER)
+    @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     @JoinTable(
-            name="user_role",
-            joinColumns = @JoinColumn(name = "user_id"),
-            inverseJoinColumns = @JoinColumn(name = "role_id")
+            name = "user_role",
+            joinColumns = @JoinColumn(name = "user_id", referencedColumnName = "id"),
+            inverseJoinColumns = @JoinColumn(name = "role_id", referencedColumnName = "id")
     )
-    private List<Role>roles;
+    private List<Role> roles;
 
 
-    @ManyToMany(cascade = CascadeType.ALL,fetch = FetchType.LAZY)
-    @JoinTable(
-            name="user_trip",
-            joinColumns = @JoinColumn(name="user_id"),
-            inverseJoinColumns = @JoinColumn(name = "trip_id")
-    )
-    private List<Trip>trips;
+    @ManyToMany(mappedBy = "userEntities")
+    @JsonIgnore
+    private List<Trip> trips = new ArrayList<>();
+
 
 }

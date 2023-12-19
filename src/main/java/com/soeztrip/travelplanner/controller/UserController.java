@@ -1,15 +1,8 @@
 package com.soeztrip.travelplanner.controller;
 
-import com.soeztrip.travelplanner.dto.TripDto;
 import com.soeztrip.travelplanner.dto.UserDto;
-import com.soeztrip.travelplanner.model.Role;
-import com.soeztrip.travelplanner.model.UserEntity;
-import com.soeztrip.travelplanner.repository.RoleRepository;
-import com.soeztrip.travelplanner.repository.UserRepository;
 import com.soeztrip.travelplanner.service.UserService;
 import jakarta.validation.Valid;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -17,17 +10,13 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
-import java.util.Collections;
 
 
 @Controller
 @CrossOrigin("http://localhost:3000/")
 public class UserController {
 
-    private static final Logger logger = LoggerFactory.getLogger(UserController.class);
     private UserService userService;
-    private UserRepository userRepository;
-    private RoleRepository roleRepository;
 
     public UserController(UserService userService) {
         this.userService = userService;
@@ -45,6 +34,7 @@ public class UserController {
         }
         return ResponseEntity.ok(userService.findUser(id));
     }
+
     @PutMapping("/users/{id}")
     public ResponseEntity<?> editUser(@PathVariable Long id,
                                       @Valid @RequestBody UserDto userDto,
@@ -68,4 +58,5 @@ public class UserController {
         userService.deleteUser(id);
         return ResponseEntity.ok().build();
     }
+
 }
