@@ -9,12 +9,9 @@ const Login = () => {
             alignItems: "center",
             justifyContent: "center",
             height: "100vh",
-            marginBottom: "100px"
+            margin: "auto",
+            marginBottom: "100px",
         }}>
-            <h2 style={{
-                 fontWeight: "bolder"
-            }}>Logowanie
-            </h2>
             <LoginForm/>
         </div>
     )
