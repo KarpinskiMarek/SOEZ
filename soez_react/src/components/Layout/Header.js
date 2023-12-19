@@ -28,7 +28,7 @@ const Header = () => {
                 marginRight: "10px"
             }}>
                 <LinkButton to={"/login"} buttonText={"Zaloguj się"}/>
-                <LinkButton to={""} buttonText={"Zarejestruj się"}/>
+                <LinkButton to={"/register"} buttonText={"Zarejestruj się"}/>
             </div>
         </header>
     )

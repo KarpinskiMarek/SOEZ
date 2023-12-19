@@ -18,7 +18,7 @@ const LoginForm = () => {
         event.preventDefault();
         if (validateForm()) {
             console.log("Formularz poprawny. Wysyłam dane:", formData)
-        }else  {
+        }else {
             console.log("Formularz zawiera błędy. Nie można wysłać danych. ", formData)
         }
     }
