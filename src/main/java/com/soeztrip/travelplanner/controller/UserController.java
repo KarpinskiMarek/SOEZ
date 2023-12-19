@@ -45,27 +45,6 @@ public class UserController {
         }
         return ResponseEntity.ok(userService.findUser(id));
     }
-
-    @PostMapping("/users/new")
-    public ResponseEntity<?> createUser(@RequestBody @Valid UserDto userDto, BindingResult bindingResult) {
-
-        UserEntity existingUserEntity = userService.findUserByEmail(userDto.getEmail());
-
-        if (bindingResult.hasErrors()) {
-            return ResponseEntity.status(HttpStatus.CONFLICT).body("data has errors");
-        }
-
-        if (existingUserEntity != null && existingUserEntity.getEmail() != null && !existingUserEntity.getEmail().isEmpty()) {
-            return ResponseEntity.status(HttpStatus.CONFLICT).body("Account registered with this email already exists");
-        }
-
-        logger.info(userDto.getFirstName());
-        logger.info(userDto.getPassword());
-        userService.saveUser(userDto);
-
-        return ResponseEntity.ok().build();
-    }
-
     @PutMapping("/users/{id}")
     public ResponseEntity<?> editUser(@PathVariable Long id,
                                       @Valid @RequestBody UserDto userDto,

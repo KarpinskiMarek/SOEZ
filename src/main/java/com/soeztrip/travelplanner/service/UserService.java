@@ -53,21 +53,10 @@ public class UserService {
         return userRepository.existsById(id);
     }
 
-    public void saveUser(UserDto userDto) {
-        UserEntity userEntity = new UserEntity();
-        userEntity.setFirstName(userDto.getFirstName());
-        userEntity.setLastName(userDto.getLastName());
-        userEntity.setEmail(userDto.getEmail());
-        userEntity.setPassword(userDto.getPassword());
-        Role role=roleRepository.findByName("USER");
-        userEntity.setRoles(Arrays.asList(role));
-        userRepository.save(userEntity);
-    }
-
     public void updateUser(UserDto userDto) {
         UserEntity existingUser = userRepository.findById(userDto.getId()).orElse(null);
         if (existingUser == null) {
-            throw new EntityNotFoundException("Użytkownik o podanym identyfikatorze nie istnieje.");
+            throw new EntityNotFoundException("The user with the specified ID does not exist.");
         }
         existingUser.setFirstName(userDto.getFirstName());
         existingUser.setLastName(userDto.getLastName());
