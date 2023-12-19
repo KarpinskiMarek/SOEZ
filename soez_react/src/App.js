@@ -1,8 +1,7 @@
-import React from 'react';
-import './styles/App.css';
 import {BrowserRouter, Route, Routes} from "react-router-dom";
 import Layout from "./components/Layout/Layout";
 import Home from "./components/Home";
+import Login from "./components/Login";
 
 const App = () => {
   return (
@@ -10,11 +9,11 @@ const App = () => {
         <Routes>
           <Route path={"/"} element={<Layout/>}>
             <Route index element={<Home/>}/>
+              <Route path={"/login"} element={<Login/>}/>
           </Route>
         </Routes>
-      </BrowserRouter>
+      </BrowserRouter>    
   );
-}
+};
 
 export default App;
-
