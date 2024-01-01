@@ -33,6 +33,7 @@ public class PlaceService {
                 .arrive(place.getArrive())
                 .leave(place.getLeave())
                 .ticket(place.getTicket())
+                .country(place.getCountry())
                 .build();
         return placeDto;
     }
@@ -49,6 +50,7 @@ public class PlaceService {
                 .arrive(placeDto.getArrive())
                 .leave(placeDto.getLeave())
                 .ticket(placeDto.getTicket())
+                .country(placeDto.getCountry())
                 .build();
         return place;
     }

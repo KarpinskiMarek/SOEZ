@@ -32,13 +32,16 @@ public class Place {
     private String ticket;
 
     @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "country_id")
+    private Country country;
+
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "trip_id")
     private Trip trip;
 
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "transport_id", referencedColumnName = "id")
     private Transport transport;
-
 
     @OneToMany(mappedBy = "place", cascade = CascadeType.ALL)
     private List<Activity> activities;
