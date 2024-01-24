@@ -1,6 +1,35 @@
 import React, {useState} from "react";
 import FormGroup from "./FormGroup";
 import * as validationRules from "../ValidationRules";
+import {request, setAuthHeader} from "../service/AxiosHelper";
+import styled from "styled-components";
+
+const StyledForm = styled.form`
+    background-color: white;
+    padding: 7rem;
+    border-radius: 12px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    margin-left: auto;
+    margin-right: auto;
+`;
+
+const StyledButton = styled.button`
+    border: solid 2px black;
+    border-radius: 12px;
+    background-color: #6b9080;
+    transition: background-color 0.3s;
+    padding: 10px;
+    padding-left: 18px;
+    padding-right: 18px;
+    margin-left: 8px;
+    margin-right: 8px;
+    &:hover {
+      background-color: #a4c3b2;
+    }
+`;
 
 const LoginForm = () => {
     
@@ -16,8 +45,25 @@ const LoginForm = () => {
     
     const handleSubmit = (event) => {
         event.preventDefault();
+        console.log(formData)
         if (validateForm()) {
-            console.log("Formularz poprawny. Wysyłam dane:", formData)
+
+            request(
+                "POST",
+                "/api/auth/login",
+                {
+                    email: formData.username,
+                    password: formData.password
+                }).then(
+                (response) => {
+                    console.log(response.data)
+                    setAuthHeader(response.data.accessToken);
+                    console.log("Udane logowanie: " + response.data.accessToken);
+                }).catch(
+                (error) => {
+                    setAuthHeader(null);
+                });
+
         }else {
             console.log("Formularz zawiera błędy. Nie można wysłać danych. ", formData)
         }
@@ -50,17 +96,7 @@ const LoginForm = () => {
     const [isButtonHovered, setButtonHovered] = useState(false);
     
     return (
-        <form style={{
-            backgroundColor: "white",
-            padding: "7rem",
-            borderRadius: "12px",
-            display: "flex",
-            flexDirection: "column",
-            alignItems: "center",
-            justifyContent: "center",
-            marginLeft: "auto",
-            marginRight: "auto"
-        }} onSubmit={handleSubmit}>
+        <StyledForm onSubmit={handleSubmit}>
             <FormGroup
                 type={"text"}
                 value={formData.username}
@@ -75,21 +111,8 @@ const LoginForm = () => {
                 onChange={(value) => setFormData({...formData, password: value})}
                 errorText={errors.password}
             />
-            <button style={{
-                border: "solid 2px black",
-                borderRadius: "12px",
-                backgroundColor: isButtonHovered ? "#6b9080" : "#a4c3b2",
-                transition: "background-color 0.3s",
-                padding: "10px",
-                paddingLeft: "18px",
-                paddingRight: "18px",
-                marginLeft: "8px",
-                marginRight: "8px"
-            }} type={"submit"}
-                    onMouseEnter={() => setButtonHovered(true)} 
-                    onMouseLeave={() => setButtonHovered(false)}
-            >Zaloguj się</button>
-        </form>
+            <StyledButton type={"submit"}>Zaloguj się</StyledButton>
+        </StyledForm>
     )
 }
 export default LoginForm;
