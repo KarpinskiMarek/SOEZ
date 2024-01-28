@@ -1,11 +1,14 @@
 package com.soeztrip.travelplanner.service;
 
 import com.soeztrip.travelplanner.dto.UserDto;
+import com.soeztrip.travelplanner.dto.UserNameDto;
 import com.soeztrip.travelplanner.model.Role;
 import com.soeztrip.travelplanner.model.UserEntity;
 import com.soeztrip.travelplanner.repository.RoleRepository;
 import com.soeztrip.travelplanner.repository.UserRepository;
 import jakarta.persistence.EntityNotFoundException;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import java.util.Arrays;
@@ -21,7 +24,7 @@ public class UserService {
 
     public UserService(UserRepository userRepository, RoleRepository roleRepository) {
         this.userRepository = userRepository;
-        this.roleRepository=roleRepository;
+        this.roleRepository = roleRepository;
     }
 
     public List<UserDto> findAllUsers() {
@@ -33,6 +36,17 @@ public class UserService {
         return userRepository.findById(id).get();
     }
 
+    public UserNameDto getUserByEmail(String email) {
+        UserEntity user = userRepository.findByEmail(email).orElseThrow(() -> new UsernameNotFoundException("email not found"));
+        return mapUserToUserNameDto(user);
+    }
+
+    private UserNameDto mapUserToUserNameDto(UserEntity userEntity) {
+        UserNameDto userDto = UserNameDto.builder()
+                .firstName(userEntity.getFirstName())
+                .lastName(userEntity.getLastName()).build();
+        return userDto;
+    }
 
     private UserDto mapUserToDto(UserEntity userEntity) {
         UserDto userDto = UserDto.builder()
@@ -66,4 +80,5 @@ public class UserService {
     public void deleteUser(Long id) {
         userRepository.deleteById(id);
     }
+
 }

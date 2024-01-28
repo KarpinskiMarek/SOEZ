@@ -1,5 +1,6 @@
 package com.soeztrip.travelplanner.dto;
 
+import com.soeztrip.travelplanner.model.Country;
 import lombok.Builder;
 import lombok.Data;
 
@@ -14,4 +15,5 @@ public class PlaceDto {
     private Date arrive;
     private Date leave;
     private String ticket;
+    private Country country;
 }

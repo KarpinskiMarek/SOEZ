@@ -13,6 +13,10 @@ spring:
         format_sql: true
     database: postgresql
     database-platform: org.hibernate.dialect.PostgreSQLDialect
+    defer-datasource-initialization: true
+#  sql:
+#    init:
+#      mode: always
 logging:
   level:
     org.springframework.security.web: DEBUG
