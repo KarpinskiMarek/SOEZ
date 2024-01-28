@@ -1,36 +1,87 @@
 import React, {useState} from "react";
 import FormGroup from "./FormGroup";
 import * as validationRules from "../ValidationRules";
+import {request, setAuthHeader} from "../service/AxiosHelper";
+import styled from "styled-components";
+
+const StyledForm = styled.form`
+    background-color: white;
+    padding: 7rem;
+    border-radius: 12px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    margin-left: auto;
+    margin-right: auto;
+`;
+
+const StyledButton = styled.button`
+    border: solid 2px black;
+    border-radius: 12px;
+    background-color: #6b9080;
+    transition: background-color 0.3s;
+    padding: 10px;
+    padding-left: 18px;
+    padding-right: 18px;
+    margin-left: 8px;
+    margin-right: 8px;
+  
+    &:hover {
+      background-color: #a4c3b2;
+    }
+`;
 
 const RegisterForm = () => {
-    
+
     const [formData, setFormData] = useState({
         firstname: "",
         lastname: "",
         email: "",
         password: ""
     });
-    
+
     const [errors, setErrors] = useState({
         firstname: "",
         lastname: "",
         email: "",
         password: ""
     });
-    
+
     const handleSubmit = (event) => {
         event.preventDefault();
         if (validateForm()) {
-            console.log("Formularz poprawny. Wysyłam dane:", formData)
+
+            request(
+                "POST",
+                "/api/auth/register",
+                {
+                    firstName: formData.firstname,
+                    lastName: formData.lastname,
+                    email: formData.email,
+                    password: formData.password
+                }).then(
+                (response) => {
+                    setAuthHeader(response.data.token);
+                    console.log("Zarejestrowano")
+                }).catch(
+                (error) => {
+                    setAuthHeader(null);
+
+                });
+
+
+                    //console.log("Udana rejestracja pod mailem: " + formData.email)
+
         }else {
             console.log("Formularz zawiera błędy. Nie można wysłać danych. ", formData)
         }
     };
-    
+
     const validateForm = () => {
         let isValid = true;
         const newErrors = { ...errors };
-        
+
         if (!validationRules.isRequired(formData.firstname)) {
             newErrors.firstname = "Pole jest wymagane";
             isValid = false;
@@ -38,7 +89,7 @@ const RegisterForm = () => {
             newErrors.firstname = "Pole musi zawierać od 3 do 20 znaków";
             isValid = false;
         }
-        
+
         if (!validationRules.isRequired(formData.lastname)) {
             newErrors.lastname = "Pole jest wymagane";
             isValid = false;
@@ -46,7 +97,7 @@ const RegisterForm = () => {
             newErrors.lastname = "Pole musi zawierać od 3 do 20 znaków";
             isValid = false;
         }
-        
+
         if (!validationRules.isRequired(formData.email)) {
             newErrors.email = "Pole jest wymagane";
             isValid = false;
@@ -54,7 +105,7 @@ const RegisterForm = () => {
             newErrors.email = "Podano błędny adres email";
             isValid = false;
         }
-        
+
         if(!validationRules.isRequired(formData.password)) {
             newErrors.password = "Hasło jest wymagane";
             isValid = false;
@@ -62,25 +113,13 @@ const RegisterForm = () => {
             newErrors.password = "Hasło musi posiadać od 8 do 20 znaków"
             isValid = false;
         }
-        
+
         setErrors(newErrors);
         return isValid;
     };
-    
-    const [isButtonHovered, setButtonHovered] = useState(false);
-    
+
     return (
-      <form style={{
-          backgroundColor: "white",
-          padding: "7rem",
-          borderRadius: "12px",
-          display: "flex",
-          flexDirection: "column",
-          alignItems: "center",
-          justifyContent: "center",
-          marginLeft: "auto",
-          marginRight: "auto"
-      }} onSubmit={handleSubmit}>
+      <StyledForm onSubmit={handleSubmit}>
           <FormGroup
               type={"text"}
               value={formData.firstname}
@@ -109,21 +148,8 @@ const RegisterForm = () => {
               onChange={(value) => setFormData({...formData, password: value})}
               errorText={errors.password}
           />
-          <button style={{
-              border: "solid 2px black",
-              borderRadius: "12px",
-              backgroundColor: isButtonHovered ? "#6b9080" : "#a4c3b2",
-              transition: "background-color 0.3s",
-              padding: "10px",
-              paddingLeft: "18px",
-              paddingRight: "18px",
-              marginLeft: "8px",
-              marginRight: "8px"
-          }} type={"submit"}
-                  onMouseEnter={() => setButtonHovered(true)}
-                  onMouseLeave={() => setButtonHovered(false)}
-          >Zarejestruj się</button>
-      </form>
+          <StyledButton type={"submit"}>Zarejestruj się</StyledButton>
+      </StyledForm>
     );
 };
 

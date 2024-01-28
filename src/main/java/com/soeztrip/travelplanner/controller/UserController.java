@@ -13,7 +13,7 @@ import java.net.URI;
 
 
 @Controller
-@CrossOrigin("http://localhost:3000/")
+@CrossOrigin(origins = "http://localhost:3000")
 public class UserController {
 
     private UserService userService;

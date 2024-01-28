@@ -1,26 +1,27 @@
-import React, {useState} from "react";
+import React from "react";
+import styled from "styled-components";
+
+const StyledLinkButton = styled.a`
+  color: black;
+  font-weight: bold;
+  padding: 10px 20px;
+  border: solid black 2px;
+  border-radius: 10px;
+  margin: 10px;
+  text-decoration: none;
+  background-color: #48cae4;
+  display: inline-block;
+
+  &:hover {
+    background-color: #0077b6;
+  }
+`;
 
 const LinkButton = ({ to, buttonText }) => {
-    
-    const [isHoverd, setIsHoverd] = useState(false);
-    
     return (
-        <a style={{
-            padding: '10px',
-            color: 'black',
-            fontWeight: 'bold',
-            paddingLeft: '20px',
-            paddingRight: '20px',
-            border: 'solid black 2px',
-            borderRadius: '10px',
-            margin: '10px',
-            textDecoration: 'none',
-            backgroundColor: isHoverd ? "#48cae4": "#0077b6",
-            display: 'inline-block'
-        }}
-        onMouseEnter={() => setIsHoverd(true)} onMouseLeave={() => setIsHoverd(false)} href={to} >
+        <StyledLinkButton href={to}>
             {buttonText}
-        </a>
+        </StyledLinkButton>
     );
 };
 

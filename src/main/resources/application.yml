@@ -16,3 +16,6 @@ spring:
 logging:
   level:
     org.springframework.security.web: DEBUG
+server:
+  error:
+    include-message: always
