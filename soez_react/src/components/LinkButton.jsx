@@ -1,7 +1,8 @@
 import React from "react";
 import styled from "styled-components";
+import {Link} from "react-router-dom";
 
-const StyledLinkButton = styled.a`
+const StyledLinkButton = styled(Link)`
   color: black;
   font-weight: bold;
   padding: 10px 20px;
@@ -17,9 +18,9 @@ const StyledLinkButton = styled.a`
   }
 `;
 
-const LinkButton = ({ to, buttonText }) => {
+const LinkButton = ({ to, buttonText, onClick }) => {
     return (
-        <StyledLinkButton href={to}>
+        <StyledLinkButton to={to} onClick={onClick}>
             {buttonText}
         </StyledLinkButton>
     );

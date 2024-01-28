@@ -29,3 +29,13 @@ export const request = (method, url, data) => {
         data: data
     })
 };
+
+export const isLoggedIn = () => {
+    const authToken = getAuthToken();
+
+    return authToken !== null && authToken !== "null";
+}
+
+export const Logout = () => {
+    window.localStorage.clear();
+}
