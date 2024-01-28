@@ -1,8 +1,9 @@
 import React, {useState} from "react";
 import FormGroup from "./FormGroup";
-import * as validationRules from "../ValidationRules";
-import {request, setAuthHeader} from "../service/AxiosHelper";
+import * as validationRules from "../service/ValidationRules";
+import {request, setAuthHeader} from "../service/AuthenticationService";
 import styled from "styled-components";
+import {useNavigate} from "react-router-dom";
 
 const StyledForm = styled.form`
     background-color: white;
@@ -42,6 +43,8 @@ const LoginForm = () => {
         username: "",
         password: ""
     })
+
+    const navigate = useNavigate();
     
     const handleSubmit = (event) => {
         event.preventDefault();
@@ -59,6 +62,7 @@ const LoginForm = () => {
                     console.log(response.data)
                     setAuthHeader(response.data.accessToken);
                     console.log("Udane logowanie: " + response.data.accessToken);
+                    navigate("/trips")
                 }).catch(
                 (error) => {
                     setAuthHeader(null);
@@ -92,9 +96,7 @@ const LoginForm = () => {
         setErrors(newErrors);
         return isValid;
     }
-    
-    const [isButtonHovered, setButtonHovered] = useState(false);
-    
+
     return (
         <StyledForm onSubmit={handleSubmit}>
             <FormGroup
