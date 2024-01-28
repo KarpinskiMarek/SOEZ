@@ -5,6 +5,7 @@ import com.soeztrip.travelplanner.model.Role;
 import com.soeztrip.travelplanner.model.UserEntity;
 import com.soeztrip.travelplanner.repository.RoleRepository;
 import com.soeztrip.travelplanner.repository.UserRepository;
+import jakarta.persistence.EntityNotFoundException;
 import org.springframework.stereotype.Service;
 
 import java.util.Arrays;
@@ -48,4 +49,21 @@ public class UserService {
         return userRepository.existsById(id);
     }
 
+
+    public void updateUser(UserDto userDto) {
+        UserEntity existingUser = userRepository.findById(userDto.getId()).orElse(null);
+        if (existingUser == null) {
+            throw new EntityNotFoundException("The user with the specified ID does not exist.");
+        }
+        existingUser.setFirstName(userDto.getFirstName());
+        existingUser.setLastName(userDto.getLastName());
+        existingUser.setEmail(userDto.getEmail());
+        existingUser.setPassword(userDto.getPassword());
+
+        userRepository.save(existingUser);
+    }
+
+    public void deleteUser(Long id) {
+        userRepository.deleteById(id);
+    }
 }

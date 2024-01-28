@@ -22,7 +22,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Controller
-@CrossOrigin("http://localhost:3000/")
+@CrossOrigin(origins = "http://localhost:3000")
 public class TripController {
 
     private TripService tripService;
