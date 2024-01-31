@@ -3,7 +3,7 @@ import logo from "../../assets/logo.png"
 import LinkButton from "../LinkButton";
 import styled from "styled-components";
 import MenuButton from "../MenuButton";
-import {Logout} from "../../service/AuthenticationService";
+import {getAuthToken, Logout, request} from "../../service/AuthenticationService";
 
 const StyledHeader = styled.header`
   display: flex;
@@ -35,9 +35,21 @@ const StyledDivRight = styled.div`
 const Header = ({isUserLoggedIn, navigate}) => {
 
     const [loggedIn, setLoggedIn] = useState(isUserLoggedIn);
+    const [userData, setUserData] = useState(null);
 
     useEffect(() => {
         setLoggedIn(isUserLoggedIn);
+        if(isUserLoggedIn) {
+            request("GET", "/users/get")
+                .then((response) => {
+                    setUserData(response.data);
+                    console.log(response.data)
+                })
+                .catch((error) => {
+                    console.error("Błąd podczas pobierania danych", error.response)
+                })
+        }
+
     }, [isUserLoggedIn, navigate]);
 
     const handleLogout = async () => {
@@ -57,7 +69,7 @@ const Header = ({isUserLoggedIn, navigate}) => {
             <StyledDivRight>
                 {loggedIn ? (
                     <>
-                        <p>Zalogowano jako: Jan Kowalski</p>
+                        <p>Zalogowano jako: {userData.firstName} {userData.lastName}</p>
                         <LinkButton onClick={handleLogout} to={"/"} buttonText={"Wyloguj się"}/>
                         <MenuButton/>
                     </>
