@@ -9,7 +9,6 @@ const StyledTripsDiv = styled.div`
   justify-content: center;
   height: 200vh;
   margin: auto;
-  margin-bottom: 100px;
   background-color: black;
 `;
 

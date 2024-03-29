@@ -2,8 +2,8 @@ import React, {useEffect, useState} from "react";
 import logo from "../../assets/logo.png"
 import LinkButton from "../LinkButton";
 import styled from "styled-components";
-import MenuButton from "../MenuButton";
-import {getAuthToken, Logout, request} from "../../service/AuthenticationService";
+import {Logout, request} from "../../service/AuthenticationService";
+import Navbar from "./Navbar";
 
 const StyledHeader = styled.header`
   display: flex;
@@ -24,15 +24,19 @@ const StyledImg = styled.img`
 `;
 
 const StyledDivRight = styled.div`
-  margin-right: 10px;
   display: flex;
   align-items: center;
-  justify-content: space-between;
+`;
+
+const UserInfo = styled.div`
+  display: flex;
+  align-items: center;
+  margin-right: 10px;
 `;
 
 
 
-const Header = ({isUserLoggedIn, navigate}) => {
+const Header = ({isUserLoggedIn, navigate, toggleNavBar}) => {
 
     const [loggedIn, setLoggedIn] = useState(isUserLoggedIn);
     const [userData, setUserData] = useState(null);
@@ -67,11 +71,13 @@ const Header = ({isUserLoggedIn, navigate}) => {
                 <h1>SoezTrip</h1>
             </StyledDivLeft>
             <StyledDivRight>
-                {loggedIn ? (
+                {loggedIn && userData ? (
                     <>
-                        <p>Zalogowano jako: {userData.firstName} {userData.lastName}</p>
-                        <LinkButton onClick={handleLogout} to={"/"} buttonText={"Wyloguj się"}/>
-                        <MenuButton/>
+                        <UserInfo>
+                            <p>Zalogowano jako: {userData.firstName} {userData.lastName}</p>
+                            <LinkButton onClick={handleLogout} to={"/"} buttonText={"Wyloguj się"}/>
+                            <Navbar/>
+                        </UserInfo>
                     </>
                 ) : (
                     <>

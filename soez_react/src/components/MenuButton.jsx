@@ -1,17 +1,21 @@
 import React from 'react';
 import styled from "styled-components";
 import {FiMenu} from "react-icons/fi";
+import Navbar from "./Layout/Navbar";
 
 const StyledMenuButton = styled.button`
-    width: 3rem;
-    height: 3rem;
+    background-color: red;
 `;
 
-const MenuButton = ({onClick}) => {
+const StyledFiMenu = styled(FiMenu)`
+`;
+
+const MenuButton = () => {
+
     return (
-        <StyledMenuButton onClick={onClick}>
-            <FiMenu />
-        </StyledMenuButton>
+            <StyledMenuButton>
+                <Navbar/>
+            </StyledMenuButton>
     )
 }
 

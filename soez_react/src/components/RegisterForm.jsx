@@ -78,6 +78,17 @@ const RegisterForm = () => {
         }
     };
 
+    const checkAlreadyRegistered = (request) => {
+        let isValid = true;
+        const newErrors = { ...errors };
+        if (request.response === 'Account registered with this email already exists') {
+            isValid = false;
+            newErrors.email = "Istnieje konto zarejestrowane na ten email";
+        }
+        setErrors(newErrors)
+        return isValid;
+    }
+
     const validateForm = () => {
         let isValid = true;
         const newErrors = { ...errors };
