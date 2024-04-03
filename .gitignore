@@ -34,3 +34,5 @@ build/
 
 ### Node JS ###
 soez_react/node_modules
+
+src/main/resources/secret.yml
