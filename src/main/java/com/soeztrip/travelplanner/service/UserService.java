@@ -7,6 +7,7 @@ import com.soeztrip.travelplanner.model.UserEntity;
 import com.soeztrip.travelplanner.repository.RoleRepository;
 import com.soeztrip.travelplanner.repository.UserRepository;
 import jakarta.persistence.EntityNotFoundException;
+import jakarta.transaction.Transactional;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
@@ -80,5 +81,29 @@ public class UserService {
     public void deleteUser(Long id) {
         userRepository.deleteById(id);
     }
+    @Transactional
+    public void addFriend(Long userId, Long friendId) {
+        UserEntity user = userRepository.findById(userId).orElse(null);
+        UserEntity friend = userRepository.findById(friendId).orElse(null);
 
+        if (user != null && friend != null) {
+            user.getFriendList().add(friend);
+            userRepository.save(user);
+        } else {
+            throw new IllegalArgumentException("User or friend not found");
+        }
+    }
+    @Transactional
+    public void removeFriend(Long userId, Long friendId) {
+        UserEntity user = userRepository.findById(userId).orElse(null);
+        UserEntity friend = userRepository.findById(friendId).orElse(null);
+
+        if (user != null && friend != null) {
+            user.getFriendList().remove(friend);
+            userRepository.save(user);
+        } else {
+            // Obsługa przypadku, gdy użytkownik lub znajomy nie istnieje
+            throw new IllegalArgumentException("User or friend not found");
+        }
+    }
 }

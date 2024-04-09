@@ -1,5 +1,6 @@
 package com.soeztrip.travelplanner.model;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -18,10 +19,8 @@ public class Message {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @JsonProperty
     private String content;
-
-    @Temporal(TemporalType.TIMESTAMP)
-    private Date timestamp;
 
     @ManyToOne
     @JoinColumn(name = "sender_id")
