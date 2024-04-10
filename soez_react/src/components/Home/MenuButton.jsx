@@ -1,7 +1,7 @@
 import React from 'react';
 import styled from "styled-components";
 import {FiMenu} from "react-icons/fi";
-import Navbar from "./Layout/Navbar";
+import Navbar from "../Layout/Navbar";
 
 const StyledMenuButton = styled.button`
     background-color: red;
