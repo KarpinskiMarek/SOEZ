@@ -1,11 +1,11 @@
 import React, {useState} from "react";
-import FormGroup from "./FormGroup";
+import AuthFormGroup from "./AuthFormGroup";
 import * as validationRules from "../../service/ValidationRules";
 import {request, setAuthHeader} from "../../service/AuthenticationService";
 import styled from "styled-components";
 
 const StyledForm = styled.form`
-    background-color: white;
+    background-color: rgba(255,255,255,0.9);
     padding: 7rem;
     border-radius: 12px;
     display: flex;
@@ -131,28 +131,28 @@ const RegisterForm = () => {
 
     return (
       <StyledForm onSubmit={handleSubmit}>
-          <FormGroup
+          <AuthFormGroup
               type={"text"}
               value={formData.firstname}
               placeholder={"Podaj imię"}
               onChange={(value) => setFormData({ ...formData, firstname: value})}
               errorText={errors.firstname}
           />
-          <FormGroup
+          <AuthFormGroup
               type={"text"}
               value={formData.lastname}
               placeholder={"Podaj nazwisko"}
               onChange={(value) => setFormData( { ...formData, lastname: value})}
               errorText={errors.lastname}
           />
-          <FormGroup
+          <AuthFormGroup
               type={"text"}
               value={formData.email}
               placeholder={"Podaj adres email"}
               onChange={(value) => setFormData( { ...formData, email: value})}
               errorText={errors.email}
           />
-          <FormGroup
+          <AuthFormGroup
               type={"password"}
               value={formData.password}
               placeholder={"Podaj hasło"}

@@ -25,7 +25,7 @@ const FormGroupSpan = styled.span`
         color: red;
     `;
 
-const FormGroup = ({ type, value, placeholder, errorText, onChange }) => {
+const AuthFormGroup = ({ type, value, placeholder, errorText, onChange }) => {
 
     return (
         <FormGroupDiv>
@@ -37,4 +37,4 @@ const FormGroup = ({ type, value, placeholder, errorText, onChange }) => {
     );
 };
 
-export default FormGroup;
+export default AuthFormGroup;

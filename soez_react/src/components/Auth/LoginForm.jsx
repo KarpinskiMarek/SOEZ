@@ -1,12 +1,12 @@
 import React, {useState} from "react";
-import FormGroup from "./FormGroup";
+import AuthFormGroup from "./AuthFormGroup";
 import * as validationRules from "../../service/ValidationRules";
 import {request, setAuthHeader} from "../../service/AuthenticationService";
 import styled from "styled-components";
 import {useNavigate} from "react-router-dom";
 
 const StyledForm = styled.form`
-    background-color: white;
+    background-color: rgba(255,255,255,0.9);
     padding: 7rem;
     border-radius: 12px;
     display: flex;
@@ -99,14 +99,14 @@ const LoginForm = () => {
 
     return (
         <StyledForm onSubmit={handleSubmit}>
-            <FormGroup
+            <AuthFormGroup
                 type={"text"}
                 value={formData.username}
                 placeholder={"Podaj adres email"}
                 onChange={(value) => setFormData({ ...formData, username: value})}
                 errorText={errors.username}
             />
-            <FormGroup
+            <AuthFormGroup
                 type={"password"}
                 value={formData.password}
                 placeholder={"Podaj hasło"}

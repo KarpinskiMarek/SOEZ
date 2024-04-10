@@ -4,18 +4,17 @@ import { CiCircleMore } from "react-icons/ci";
 import {Link} from "react-router-dom";
 
 const Tile = styled.div`
-  border: solid 2px black;
   border-radius: 10px;
   margin: 1rem;
   width: 60%;
   padding: 1rem;
-  background-color: #caf0f8;
+  background-color: rgba(202, 240, 248, 1);
   display: flex;
   justify-content: space-between;
   
   
   &:hover {
-    background-color: #48cae4;
+    background-color: rgba(72, 202, 228, 1);
   }
 `;
 
@@ -29,11 +28,15 @@ const Right = styled.div`
   align-items: center;
 `;
 
+const TravelTitle = styled.h1`
+  text-decoration: underline;
+`;
+
 const TravelTile = ({title, dateFrom, dateTo}) => {
     return (
         <Tile>
             <Left>
-                <h1>{title}</h1>
+                <TravelTitle>{title}</TravelTitle>
                 <h2>{dateFrom} - {dateTo}</h2>
             </Left>
             <Right>
