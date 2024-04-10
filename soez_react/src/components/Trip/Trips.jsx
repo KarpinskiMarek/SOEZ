@@ -1,6 +1,6 @@
 import styled from "styled-components";
 import React from "react";
-import LinkButton from "./LinkButton";
+import LinkButton from "../Home/LinkButton";
 import TravelTile from "./TravelTile";
 
 

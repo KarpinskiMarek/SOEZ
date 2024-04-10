@@ -1,10 +1,10 @@
 import {BrowserRouter, Route, Routes} from "react-router-dom";
 import Layout from "./components/Layout/Layout";
-import Home from "./components/Home";
-import Login from "./components/Login";
-import Register from "./components/Register";
-import Trips from "./components/Trips";
-import NewTrip from "./components/NewTrip";
+import Home from "./components/Home/Home";
+import Login from "./components/Auth/Login";
+import Register from "./components/Auth/Register";
+import Trips from "./components/Trip/Trips";
+import NewTrip from "./components/Trip/NewTrip";
 
 const App = () => {
   return (

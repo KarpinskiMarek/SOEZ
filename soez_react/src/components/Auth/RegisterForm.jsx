@@ -1,7 +1,7 @@
 import React, {useState} from "react";
 import FormGroup from "./FormGroup";
-import * as validationRules from "../service/ValidationRules";
-import {request, setAuthHeader} from "../service/AuthenticationService";
+import * as validationRules from "../../service/ValidationRules";
+import {request, setAuthHeader} from "../../service/AuthenticationService";
 import styled from "styled-components";
 
 const StyledForm = styled.form`

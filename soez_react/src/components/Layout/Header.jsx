@@ -1,6 +1,6 @@
 import React, {useEffect, useState} from "react";
 import logo from "../../assets/logo.png"
-import LinkButton from "../LinkButton";
+import LinkButton from "../Home/LinkButton";
 import styled from "styled-components";
 import {Logout, request} from "../../service/AuthenticationService";
 import Navbar from "./Navbar";

@@ -1,7 +1,7 @@
 import React, {useState} from "react";
 import {useNavigate} from "react-router-dom";
 import styled from "styled-components";
-import FormGroup from "./FormGroup";
+import FormGroup from "../Auth/FormGroup";
 
 const TripForm = styled.form`
   background-color: white;
@@ -56,28 +56,6 @@ const NewTripForm = () => {
 
     return (
         <TripForm onSubmit={handleSubmit}>
-            <FormGroup
-                type={"text"}
-                value={formData.title}
-                placeholder={"Podaj tytuł"}
-                onChange={(value) => setFormData({ ...formData, title: value})}
-                errorText={errors.title}
-            />
-            <FormGroup
-                type={"date"}
-                value={formData.startingDate}
-                placeholder={Date.now()}
-                onChange={(value) => setFormData({ ...formData, startingDate: value})}
-                errorText={errors.startingDate}
-            />
-            <FormGroup
-                type={"date"}
-                value={formData.endingDate}
-                placeholder={Date.now()}
-                onChange={(value) => setFormData({ ...formData, endingDate: value})}
-                errorText={errors.endingDate}
-            />
-            <SubmitButton type={"submit"}>Utwórz</SubmitButton>
         </TripForm>
     )
 }
