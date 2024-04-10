@@ -1,14 +1,12 @@
 package com.soeztrip.travelplanner.controller;
 
 import com.soeztrip.travelplanner.dto.UserDto;
-import com.soeztrip.travelplanner.repository.UserRepository;
 import com.soeztrip.travelplanner.service.UserService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.User;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;

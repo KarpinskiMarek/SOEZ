@@ -8,10 +8,8 @@ import org.springframework.boot.context.properties.EnableConfigurationProperties
 @SpringBootApplication
 @EnableConfigurationProperties(OpenAIConfigProperties.class)
 public class SoezTripApplication {
-
-	public static void main(String[] args) {
-		SpringApplication.run(SoezTripApplication.class, args);
-	}
-
+    public static void main(String[] args) {
+        SpringApplication.run(SoezTripApplication.class, args);
+    }
 
 }
