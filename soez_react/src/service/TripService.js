@@ -12,7 +12,7 @@ export const createTrip = (title, startingDate, endingDate) => {
         (response) => {
             console.log(response)
         }).catch(
-            (error) => {
+                (error) => {
                 console.log(error);
             });
 }

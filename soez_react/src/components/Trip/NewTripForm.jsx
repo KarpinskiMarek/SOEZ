@@ -3,6 +3,7 @@ import {useNavigate} from "react-router-dom";
 import styled from "styled-components";
 import AuthFormGroup from "../Auth/AuthFormGroup";
 import TripFormGroup from "./TripFormGroup";
+import * as service from "../../service/TripService";
 
 const TripForm = styled.form`
   background-color: white;
@@ -51,7 +52,8 @@ const NewTripForm = () => {
     const navigate = useNavigate();
 
     const handleSubmit = (event) => {
-        console.log(formData);
+        event.preventDefault();
+        service.createTrip(formData.title, formData.startingDate, formData.endingDate);
     }
 
     const validateForm = () => {
