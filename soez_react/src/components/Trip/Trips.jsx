@@ -1,7 +1,9 @@
 import styled from "styled-components";
-import React from "react";
+import React, {useEffect, useState} from "react";
 import LinkButton from "../Home/LinkButton";
 import TravelTile from "./TravelTile";
+import {isLoggedIn} from "../../service/AuthenticationService";
+import {formatDate, getAllTrips} from "../../service/TripService";
 
 
 const TripsDiv = styled.div`
@@ -31,38 +33,31 @@ const CreateButton = styled(LinkButton)`
 `;
 
 const Trips = () => {
+
+
+    const [trips, setTrips] = useState([]);
+
+    const fetchTrips = async () => {
+        const tripsData = await getAllTrips();
+        setTrips(tripsData);
+    }
+
+    useEffect(() => {
+        fetchTrips();
+    }, []);
+
     return(
         <TripsDiv>
             <CreateButton to={"/trips/new"} buttonText={"Utwórz podróż"} t/>
             <TilesList>
-                <TravelTile title={"Włochy 2024"} dateFrom={"21.07.2024"} dateTo={"30.07.2024"}/>
-                <TravelTile title={"Jesien Hiszpania"} dateFrom={"11.09.2024"} dateTo={"18.09.2024"}/>
-                <TravelTile title={"Narty Austria"} dateFrom={"02.02.204"} dateTo={"12.02.2024"}/>
-                <TravelTile title={"Majówka"} dateFrom={"01.05.2024"} dateTo={"05.05.2024"}/>
-                <TravelTile title={"Włochy 2024"} dateFrom={"21.07.2024"} dateTo={"30.07.2024"}/>
-                <TravelTile title={"Jesien Hiszpania"} dateFrom={"11.09.2024"} dateTo={"18.09.2024"}/>
-                <TravelTile title={"Narty Austria"} dateFrom={"02.02.204"} dateTo={"12.02.2024"}/>
-                <TravelTile title={"Majówka"} dateFrom={"01.05.2024"} dateTo={"05.05.2024"}/>
-                <TravelTile title={"Włochy 2024"} dateFrom={"21.07.2024"} dateTo={"30.07.2024"}/>
-                <TravelTile title={"Jesien Hiszpania"} dateFrom={"11.09.2024"} dateTo={"18.09.2024"}/>
-                <TravelTile title={"Narty Austria"} dateFrom={"02.02.204"} dateTo={"12.02.2024"}/>
-                <TravelTile title={"Majówka"} dateFrom={"01.05.2024"} dateTo={"05.05.2024"}/>
-                <TravelTile title={"Włochy 2024"} dateFrom={"21.07.2024"} dateTo={"30.07.2024"}/>
-                <TravelTile title={"Jesien Hiszpania"} dateFrom={"11.09.2024"} dateTo={"18.09.2024"}/>
-                <TravelTile title={"Narty Austria"} dateFrom={"02.02.204"} dateTo={"12.02.2024"}/>
-                <TravelTile title={"Majówka"} dateFrom={"01.05.2024"} dateTo={"05.05.2024"}/>
-                <TravelTile title={"Włochy 2024"} dateFrom={"21.07.2024"} dateTo={"30.07.2024"}/>
-                <TravelTile title={"Jesien Hiszpania"} dateFrom={"11.09.2024"} dateTo={"18.09.2024"}/>
-                <TravelTile title={"Narty Austria"} dateFrom={"02.02.204"} dateTo={"12.02.2024"}/>
-                <TravelTile title={"Majówka"} dateFrom={"01.05.2024"} dateTo={"05.05.2024"}/>
-                <TravelTile title={"Włochy 2024"} dateFrom={"21.07.2024"} dateTo={"30.07.2024"}/>
-                <TravelTile title={"Jesien Hiszpania"} dateFrom={"11.09.2024"} dateTo={"18.09.2024"}/>
-                <TravelTile title={"Narty Austria"} dateFrom={"02.02.204"} dateTo={"12.02.2024"}/>
-                <TravelTile title={"Majówka"} dateFrom={"01.05.2024"} dateTo={"05.05.2024"}/>
-                <TravelTile title={"Włochy 2024"} dateFrom={"21.07.2024"} dateTo={"30.07.2024"}/>
-                <TravelTile title={"Jesien Hiszpania"} dateFrom={"11.09.2024"} dateTo={"18.09.2024"}/>
-                <TravelTile title={"Narty Austria"} dateFrom={"02.02.204"} dateTo={"12.02.2024"}/>
-                <TravelTile title={"Majówka"} dateFrom={"01.05.2024"} dateTo={"05.05.2024"}/>
+                {trips.map((trip) => (
+                    <TravelTile
+                        key={trip.id}
+                        title={trip.title}
+                        dateFrom={formatDate(trip.startingDate)}
+                        dateTo={formatDate(trip.endingDate)}
+                    />
+                ))}
             </TilesList>
         </TripsDiv>
     )

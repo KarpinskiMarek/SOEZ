@@ -12,6 +12,7 @@ import com.soeztrip.travelplanner.service.TripService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
@@ -84,7 +85,8 @@ public class TripController {
 
     @GetMapping("/trips")
     public ResponseEntity<?> listTrips() {
-        return ResponseEntity.ok(tripService.findAllTrips());
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        return ResponseEntity.ok(tripService.findAllTrips(authentication.getName()));
     }
 
     @GetMapping("/trips/{id}")

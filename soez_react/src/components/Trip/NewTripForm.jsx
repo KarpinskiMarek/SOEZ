@@ -51,9 +51,18 @@ const NewTripForm = () => {
 
     const navigate = useNavigate();
 
-    const handleSubmit = (event) => {
+    const handleSubmit = async (event) => {
         event.preventDefault();
-        service.createTrip(formData.title, formData.startingDate, formData.endingDate);
+        try {
+            const response = await service.createTrip(formData.title, formData.startingDate, formData.endingDate);
+            console.log(response);
+            if (response && response.status === 201) {
+                navigate("/trips");
+            }
+        } catch (error) {
+            console.error("Error while creating trip:", error);
+            // Obsługa błędu, np. wyświetlenie komunikatu dla użytkownika
+        }
     }
 
     const validateForm = () => {
