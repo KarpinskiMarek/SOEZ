@@ -32,7 +32,7 @@ const TravelTitle = styled.h1`
   text-decoration: underline;
 `;
 
-const TravelTile = ({title, dateFrom, dateTo}) => {
+const TravelTile = ({key, title, dateFrom, dateTo}) => {
     return (
         <Tile>
             <Left>
