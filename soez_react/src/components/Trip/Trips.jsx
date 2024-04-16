@@ -2,7 +2,6 @@ import styled from "styled-components";
 import React, {useEffect, useState} from "react";
 import LinkButton from "../Home/LinkButton";
 import TravelTile from "./TravelTile";
-import {isLoggedIn} from "../../service/AuthenticationService";
 import {formatDate, getAllTrips} from "../../service/TripService";
 
 

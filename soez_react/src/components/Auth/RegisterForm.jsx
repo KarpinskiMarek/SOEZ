@@ -1,8 +1,10 @@
 import React, {useState} from "react";
 import AuthFormGroup from "./AuthFormGroup";
 import * as validationRules from "../../service/ValidationRules";
-import {request, setAuthHeader} from "../../service/AuthenticationService";
+import {request, setAuthHeader} from "../../service/AuthenticationConfig";
 import styled from "styled-components";
+import {useNavigate} from "react-router-dom";
+import * as service from "../../service/AuthenticationService"
 
 const StyledForm = styled.form`
     background-color: rgba(255,255,255,0.9);
@@ -48,33 +50,25 @@ const RegisterForm = () => {
         password: ""
     });
 
-    const handleSubmit = (event) => {
+    const navigate = useNavigate();
+
+    const handleSubmit = async (event) => {
         event.preventDefault();
         if (validateForm()) {
-
-            request(
-                "POST",
-                "/api/auth/register",
-                {
-                    firstName: formData.firstname,
-                    lastName: formData.lastname,
-                    email: formData.email,
-                    password: formData.password
-                }).then(
-                (response) => {
-                    setAuthHeader(response.data.token);
-                    console.log("Zarejestrowano")
-                }).catch(
-                (error) => {
+            try {
+                const response = await service.register(formData.firstname, formData.lastname, formData.email, formData.password);
+                console.log(response);
+                if (response && response.status === 201) {
                     setAuthHeader(null);
-
-                });
-
-
-                    //console.log("Udana rejestracja pod mailem: " + formData.email)
-
-        }else {
-            console.log("Formularz zawiera błędy. Nie można wysłać danych. ", formData)
+                    const loginRequest = await service.login(formData.email, formData.password);
+                    if (loginRequest && loginRequest.status === 200) {
+                        setAuthHeader(loginRequest.data.accessToken);
+                        navigate("/trips");
+                    }
+                }
+            } catch (error) {
+                console.error("Error while login:", error);
+            }
         }
     };
 

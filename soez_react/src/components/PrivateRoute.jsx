@@ -1,7 +1,6 @@
-import {getAuthToken, isLoggedIn} from "../service/AuthenticationService";
-import {Navigate, Outlet, Route, useNavigate} from "react-router-dom";
+import {isLoggedIn} from "../service/AuthenticationConfig";
+import {Navigate, Outlet} from "react-router-dom";
 import React from "react";
-import Login from "./Auth/Login";
 
 
 const PrivateRoute = () => {
