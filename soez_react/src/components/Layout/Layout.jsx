@@ -2,7 +2,7 @@ import React from "react";
 import Header from "./Header";
 import Footer from "./Footer";
 import {Outlet, useNavigate} from "react-router-dom";
-import {isLoggedIn} from "../../service/AuthenticationService";
+import {isLoggedIn} from "../../service/AuthenticationConfig";
 import styled from "styled-components";
 
 

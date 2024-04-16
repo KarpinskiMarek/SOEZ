@@ -1,7 +1,6 @@
 import React, {useState} from "react";
 import {useNavigate} from "react-router-dom";
 import styled from "styled-components";
-import AuthFormGroup from "../Auth/AuthFormGroup";
 import TripFormGroup from "./TripFormGroup";
 import * as service from "../../service/TripService";
 
@@ -61,7 +60,6 @@ const NewTripForm = () => {
             }
         } catch (error) {
             console.error("Error while creating trip:", error);
-            // Obsługa błędu, np. wyświetlenie komunikatu dla użytkownika
         }
     }
 

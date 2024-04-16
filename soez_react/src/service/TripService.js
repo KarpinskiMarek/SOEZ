@@ -1,4 +1,4 @@
-import {request} from "./AuthenticationService";
+import {request} from "./AuthenticationConfig";
 
 export const createTrip = async (title, startingDate, endingDate) => {
     try {

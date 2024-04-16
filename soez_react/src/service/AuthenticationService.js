@@ -1,44 +1,26 @@
-import axios from "axios";
+import {request} from "./AuthenticationConfig"
 
-export const getAuthToken = () => {
-    return window.localStorage.getItem('auth_token');
-}
-
-export const setAuthHeader = (token) => {
-    if (token !== null) {
-        window.localStorage.setItem('auth_token', token);
-    }else {
-        window.localStorage.removeItem('auth_token');
+export const register = async (firstName, lastName, email, password) => {
+    try {
+        return await request("POST", "/api/auth/register", {
+            firstName: firstName,
+            lastName: lastName,
+            email: email,
+            password: password
+        });
+    } catch (error) {
+        console.error("Error while register: ", error);
+        throw error;
     }
 }
 
-axios.defaults.baseURL = 'http://localhost:8080'
-axios.defaults.headers.post["Content-Type"] = 'application/json'
-
-export const request = (method, url, data) => {
-
-    let headers = {};
-
-    if (getAuthToken() !== null && getAuthToken() !== "null") {
-        headers = {'Authorization': `Bearer ${getAuthToken()}`}
+export const login = async (email, password) => {
+    try {
+        return await request("POST", "/api/auth/login", {
+            email: email,
+            password: password
+        });
+    } catch (error) {
+        console.error("Error while login: ", error);
     }
-
-    console.log('header 26 service' + headers)
-
-    return axios({
-        method: method,
-        url: url,
-        headers: headers,
-        data: data
-    })
-};
-
-export const isLoggedIn = () => {
-    const authToken = getAuthToken();
-
-    return authToken !== null && authToken !== "null";
-}
-
-export const Logout = () => {
-    window.localStorage.clear();
 }
