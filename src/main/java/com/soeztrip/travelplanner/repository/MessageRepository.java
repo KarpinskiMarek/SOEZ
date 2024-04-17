@@ -11,5 +11,5 @@ import java.util.List;
 public interface MessageRepository extends JpaRepository<Message, Long> {
     List<Message> findAllBySender(UserEntity sender);
 
-    List<Message> findBySender(String username);
+    List<Message> findBySender(UserEntity sender);
 }
