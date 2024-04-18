@@ -6,6 +6,7 @@ import Register from "./components/Auth/Register";
 import Trips from "./components/Trip/Trips";
 import NewTrip from "./components/Trip/NewTrip";
 import PrivateRoute from "./components/PrivateRoute";
+import TripDetails from "./components/Trip/TripDetails";
 
 const App = () => {
   return (
@@ -20,6 +21,7 @@ const App = () => {
                 <Route path={"/"} element={<PrivateRoute/>}>
                     <Route path={"/trips"} element={<Trips/>}/>
                     <Route path={"/trips/new"} element={<NewTrip/>}/>
+                    <Route path={"/trips/details"} element={<TripDetails/>} />
                 </Route>
             </Route>
         </Routes>
