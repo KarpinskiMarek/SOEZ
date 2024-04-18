@@ -18,6 +18,7 @@ const TripsDiv = styled.div`
 const TripDetails = () => {
     return(
         <TripsDiv>
+
         </TripsDiv>
     )
 }
