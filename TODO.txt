@@ -1,0 +1,15 @@
+1) Utworzenie tabeli trip_roles (id, name) relacja 1 - * między trip_roles
+   a user_trip
+2) Dodawanie innych userów do tripa -> (usuwanie, modyfikacje)
+3) Manipulacje datami (początek, konic tripa, daty dla placeów)
+4) Manipulacja placeami
+5) Podpięcie prompta pod details
+6) Modyfikacja prompta min: rozszerzenie o długoś pobytu (np. zaplanuj 3 dniowy pobyt w Sosnowcu)
+   max: to taki że na froncie są filtry (np. rodzaje atrakcji itp) i prompt te filtry uwzględnia
+
+   1) rodzje atrakcji: bary, muzea, resturacje,
+
+7) Utworzenie tabeli prompts zawierającą (id, string prompt) -> request na prompt powoduje zapisanie wyniku
+   prompta do tabeli i utworzenie relacji między danym placem a promptem
+
+   75$ szacowana cena za 100000 requestów do prompta

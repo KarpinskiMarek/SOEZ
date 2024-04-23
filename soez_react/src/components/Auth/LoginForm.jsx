@@ -1,12 +1,13 @@
 import React, {useState} from "react";
-import FormGroup from "./FormGroup";
-import * as validationRules from "../service/ValidationRules";
-import {request, setAuthHeader} from "../service/AuthenticationService";
+import AuthFormGroup from "./AuthFormGroup";
+import * as validationRules from "../../service/ValidationRules";
+import {request, setAuthHeader} from "../../service/AuthenticationConfig";
 import styled from "styled-components";
 import {useNavigate} from "react-router-dom";
+import * as service from "../../service/AuthenticationService"
 
 const StyledForm = styled.form`
-    background-color: white;
+    background-color: rgba(255,255,255,0.9);
     padding: 7rem;
     border-radius: 12px;
     display: flex;
@@ -46,30 +47,19 @@ const LoginForm = () => {
 
     const navigate = useNavigate();
     
-    const handleSubmit = (event) => {
+    const handleSubmit = async (event) => {
         event.preventDefault();
-        console.log(formData)
         if (validateForm()) {
-
-            request(
-                "POST",
-                "/api/auth/login",
-                {
-                    email: formData.username,
-                    password: formData.password
-                }).then(
-                (response) => {
-                    console.log(response.data)
+            try {
+                const response = await service.login(formData.username, formData.password);
+                console.log(response);
+                if (response && response.status === 200) {
                     setAuthHeader(response.data.accessToken);
-                    console.log("Udane logowanie: " + response.data.accessToken);
-                    navigate("/trips")
-                }).catch(
-                (error) => {
-                    setAuthHeader(null);
-                });
-
-        }else {
-            console.log("Formularz zawiera błędy. Nie można wysłać danych. ", formData)
+                    navigate("/trips");
+                }
+            } catch (error) {
+                console.error("Error while login:", error);
+            }
         }
     }
     
@@ -99,14 +89,14 @@ const LoginForm = () => {
 
     return (
         <StyledForm onSubmit={handleSubmit}>
-            <FormGroup
+            <AuthFormGroup
                 type={"text"}
                 value={formData.username}
                 placeholder={"Podaj adres email"}
                 onChange={(value) => setFormData({ ...formData, username: value})}
                 errorText={errors.username}
             />
-            <FormGroup
+            <AuthFormGroup
                 type={"password"}
                 value={formData.password}
                 placeholder={"Podaj hasło"}

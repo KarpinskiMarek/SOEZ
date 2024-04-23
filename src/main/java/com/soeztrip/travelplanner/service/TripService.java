@@ -35,8 +35,8 @@ public class TripService {
         return mapToTripDto(trip);
     }
 
-    public List<TripDto> findAllTrips() {
-        List<Trip> trips = tripRepository.findAll();
+    public List<TripDto> findAllTrips(String email) {
+        List<Trip> trips = tripRepository.findByUserEntities_Email(email);
         return trips.stream().map(this::mapToTripDto).collect(Collectors.toList());
     }
 

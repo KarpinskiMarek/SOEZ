@@ -1,7 +1,8 @@
 import React, {useState} from "react";
 import {useNavigate} from "react-router-dom";
 import styled from "styled-components";
-import FormGroup from "./FormGroup";
+import TripFormGroup from "./TripFormGroup";
+import * as service from "../../service/TripService";
 
 const TripForm = styled.form`
   background-color: white;
@@ -13,6 +14,8 @@ const TripForm = styled.form`
   justify-content: center;
   margin-left: auto;
   margin-right: auto;
+  border: solid 2px black;
+  background-color: rgba(255,255,255,1.0);
 `;
 
 const SubmitButton = styled.button`
@@ -25,6 +28,7 @@ const SubmitButton = styled.button`
   padding-right: 18px;
   margin-left: 8px;
   margin-right: 8px;
+  cursor: pointer;
   &:hover {
     background-color: #a4c3b2;
   }
@@ -46,8 +50,17 @@ const NewTripForm = () => {
 
     const navigate = useNavigate();
 
-    const handleSubmit = (event) => {
-        console.log(formData);
+    const handleSubmit = async (event) => {
+        event.preventDefault();
+        try {
+            const response = await service.createTrip(formData.title, formData.startingDate, formData.endingDate);
+            console.log(response);
+            if (response && response.status === 201) {
+                navigate("/trips");
+            }
+        } catch (error) {
+            console.error("Error while creating trip:", error);
+        }
     }
 
     const validateForm = () => {
@@ -56,28 +69,29 @@ const NewTripForm = () => {
 
     return (
         <TripForm onSubmit={handleSubmit}>
-            <FormGroup
+            <TripFormGroup
+                labelText={"Nazwa: "}
                 type={"text"}
                 value={formData.title}
-                placeholder={"Podaj tytuł"}
+                placeholder={"Wpisz nazwę..."}
                 onChange={(value) => setFormData({ ...formData, title: value})}
                 errorText={errors.title}
             />
-            <FormGroup
+            <TripFormGroup
+                labelText={"Data rozpoczęcia: "}
                 type={"date"}
                 value={formData.startingDate}
-                placeholder={Date.now()}
                 onChange={(value) => setFormData({ ...formData, startingDate: value})}
                 errorText={errors.startingDate}
             />
-            <FormGroup
+            <TripFormGroup
+                labelText={"Data zakończenia: "}
                 type={"date"}
                 value={formData.endingDate}
-                placeholder={Date.now()}
                 onChange={(value) => setFormData({ ...formData, endingDate: value})}
                 errorText={errors.endingDate}
             />
-            <SubmitButton type={"submit"}>Utwórz</SubmitButton>
+            <SubmitButton type={"submit"}>Utwórz podróż</SubmitButton>
         </TripForm>
     )
 }

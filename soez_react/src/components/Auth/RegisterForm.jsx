@@ -1,11 +1,13 @@
 import React, {useState} from "react";
-import FormGroup from "./FormGroup";
-import * as validationRules from "../service/ValidationRules";
-import {request, setAuthHeader} from "../service/AuthenticationService";
+import AuthFormGroup from "./AuthFormGroup";
+import * as validationRules from "../../service/ValidationRules";
+import {request, setAuthHeader} from "../../service/AuthenticationConfig";
 import styled from "styled-components";
+import {useNavigate} from "react-router-dom";
+import * as service from "../../service/AuthenticationService"
 
 const StyledForm = styled.form`
-    background-color: white;
+    background-color: rgba(255,255,255,0.9);
     padding: 7rem;
     border-radius: 12px;
     display: flex;
@@ -48,33 +50,25 @@ const RegisterForm = () => {
         password: ""
     });
 
-    const handleSubmit = (event) => {
+    const navigate = useNavigate();
+
+    const handleSubmit = async (event) => {
         event.preventDefault();
         if (validateForm()) {
-
-            request(
-                "POST",
-                "/api/auth/register",
-                {
-                    firstName: formData.firstname,
-                    lastName: formData.lastname,
-                    email: formData.email,
-                    password: formData.password
-                }).then(
-                (response) => {
-                    setAuthHeader(response.data.token);
-                    console.log("Zarejestrowano")
-                }).catch(
-                (error) => {
+            try {
+                const response = await service.register(formData.firstname, formData.lastname, formData.email, formData.password);
+                console.log(response);
+                if (response && response.status === 201) {
                     setAuthHeader(null);
-
-                });
-
-
-                    //console.log("Udana rejestracja pod mailem: " + formData.email)
-
-        }else {
-            console.log("Formularz zawiera błędy. Nie można wysłać danych. ", formData)
+                    const loginRequest = await service.login(formData.email, formData.password);
+                    if (loginRequest && loginRequest.status === 200) {
+                        setAuthHeader(loginRequest.data.accessToken);
+                        navigate("/trips");
+                    }
+                }
+            } catch (error) {
+                console.error("Error while login:", error);
+            }
         }
     };
 
@@ -131,28 +125,28 @@ const RegisterForm = () => {
 
     return (
       <StyledForm onSubmit={handleSubmit}>
-          <FormGroup
+          <AuthFormGroup
               type={"text"}
               value={formData.firstname}
               placeholder={"Podaj imię"}
               onChange={(value) => setFormData({ ...formData, firstname: value})}
               errorText={errors.firstname}
           />
-          <FormGroup
+          <AuthFormGroup
               type={"text"}
               value={formData.lastname}
               placeholder={"Podaj nazwisko"}
               onChange={(value) => setFormData( { ...formData, lastname: value})}
               errorText={errors.lastname}
           />
-          <FormGroup
+          <AuthFormGroup
               type={"text"}
               value={formData.email}
               placeholder={"Podaj adres email"}
               onChange={(value) => setFormData( { ...formData, email: value})}
               errorText={errors.email}
           />
-          <FormGroup
+          <AuthFormGroup
               type={"password"}
               value={formData.password}
               placeholder={"Podaj hasło"}
