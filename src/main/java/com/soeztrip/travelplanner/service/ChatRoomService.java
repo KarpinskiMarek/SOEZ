@@ -5,10 +5,12 @@ import com.soeztrip.travelplanner.exception.ChatRoomNotFoundException;
 import com.soeztrip.travelplanner.model.ChatRoom;
 import com.soeztrip.travelplanner.model.UserEntity;
 import com.soeztrip.travelplanner.repository.ChatRoomRepository;
+import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
@@ -51,11 +53,39 @@ public class ChatRoomService {
         return mapChatRoomToDTO(savedChatRoom);
     }
 
-    private ChatRoomDTO mapChatRoomToDTO(ChatRoom chatRoom) {
+    public ChatRoomDTO mapChatRoomToDTO(ChatRoom chatRoom) {
         ChatRoomDTO chatRoomDTO = new ChatRoomDTO();
         chatRoomDTO.setId(chatRoom.getId());
         chatRoomDTO.setName(chatRoom.getName());
         chatRoomDTO.setUserIds(chatRoom.getUserEntities().stream().map(UserEntity::getId).collect(Collectors.toSet()));
         return chatRoomDTO;
+    }
+
+    public void saveChatRoom(ChatRoom chatRoom) {
+        chatRoomRepository.save(chatRoom);
+    }
+
+    public ChatRoom mapToChatRoom(ChatRoomDTO chatRoomDTO) {
+        ChatRoom chatRoom = ChatRoom.builder()
+                .id(chatRoomDTO.getId())
+                .name(chatRoomDTO.getName())
+                .userIds(chatRoomDTO.getUserIds())
+                .build();
+        return chatRoom;
+    }
+    public ChatRoomDTO mapToChatRoomDto(ChatRoom chatRoom) {
+        ChatRoomDTO chatRoomDto = new ChatRoomDTO();
+        chatRoomDto.setId(chatRoom.getId());
+        chatRoomDto.setName(chatRoom.getName());
+        Set<Long> userIds = chatRoom.getUserEntities().stream()
+                .map(UserEntity::getId)
+                .collect(Collectors.toSet());
+        chatRoomDto.setUserIds(userIds);
+
+        return chatRoomDto;
+    }
+    public ChatRoom getChatRoomById(Long chatRoomId) {
+        return chatRoomRepository.findById(chatRoomId)
+                .orElseThrow(() -> new EntityNotFoundException("ChatRoom with id " + chatRoomId + " not found"));
     }
 }

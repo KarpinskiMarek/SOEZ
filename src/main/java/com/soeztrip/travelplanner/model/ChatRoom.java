@@ -37,4 +37,7 @@ public class ChatRoom {
     @OneToMany(mappedBy = "chatRoom", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonIgnore
     private List<Message> messages = new ArrayList<>();
+
+    @ElementCollection
+    private Set<Long> userIds = new HashSet<>();
 }

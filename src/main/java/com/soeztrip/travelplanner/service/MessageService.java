@@ -33,8 +33,6 @@ public class MessageService {
 
         ChatRoom chatRoom = chatRoomRepository.findById(chatRoomId)
                 .orElseThrow(() -> new ChatRoomNotFoundException("Chat room not found with id: " + chatRoomId));
-
-
         UserEntity sender = userRepository.findById(messageDTO.getSenderId())
                 .orElseThrow(() -> new UserNotFoundException("User not found with id: " + messageDTO.getSenderId()));
 

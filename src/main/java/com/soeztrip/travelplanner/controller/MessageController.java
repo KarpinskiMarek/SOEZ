@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/messages")
+@CrossOrigin(origins = "http://localhost:3000")
 public class MessageController {
 
     private final MessageService messageService;
@@ -17,13 +17,13 @@ public class MessageController {
         this.messageService = messageService;
     }
 
-    @PostMapping("/{chatRoomId}/send")
-    public ResponseEntity<MessageDTO> sendMessage(@PathVariable Long chatRoomId, @RequestBody MessageDTO messageDTO) {
+    @PostMapping("messages/{chatRoomId}/send")
+    public ResponseEntity<?> sendMessage(@PathVariable Long chatRoomId, @RequestBody MessageDTO messageDTO) {
         MessageDTO savedMessage = messageService.sendMessage(chatRoomId, messageDTO);
         return ResponseEntity.ok(savedMessage);
     }
 
-    @GetMapping("/{chatRoomId}")
+    @GetMapping("messages/{chatRoomId}")
     public ResponseEntity<List<MessageDTO>> getAllMessagesInChatRoom(@PathVariable Long chatRoomId) {
         List<MessageDTO> messages = messageService.getAllMessagesInChatRoom(chatRoomId);
         return ResponseEntity.ok(messages);
