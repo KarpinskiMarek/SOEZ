@@ -8,7 +8,9 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Data
 @NoArgsConstructor
@@ -48,5 +50,21 @@ public class UserEntity {
     @JsonIgnore
     private List<Trip> trips = new ArrayList<>();
 
+    @ManyToMany
+    @JoinTable(
+            name = "friendship",
+            joinColumns = @JoinColumn(name = "user_id"),
+            inverseJoinColumns = @JoinColumn(name = "friend_id")
+    )
+    private Set<UserEntity> friendList = new HashSet<>();
 
+    @ManyToMany(mappedBy = "friendList")
+    @JsonIgnore
+    private Set<UserEntity> friendsOf = new HashSet<>();
+
+    @ManyToMany(mappedBy = "users")
+    private Set<ChatRoom> chatRooms = new HashSet<>();
+
+    @OneToMany(mappedBy = "sender", cascade = CascadeType.ALL)
+    private List<Message> sentMessages = new ArrayList<>();
 }
