@@ -1,12 +1,9 @@
 import styled from "styled-components";
 import React from "react";
+import TripDetailsMainInfo from "./TripDetailsMainInfo";
 
 
 const TripsDiv = styled.div`
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
   min-height: 100vh;
   max-width: 95%;
   background-color: rgba(255, 255, 255, 0.9);
@@ -18,7 +15,7 @@ const TripsDiv = styled.div`
 const TripDetails = () => {
     return(
         <TripsDiv>
-
+            <TripDetailsMainInfo/>
         </TripsDiv>
     )
 }
