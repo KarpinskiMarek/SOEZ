@@ -23,10 +23,44 @@ export const getAllTrips = async () => {
     }
 }
 
+export const getTrip = async (id) => {
+    try {
+        const response = await request("GET", `/trips/${id}`);
+        console.log(response.data);
+        return response.data;
+    } catch (error) {
+        console.log("Error while fetching trips:", error);
+        return null;
+    }
+}
+
+export const editTrip = async (id, startingDate, endingDate, title) => {
+    try {
+        return await request("PUT", `trips/${id}`, {
+            startingDate: startingDate,
+            endingDate: endingDate,
+            title: title,
+            finished: null,
+            places: []
+        });
+    } catch (error) {
+        console.log("Error while editing trip:", error);
+        return null;
+    }
+}
+
 export const formatDate = (timestamp) => {
-        const date = new Date(timestamp);
-        const day = String(date.getDate()).padStart(2, '0');
-        const month = String(date.getMonth() + 1).padStart(2, '0');
-        const year = date.getFullYear();
-        return `${day}.${month}.${year}`;
+    const date = new Date(timestamp);
+    const day = String(date.getDate()).padStart(2, '0');
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const year = date.getFullYear();
+    return `${day}.${month}.${year}`;
+}
+
+export const formatDateInput = (timestamp) => {
+    const date = new Date(timestamp);
+    const day = String(date.getDate()).padStart(2, '0');
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const year = date.getFullYear();
+    return `${year}-${month}-${day}`;
 }

@@ -51,7 +51,7 @@ const Trips = () => {
             <TilesList>
                 {trips.map((trip) => (
                     <TravelTile
-                        key={trip.id}
+                        id={trip.id}
                         title={trip.title}
                         dateFrom={formatDate(trip.startingDate)}
                         dateTo={formatDate(trip.endingDate)}
