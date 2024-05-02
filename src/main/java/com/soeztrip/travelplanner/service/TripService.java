@@ -1,12 +1,14 @@
 package com.soeztrip.travelplanner.service;
 
 
-import com.soeztrip.travelplanner.dto.PlaceDto;
 import com.soeztrip.travelplanner.dto.TripDto;
-import com.soeztrip.travelplanner.model.Place;
+import com.soeztrip.travelplanner.dto.UserDto;
 import com.soeztrip.travelplanner.model.Trip;
+import com.soeztrip.travelplanner.model.UserEntity;
+import com.soeztrip.travelplanner.model.UserTrip;
 import com.soeztrip.travelplanner.repository.TripRepository;
-import com.soeztrip.travelplanner.service.PlaceService;
+import com.soeztrip.travelplanner.repository.UserRepository;
+import com.soeztrip.travelplanner.repository.UserTripRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -20,10 +22,24 @@ public class TripService {
 
     private PlaceService placeService;
 
+    private UserRepository userRepository;
+
+    private UserTripRepository userTripRepository;
+
     @Autowired
-    public TripService(TripRepository tripRepository, PlaceService placeService) {
+    public TripService(TripRepository tripRepository,
+                       PlaceService placeService,
+                       UserRepository userRepository,
+                       UserTripRepository userTripRepository) {
         this.tripRepository = tripRepository;
         this.placeService = placeService;
+        this.userRepository = userRepository;
+        this.userTripRepository = userTripRepository;
+    }
+
+    public Trip addUserToTrip(String email) {
+
+        return null;
     }
 
     public void deleteTrip(Long id) {
@@ -36,7 +52,7 @@ public class TripService {
     }
 
     public List<TripDto> findAllTrips(String email) {
-        List<Trip> trips = tripRepository.findByUserEntities_Email(email);
+        List<Trip> trips = tripRepository.findByUserEmail(email);
         return trips.stream().map(this::mapToTripDto).collect(Collectors.toList());
     }
 
@@ -59,9 +75,20 @@ public class TripService {
                 .endingDate(trip.getEndingDate())
                 .finished(trip.getFinished())
                 .title(trip.getTitle())
-                .places(trip.getPlaces())
+                .participants(mapToUserDtoList(trip.getUserTrips()))
                 .build();
         return tripDto;
+    }
+
+    private List<UserDto> mapToUserDtoList(List<UserTrip> userTrips) {
+        return userTrips.stream()
+                .map(userTrip -> UserDto.builder()
+                        .id(userTrip.getUser().getId())
+                        .firstName(userTrip.getUser().getFirstName())
+                        .lastName(userTrip.getUser().getLastName())
+                        .email(userTrip.getUser().getEmail())
+                        .build())
+                .collect(Collectors.toList());
     }
 
     public Trip saveTrip(Trip trip) {
@@ -73,8 +100,35 @@ public class TripService {
         return tripRepository.existsById(id);
     }
 
-    public void updateTrip(TripDto tripDto) {
-        Trip trip = mapToTrip(tripDto);
+    public void updateTrip(Long id, TripDto tripDto) {
+        Trip trip = this.tripRepository.findById(id).orElseThrow();
+        trip.setTitle(trip.getTitle());
+        trip.setStartingDate(tripDto.getStartingDate());
+        trip.setEndingDate(tripDto.getEndingDate());
+        tripRepository.save(trip);
+    }
+
+    public void addParticipant(Long id, String email) {
+        UserEntity user = this.userRepository.findByEmail(email).orElseThrow();
+        Trip trip = this.tripRepository.findById(id).orElseThrow();
+        UserTrip userTrip = new UserTrip();
+        userTrip.setUser(user);
+        userTrip.setTrip(trip);
+        userTripRepository.save(userTrip);
+    }
+    public void updateBasicInfo(Long id, TripDto tripDto) {
+        Trip trip = this.tripRepository.findById(id).orElseThrow();
+        trip.setTitle(trip.getTitle());
+        trip.setStartingDate(tripDto.getStartingDate());
+        trip.setEndingDate(tripDto.getEndingDate());
+        tripRepository.save(trip);
+    }
+
+    public void removeParticipant(Long id, String email) {
+        UserEntity user = this.userRepository.findByEmail(email).orElseThrow();
+        Trip trip = this.tripRepository.findById(id).orElseThrow();
+        UserTrip userTrip = userTripRepository.findByUserAndTrip(user, trip);
+        userTripRepository.delete(userTrip);
         tripRepository.save(trip);
     }
 }

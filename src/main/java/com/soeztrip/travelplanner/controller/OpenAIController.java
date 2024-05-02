@@ -1,6 +1,7 @@
 package com.soeztrip.travelplanner.controller;
 
 import com.soeztrip.travelplanner.dto.SearchRequestDto;
+import com.soeztrip.travelplanner.model.Place;
 import com.soeztrip.travelplanner.service.OpenAIService;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;

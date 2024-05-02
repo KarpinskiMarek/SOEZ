@@ -20,4 +20,5 @@ public class PlaceDto {
     private Date leave;
     private String ticket;
     private Country country;
+
 }

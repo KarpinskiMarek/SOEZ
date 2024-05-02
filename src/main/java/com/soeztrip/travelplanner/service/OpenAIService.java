@@ -18,7 +18,7 @@ public class OpenAIService {
 
     public String processResponse(String destination) {
 
-        String prompt = "Wygeneruj listę 5 najlepszych miejsc turystycznych w {query}, każde z krótkim opisem. Upewnij się, że miejsca są różnorodne, obejmując różne typy atrakcji, takie jak zabytki, muzea, parki, itp.";
+        String prompt = "Wygeneruj listę 3 najlepszych miejsc turystycznych w {query}, każde z krótkim opisem. Upewnij się, że miejsca są różnorodne, obejmując różne typy atrakcji, takie jak zabytki, muzea, parki, itp.";
         String updatedPrompt = prompt.replace("{query}", destination);
 
         OpenAIRequest openAIRequest = new OpenAIRequest(updatedPrompt);

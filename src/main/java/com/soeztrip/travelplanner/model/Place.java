@@ -8,12 +8,13 @@ import lombok.NoArgsConstructor;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
 @Data
 @NoArgsConstructor
-@AllArgsConstructor
+//@AllArgsConstructor
 @Builder
 @Entity
 @Table(name = "places")
@@ -31,6 +32,9 @@ public class Place {
 
     private String ticket;
 
+    @Column(length = 2048)
+    private String prompt;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "country_id")
     private Country country;
@@ -44,7 +48,18 @@ public class Place {
     private Transport transport;
 
     @OneToMany(mappedBy = "place", cascade = CascadeType.ALL)
-    private List<Activity> activities;
+    private List<Activity> activities = new ArrayList<>();
 
-
+    public Place(Long id, String name, Date arrive, Date leave, String ticket, String prompt, Country country, Trip trip, Transport transport, List<Activity> activities) {
+        this.id = id;
+        this.name = name;
+        this.arrive = arrive;
+        this.leave = leave;
+        this.ticket = ticket;
+        this.prompt = prompt;
+        this.country = country;
+        this.trip = trip;
+        this.transport = transport;
+        this.activities = activities;
+    }
 }

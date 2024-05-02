@@ -43,12 +43,11 @@ public class UserEntity {
             joinColumns = @JoinColumn(name = "user_id", referencedColumnName = "id"),
             inverseJoinColumns = @JoinColumn(name = "role_id", referencedColumnName = "id")
     )
-    private List<Role> roles;
+    private List<Role> roles= new ArrayList<>();
 
+    @OneToMany(mappedBy = "user")
+    private List<UserTrip> userTrips = new ArrayList<>();
 
-    @ManyToMany(mappedBy = "userEntities")
-    @JsonIgnore
-    private List<Trip> trips = new ArrayList<>();
 
     @ManyToMany
     @JoinTable(
