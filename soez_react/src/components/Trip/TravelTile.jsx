@@ -32,7 +32,7 @@ const TravelTitle = styled.h1`
   text-decoration: underline;
 `;
 
-const TravelTile = ({key, title, dateFrom, dateTo}) => {
+const TravelTile = ({id, title, dateFrom, dateTo}) => {
     return (
         <Tile>
             <Left>
@@ -40,7 +40,7 @@ const TravelTile = ({key, title, dateFrom, dateTo}) => {
                 <h2>{dateFrom} - {dateTo}</h2>
             </Left>
             <Right>
-                <Link to={"/"}><CiCircleMore style={{ fontSize: "3rem", color: "black"}}/></Link>
+                <Link to={`/trips/details/${id}`}><CiCircleMore style={{ fontSize: "3rem", color: "black"}}/></Link>
             </Right>
         </Tile>
     )
