@@ -10,7 +10,6 @@ import org.springframework.stereotype.Repository;
 public interface UserTripRepository extends JpaRepository<UserTrip, Long> {
 
     UserTrip findByUserAndTrip(UserEntity user, Trip trip);
-    boolean existsByIdAndUser(Long id, UserEntity user);
 }
 
 

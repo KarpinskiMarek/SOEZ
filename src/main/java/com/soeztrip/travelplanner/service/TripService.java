@@ -102,9 +102,19 @@ public class TripService {
 
     public void updateTrip(Long id, TripDto tripDto) {
         Trip trip = this.tripRepository.findById(id).orElseThrow();
-        trip.setTitle(trip.getTitle());
-        trip.setStartingDate(tripDto.getStartingDate());
-        trip.setEndingDate(tripDto.getEndingDate());
+        if (tripDto.getStartingDate() != null) {
+            trip.setStartingDate(tripDto.getStartingDate());
+        }
+        if (tripDto.getEndingDate() != null) {
+            trip.setEndingDate(tripDto.getEndingDate());
+        }
+        if (tripDto.getFinished() != null) {
+            trip.setFinished(tripDto.getFinished());
+        }
+        if (tripDto.getTitle() != null) {
+            trip.setTitle(tripDto.getTitle());
+        }
+
         tripRepository.save(trip);
     }
 
