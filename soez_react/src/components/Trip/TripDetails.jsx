@@ -2,6 +2,7 @@ import styled from "styled-components";
 import React from "react";
 import TripDetailsMainInfo from "./TripDetailsMainInfo";
 import {useParams} from "react-router-dom";
+import TripPlaces from "./TripPlaces";
 
 
 const TripsDiv = styled.div`
@@ -23,6 +24,7 @@ const TripDetails = () => {
     return(
         <TripsDiv>
             <TripDetailsMainInfo tripId={id}/>
+            <TripPlaces/>
         </TripsDiv>
     )
 }
