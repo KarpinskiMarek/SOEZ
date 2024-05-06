@@ -1,12 +1,9 @@
 package com.soeztrip.travelplanner.model;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.hibernate.annotations.OnDelete;
-import org.hibernate.annotations.OnDeleteAction;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -14,7 +11,6 @@ import java.util.List;
 
 @Data
 @NoArgsConstructor
-//@AllArgsConstructor
 @Builder
 @Entity
 @Table(name = "places")

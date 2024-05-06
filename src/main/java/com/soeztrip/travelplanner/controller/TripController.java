@@ -3,10 +3,6 @@ package com.soeztrip.travelplanner.controller;
 import com.soeztrip.travelplanner.dto.PlaceDto;
 import com.soeztrip.travelplanner.dto.TripDto;
 import com.soeztrip.travelplanner.dto.TripParticipantDTO;
-import com.soeztrip.travelplanner.model.Place;
-import com.soeztrip.travelplanner.model.Trip;
-import com.soeztrip.travelplanner.model.UserEntity;
-import com.soeztrip.travelplanner.model.UserTrip;
 import com.soeztrip.travelplanner.repository.PlaceRepository;
 import com.soeztrip.travelplanner.repository.TripRepository;
 import com.soeztrip.travelplanner.repository.UserRepository;
@@ -15,7 +11,6 @@ import com.soeztrip.travelplanner.service.OpenAIService;
 import com.soeztrip.travelplanner.service.PlaceService;
 import com.soeztrip.travelplanner.service.TripService;
 import jakarta.validation.Valid;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -24,10 +19,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
-import java.net.URI;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 @Controller
 @CrossOrigin(origins = "http://localhost:3000")
@@ -36,55 +28,26 @@ public class TripController {
     private TripService tripService;
     private UserRepository userRepository;
     private PlaceService placeService;
-    private PlaceRepository placeRepository;
-    private OpenAIService openAIService;
-    private UserTripRepository userTripRepository;
-    private TripRepository tripRepository;
 
     public TripController(TripService tripService,
                           UserRepository userRepository,
-                          PlaceService placeService,
-                          PlaceRepository placeRepository,
-                          OpenAIService openAIService,
-                          UserTripRepository userTripRepository,
-                          TripRepository tripRepository) {
+                          PlaceService placeService) {
         this.tripService = tripService;
         this.userRepository = userRepository;
         this.placeService = placeService;
-        this.placeRepository = placeRepository;
-        this.openAIService = openAIService;
-        this.userTripRepository = userTripRepository;
-        this.tripRepository=tripRepository;
     }
 
 
     @PostMapping("/trips/places/{id}/new")
-    //prompt.setContent(openAIService.processResponse(placedto.getName())); //to do replaced later
     public ResponseEntity<?> addPlace(@PathVariable Long id, @RequestBody PlaceDto placedto) {
-        Trip trip = tripService.mapToTrip(tripService.findTrip(id));
-        Place place = placeService.mapToPlace(placedto);
-        place.setTrip(trip);
-        placeRepository.save(place);
-        trip.getPlaces().add(place);
-        tripService.saveTrip(trip);
-
-        return ResponseEntity.created(URI.create("/" + place.getId())).body(place);
+        placeService.addNewPlace(id, placedto);
+        return ResponseEntity.status(HttpStatus.CREATED).body("Trip has been updated successfully");
     }
 
     @PostMapping("/trips/new")
     public ResponseEntity<?> createTrip(@RequestBody @Valid TripDto tripDto) {
-        String email = SecurityContextHolder.getContext().getAuthentication().getName();
-        UserEntity user = this.userRepository.findByEmail(email).orElseThrow();
-
-        Trip trip = this.tripService.mapToTrip(tripDto);
-
-        UserTrip userTrip = new UserTrip();
-        userTrip.setUser(user);
-        userTrip.setTrip(trip);
-        tripService.saveTrip(trip);
-        userTripRepository.save(userTrip);
-
-        return ResponseEntity.created(URI.create("/" + trip.getId())).body(trip);
+        tripService.saveTrip(tripDto);
+        return ResponseEntity.status(HttpStatus.CREATED).body("Trip has been successfully created");
     }
 
     @DeleteMapping("/trips/{id}")
@@ -93,8 +56,25 @@ public class TripController {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Trip not found");
         }
         tripService.deleteTrip(id);
-        return ResponseEntity.ok().build();
+        return ResponseEntity.ok().body("Trip has been deleted");
     }
+
+    @DeleteMapping("/trips/{idTrip}/places/delete/{idPlace}")
+    public ResponseEntity<?> deletePlace(@PathVariable Long idTrip, @PathVariable Long idPlace) {
+        if (!tripService.tripExists(idTrip)) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Trip not found");
+        }
+        if (!placeService.placeExists(idPlace)) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Place not found");
+        }
+        try {
+            placeService.deletePlace(idPlace);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+        return ResponseEntity.ok().body("Place has been deleted successfully");
+    }
+
 
     @PutMapping("/trips/{id}")
     public ResponseEntity<?> editTrip(@PathVariable Long id,
@@ -108,7 +88,21 @@ public class TripController {
         }
         tripDto.setId(id);
         tripService.updateTrip(id, tripDto);
-        return ResponseEntity.status(HttpStatus.OK).body("trip successfully updated");
+        return ResponseEntity.ok().body("Trip has been updated successfully");
+    }
+
+    @PutMapping("/trips/{idTrip}/places/{idPlace}")
+    public ResponseEntity<?> editPlace(@PathVariable Long idTrip,
+                                       @PathVariable Long idPlace,
+                                       @RequestBody PlaceDto dto) {
+        if (!tripService.tripExists(idTrip)) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Trip not found");
+        }
+        if (!placeService.placeExists(idPlace)) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Place not found");
+        }
+        placeService.updatePlace(idPlace, dto);
+        return ResponseEntity.ok().body("Place has been updated successfully");
     }
 
     @PutMapping("/trips/{id}/addPerson")
@@ -122,7 +116,7 @@ public class TripController {
         }
         try {
             tripService.addParticipant(id, dto.getEmail());
-            return ResponseEntity.ok("User added to trip successfully.");
+            return ResponseEntity.ok("User has been added to the trip successfully.");
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
@@ -138,7 +132,7 @@ public class TripController {
         }
         try {
             tripService.removeParticipant(id, dto.getEmail());
-            return ResponseEntity.ok("User removed from trip successfully.");
+            return ResponseEntity.ok("User has been removed from the trip successfully.");
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
@@ -147,8 +141,8 @@ public class TripController {
     @GetMapping("/trips")
     public ResponseEntity<List<TripDto>> listTrips() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        List<TripDto> tripDtos = tripService.findAllTrips(authentication.getName());
-        return ResponseEntity.ok(tripDtos);
+        List<TripDto> tripDto = tripService.findAllTrips(authentication.getName());
+        return ResponseEntity.ok(tripDto);
     }
 
     @GetMapping("/trips/{id}")

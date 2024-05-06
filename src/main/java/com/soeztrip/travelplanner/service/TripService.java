@@ -10,6 +10,7 @@ import com.soeztrip.travelplanner.repository.TripRepository;
 import com.soeztrip.travelplanner.repository.UserRepository;
 import com.soeztrip.travelplanner.repository.UserTripRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -20,26 +21,17 @@ public class TripService {
 
     private TripRepository tripRepository;
 
-    private PlaceService placeService;
-
     private UserRepository userRepository;
 
     private UserTripRepository userTripRepository;
 
     @Autowired
     public TripService(TripRepository tripRepository,
-                       PlaceService placeService,
                        UserRepository userRepository,
                        UserTripRepository userTripRepository) {
         this.tripRepository = tripRepository;
-        this.placeService = placeService;
         this.userRepository = userRepository;
         this.userTripRepository = userTripRepository;
-    }
-
-    public Trip addUserToTrip(String email) {
-
-        return null;
     }
 
     public void deleteTrip(Long id) {
@@ -75,6 +67,7 @@ public class TripService {
                 .endingDate(trip.getEndingDate())
                 .finished(trip.getFinished())
                 .title(trip.getTitle())
+                .places(trip.getPlaces())
                 .participants(mapToUserDtoList(trip.getUserTrips()))
                 .build();
         return tripDto;
@@ -91,9 +84,15 @@ public class TripService {
                 .collect(Collectors.toList());
     }
 
-    public Trip saveTrip(Trip trip) {
-        //Trip trip = mapToTrip(tripDto);
-        return tripRepository.save(trip);
+    public void saveTrip(TripDto tripDto) {
+        String email = SecurityContextHolder.getContext().getAuthentication().getName();
+        UserEntity user = this.userRepository.findByEmail(email).orElseThrow();
+        Trip trip = mapToTrip(tripDto);
+        UserTrip userTrip = new UserTrip();
+        userTrip.setUser(user);
+        userTrip.setTrip(trip);
+        tripRepository.save(trip);
+        userTripRepository.save(userTrip);
     }
 
     public boolean tripExists(Long id) {
@@ -125,13 +124,6 @@ public class TripService {
         userTrip.setUser(user);
         userTrip.setTrip(trip);
         userTripRepository.save(userTrip);
-    }
-    public void updateBasicInfo(Long id, TripDto tripDto) {
-        Trip trip = this.tripRepository.findById(id).orElseThrow();
-        trip.setTitle(trip.getTitle());
-        trip.setStartingDate(tripDto.getStartingDate());
-        trip.setEndingDate(tripDto.getEndingDate());
-        tripRepository.save(trip);
     }
 
     public void removeParticipant(Long id, String email) {
