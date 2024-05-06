@@ -15,7 +15,6 @@ import java.util.List;
 
 @Data
 @NoArgsConstructor
-
 @Builder
 @Entity
 @Table(name = "trips")
@@ -36,7 +35,7 @@ public class Trip {
     private List<UserTrip> userTrips = new ArrayList<>();
 
 
-    @OneToMany(mappedBy = "trip", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "trip", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonIgnore
     private List<Place> places = new ArrayList<>();
 
@@ -48,5 +47,15 @@ public class Trip {
         this.title = title;
         this.userTrips = new ArrayList<>();
         this.places = new ArrayList<>();
+    }
+    @Override
+    public String toString() {
+        return "Trip{" +
+                "id=" + id +
+                ", startingDate=" + startingDate +
+                ", endingDate=" + endingDate +
+                ", finished=" + finished +
+                ", title='" + title + '\'' +
+                '}';
     }
 }
