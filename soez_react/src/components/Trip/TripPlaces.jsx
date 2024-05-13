@@ -22,11 +22,7 @@ const DatesInfo = styled.div`
 const Date = styled.p`
     color: red;
 `
-
-
-
 const TripPlaces = () => {
-
 
     return(
         <MainContainer>
