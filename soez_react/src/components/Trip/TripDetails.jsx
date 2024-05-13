@@ -3,6 +3,7 @@ import React from "react";
 import TripDetailsMainInfo from "./TripDetailsMainInfo";
 import {useParams} from "react-router-dom";
 import TripPlaces from "./TripPlaces";
+import TripParticipants from "./TripParticipants";
 
 
 const TripsDiv = styled.div`
@@ -25,6 +26,7 @@ const TripDetails = () => {
         <TripsDiv>
             <TripDetailsMainInfo tripId={id}/>
             <TripPlaces/>
+            <TripParticipants/>
         </TripsDiv>
     )
 }

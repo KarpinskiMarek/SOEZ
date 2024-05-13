@@ -1,36 +1,42 @@
 import React from "react";
 import styled from "styled-components";
+import TravelTile from "./TravelTile";
+import LinkButton from "../Home/LinkButton";
+import PlaceTile from "./PlaceTile";
 
 const MainContainer = styled.div`
     margin-top: 10rem;
+    border: solid 2px black;
+    border-radius: 5px;
     display: flex;
     flex-direction: column;
     align-items: center;
-    width: 100%;
+    width: 50%;
+    background-color: rgba(255, 255, 255, 1);
+    padding: 1rem;
 `;
 
-const PlaceName = styled.h2`
-    font-size: 15px;
+const ComponentTitle = styled.h1`
+    text-decoration: underline;
+    margin-bottom: 5rem;
 `;
 
-const DatesInfo = styled.div`
-    display: flex;
-    justify-content: space-between;
-    width: 25%;
+const CreateButton = styled(LinkButton)`
+  width: 600px;
+  margin: 5rem;
 `;
 
-const Date = styled.p`
-    color: red;
-`
 const TripPlaces = () => {
 
     return(
         <MainContainer>
-            <PlaceName>1. Mediolan</PlaceName>
-            <DatesInfo>
-               <Date>19.07.2024</Date>
-               <Date>21.07.2024</Date>
-            </DatesInfo>
+            <ComponentTitle>Plan podróży</ComponentTitle>
+            <CreateButton to={""} buttonText={"Dodaj miejsce"} />
+            <PlaceTile placeName={"Rzym"} dateFrom={"29.04.2024"} dateTo={"31.04.2024"}/>
+            <PlaceTile placeName={"Bolonia"} dateFrom={"29.04.2024"} dateTo={"31.04.2024"}/>
+            <PlaceTile placeName={"Bari"} dateFrom={"29.04.2024"} dateTo={"31.04.2024"}/>
+            <PlaceTile placeName={"Neapol"} dateFrom={"29.04.2024"} dateTo={"31.04.2024"}/>
+            <PlaceTile placeName={"Mediolan"} dateFrom={"29.04.2024"} dateTo={"31.04.2024"}/>
         </MainContainer>
     )
 }
