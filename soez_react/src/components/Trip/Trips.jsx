@@ -47,7 +47,7 @@ const Trips = () => {
 
     return(
         <TripsDiv>
-            <CreateButton to={"/trips/new"} buttonText={"Utwórz podróż"} t/>
+            <CreateButton to={"/trips/new"} buttonText={"Utwórz podróż"} />
             <TilesList>
                 {trips.map((trip) => (
                     <TravelTile
