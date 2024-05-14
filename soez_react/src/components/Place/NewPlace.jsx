@@ -1,6 +1,7 @@
 import react from "react";
 import styled from "styled-components";
 import NewPlaceForm from "./NewPlaceForm";
+import {useParams} from "react-router-dom";
 
 const NewPlaceDiv = styled.div`
   display: flex;
@@ -21,10 +22,13 @@ const PageTitle = styled.h1`
 `;
 
 const NewPlace = () => {
+
+    const { id } = useParams();
+
     return(
         <NewPlaceDiv>
             <PageTitle>Dodaj nowe miejsce</PageTitle>
-            <NewPlaceForm/>
+            <NewPlaceForm tripId={id}/>
         </NewPlaceDiv>
     )
 };

@@ -1,8 +1,10 @@
-import React from "react";
+import React, {useEffect, useState} from "react";
 import styled from "styled-components";
 import TravelTile from "./TravelTile";
 import LinkButton from "../Home/LinkButton";
 import PlaceTile from "./PlaceTile";
+import {getTripPlaces} from "../../service/PlaceService";
+import {formatDate} from "../../service/TripService";
 
 const MainContainer = styled.div`
     margin-top: 10rem;
@@ -26,17 +28,32 @@ const CreateButton = styled(LinkButton)`
   margin: 5rem;
 `;
 
-const TripPlaces = () => {
+const TripPlaces = ({ tripId }) => {
+
+    const [places, setPlaces] = useState([]);
+
+    const fetchPlaces = async () => {
+        const placesData = await getTripPlaces(tripId);
+        setPlaces(placesData);
+    }
+
+    useEffect(() => {
+        fetchPlaces();
+    }, []);
 
     return(
         <MainContainer>
             <ComponentTitle>Plan podróży</ComponentTitle>
-            <CreateButton to={"/trips/places/new"} buttonText={"Dodaj miejsce"} />
-            <PlaceTile placeName={"Rzym"} dateFrom={"29.04.2024"} dateTo={"31.04.2024"}/>
-            <PlaceTile placeName={"Bolonia"} dateFrom={"29.04.2024"} dateTo={"31.04.2024"}/>
-            <PlaceTile placeName={"Bari"} dateFrom={"29.04.2024"} dateTo={"31.04.2024"}/>
-            <PlaceTile placeName={"Neapol"} dateFrom={"29.04.2024"} dateTo={"31.04.2024"}/>
-            <PlaceTile placeName={"Mediolan"} dateFrom={"29.04.2024"} dateTo={"31.04.2024"}/>
+            <CreateButton to={`/trips/${tripId}/places/new`} buttonText={"Dodaj miejsce"} />
+            {places.map((place) => (
+                <PlaceTile
+                    placeId={place.id}
+                    tripId={tripId}
+                    placeName={place.name}
+                    dateFrom={formatDate(place.arrive)}
+                    dateTo={formatDate(place.leave)}
+                />
+            ))}
         </MainContainer>
     )
 }

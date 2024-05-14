@@ -1,7 +1,8 @@
 import React, {useState} from "react";
 import styled from "styled-components";
-import {useNavigate} from "react-router-dom";
+import {useNavigate, useParams} from "react-router-dom";
 import TripFormGroup from "../Trip/TripFormGroup";
+import * as service from "../../service/PlaceService";
 
 const PlaceFrom = styled.form`
   background-color: white;
@@ -33,7 +34,9 @@ const SubmitButton = styled.button`
   }
 `;
 
-const NewPlaceForm = () => {
+const NewPlaceForm = ( {tripId} ) => {
+
+
 
     const [formData, setFormData] = useState({
         name: "",
@@ -56,7 +59,18 @@ const NewPlaceForm = () => {
     const handleSubmit = async (event) => {
         event.preventDefault();
         try {
-
+            const response = await service.addPlace(
+                tripId,
+                formData.name,
+                formData.arrive,
+                formData.leave,
+                formData.ticket,
+                formData.country
+            );
+            console.log(response);
+            if (response && response.status === 201) {
+                navigate(`/trips/details/${tripId}`);
+            }
         } catch (error) {
             console.error("Error while adding new place:", error);
         }
@@ -85,7 +99,7 @@ const NewPlaceForm = () => {
             />
             <TripFormGroup
                 labelText={"Wyjazd: "}
-                type={"text"}
+                type={"date"}
                 value={formData.leave}
                 onChange={(value) => setFormData({...formData, leave: value})}
                 errorText={errors.leave}
@@ -102,7 +116,7 @@ const NewPlaceForm = () => {
                 type={"text"}
                 value={formData.country}
                 placeholder={"Podaj państwo"}
-                onChange={(value) => setFormData({...formData, name: value})}
+                onChange={(value) => setFormData({...formData, country: value})}
                 errorText={errors.country}
             />
             <SubmitButton type={"submit"}>Dodaj miejsce</SubmitButton>

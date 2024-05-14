@@ -1,6 +1,7 @@
-import React, {useState} from "react";
+import React, {useEffect, useState} from "react";
 import styled from "styled-components";
 import {formatDateInput} from "../../service/TripService";
+import {getPlace} from "../../service/PlaceService";
 
 const PlaceInfo = styled.form`
   display: flex;
@@ -13,6 +14,12 @@ const PlaceInfo = styled.form`
   background-color: rgba(255, 255, 255, 1);
   padding: 1rem;
 `;
+
+const Left = styled.div`
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+`
 
 const Right = styled.div`
   display: flex;
@@ -63,6 +70,17 @@ const PlaceMainDetails = ({ placeId }) => {
         country: ""
     });
 
+    const fetchPlace = async () => {
+        const placeData = await getPlace(placeId);
+        if(placeData) {
+            setData(placeData);
+        }
+    }
+
+    useEffect(() => {
+        fetchPlace();
+    }, []);
+
     const [errors, setErrors] = useState({
         name: "",
         arrive: "",
@@ -100,13 +118,18 @@ const PlaceMainDetails = ({ placeId }) => {
 
     return(
         <PlaceInfo>
-            <div>
+            <Left>
                 <PlaceName
                     type={"text"}
-                    value={data ? data.title : ''}
+                    value={data ? data.name : ''}
                     onChange={handleNameChange}
                 />
-            </div>
+                <PlaceName
+                    type={"text"}
+                    value={data ? data.country : ''}
+                    onChange={handleCountryChange}
+                />
+            </Left>
             <Right>
                 <p>Od:</p>
                 <PlaceDate

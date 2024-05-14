@@ -1,6 +1,7 @@
 package com.soeztrip.travelplanner.service;
 
 import com.soeztrip.travelplanner.dto.PlaceDto;
+import com.soeztrip.travelplanner.model.Country;
 import com.soeztrip.travelplanner.model.Place;
 import com.soeztrip.travelplanner.model.Trip;
 import com.soeztrip.travelplanner.repository.PlaceRepository;
@@ -34,6 +35,11 @@ public class PlaceService {
         trip.getPlaces().add(place);
         tripRepository.save(trip);
 
+    }
+
+    public PlaceDto getPlace(Long id) {
+        Place place = placeRepository.findById(id).get();
+        return mapToPlaceDto(place);
     }
 
     public void deletePlace(Long id) {
