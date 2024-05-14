@@ -37,6 +37,11 @@ public class PlaceService {
 
     }
 
+    public PlaceDto getPlace(Long id) {
+        Place place = placeRepository.findById(id).get();
+        return mapToPlaceDto(place);
+    }
+
     public void deletePlace(Long id) {
         placeRepository.deleteById(id);
     }

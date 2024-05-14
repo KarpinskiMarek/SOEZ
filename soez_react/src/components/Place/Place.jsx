@@ -1,6 +1,7 @@
 import react from "react";
 import styled from "styled-components";
 import PlaceMainDetails from "./PlaceMainDetails";
+import {useParams} from "react-router-dom";
 
 const PlaceDiv = styled.div`
   display: flex;
@@ -17,9 +18,14 @@ const PlaceDiv = styled.div`
 
 
 const Place = () => {
+
+    const { placeId } = useParams();
+
+    console.log(placeId);
+
     return(
         <PlaceDiv>
-            <PlaceMainDetails/>
+            <PlaceMainDetails placeId={placeId}/>
         </PlaceDiv>
     )
 }

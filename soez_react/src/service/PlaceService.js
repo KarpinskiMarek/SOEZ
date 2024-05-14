@@ -25,3 +25,13 @@ export const getTripPlaces = async (tripId) => {
         return null;
     }
 }
+
+export const getPlace = async (placeId) => {
+    try {
+        const response = await request("GET", `/places/${placeId}`)
+        return response.data;
+    } catch (error) {
+        console.log("Error while fetching place", error);
+        return null;
+    }
+}

@@ -91,6 +91,14 @@ public class TripController {
         return ResponseEntity.ok().body("Trip has been updated successfully");
     }
 
+    @GetMapping("/places/{idPlace}")
+    public ResponseEntity<?> getPlace(@PathVariable Long idPlace) {
+        if(!placeService.placeExists(idPlace)) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Place not found");
+        }
+        return ResponseEntity.ok(placeService.getPlace(idPlace));
+    }
+
     @PutMapping("/trips/{idTrip}/places/{idPlace}")
     public ResponseEntity<?> editPlace(@PathVariable Long idTrip,
                                        @PathVariable Long idPlace,

@@ -47,6 +47,8 @@ const TripPlaces = ({ tripId }) => {
             <CreateButton to={`/trips/${tripId}/places/new`} buttonText={"Dodaj miejsce"} />
             {places.map((place) => (
                 <PlaceTile
+                    placeId={place.id}
+                    tripId={tripId}
                     placeName={place.name}
                     dateFrom={formatDate(place.arrive)}
                     dateTo={formatDate(place.leave)}

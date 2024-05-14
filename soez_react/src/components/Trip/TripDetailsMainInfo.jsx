@@ -65,7 +65,6 @@ const TripDetailsMainInfo = ({ tripId }) => {
 
     const fetchTrip = async () => {
         const tripData = await getTrip(tripId);
-        console.log(tripData)
         if (tripData) {
             setData(tripData);
         }
