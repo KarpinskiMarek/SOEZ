@@ -1,6 +1,7 @@
 package com.soeztrip.travelplanner.service;
 
 import com.soeztrip.travelplanner.dto.PlaceDto;
+import com.soeztrip.travelplanner.model.Country;
 import com.soeztrip.travelplanner.model.Place;
 import com.soeztrip.travelplanner.model.Trip;
 import com.soeztrip.travelplanner.repository.PlaceRepository;

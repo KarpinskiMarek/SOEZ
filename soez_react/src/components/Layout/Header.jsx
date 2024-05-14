@@ -47,7 +47,6 @@ const Header = ({isUserLoggedIn, navigate, toggleNavBar}) => {
             request("GET", "/users/get")
                 .then((response) => {
                     setUserData(response.data);
-                    console.log(response.data)
                 })
                 .catch((error) => {
                     console.error("Błąd podczas pobierania danych", error.response)

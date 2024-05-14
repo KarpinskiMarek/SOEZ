@@ -23,8 +23,6 @@ export const request = (method, url, data) => {
         headers = {'Authorization': `Bearer ${getAuthToken()}`}
     }
 
-    console.log('header 26 service' + headers)
-
     return axios({
         method: method,
         url: url,

@@ -26,7 +26,6 @@ export const getAllTrips = async () => {
 export const getTrip = async (id) => {
     try {
         const response = await request("GET", `/trips/${id}`);
-        console.log(response.data);
         return response.data;
     } catch (error) {
         console.log("Error while fetching trips:", error);

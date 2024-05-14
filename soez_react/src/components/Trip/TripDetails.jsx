@@ -25,7 +25,7 @@ const TripDetails = () => {
     return(
         <TripsDiv>
             <TripDetailsMainInfo tripId={id}/>
-            <TripPlaces/>
+            <TripPlaces tripId={id}/>
             <TripParticipants/>
         </TripsDiv>
     )
