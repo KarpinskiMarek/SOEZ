@@ -31,7 +31,7 @@ const TripPlaces = () => {
     return(
         <MainContainer>
             <ComponentTitle>Plan podróży</ComponentTitle>
-            <CreateButton to={""} buttonText={"Dodaj miejsce"} />
+            <CreateButton to={"/trips/places/new"} buttonText={"Dodaj miejsce"} />
             <PlaceTile placeName={"Rzym"} dateFrom={"29.04.2024"} dateTo={"31.04.2024"}/>
             <PlaceTile placeName={"Bolonia"} dateFrom={"29.04.2024"} dateTo={"31.04.2024"}/>
             <PlaceTile placeName={"Bari"} dateFrom={"29.04.2024"} dateTo={"31.04.2024"}/>
