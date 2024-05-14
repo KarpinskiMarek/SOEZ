@@ -41,7 +41,7 @@ const PlaceTile = ({id, placeName, dateFrom, dateTo}) => {
                 <h2>{dateFrom} - {dateTo}</h2>
             </Left>
             <Right>
-                <Link to={``}><CiCircleMore style={{ fontSize: "3rem", color: "black"}}/></Link>
+                <Link to={`/trips/places/${id}`}><CiCircleMore style={{ fontSize: "3rem", color: "black"}}/></Link>
                 <Link to={``}><MdDelete style={{ fontSize: "3rem", color: "black"}}/></Link>
             </Right>
         </Tile>
