@@ -1,10 +1,11 @@
-import react from "react";
+import react, {useEffect, useState} from "react";
 import styled from "styled-components";
 import { FaSearch } from "react-icons/fa";
 import { IoPersonAddSharp } from "react-icons/io5";
 import {MdDelete} from "react-icons/md";
 import {Link} from "react-router-dom";
 import React from "react";
+import {getEmails} from "../../service/FriendsService";
 
 const MainContainer = styled.div`
   display: flex;
@@ -18,6 +19,7 @@ const SearchForm = styled.form`
    justify-content: space-between;
    align-items: center;
    margin-bottom: 2rem;
+   width: 50%;
 `;
 
 const SearchInput = styled.input`
@@ -26,18 +28,7 @@ const SearchInput = styled.input`
     border-radius: 12px;
     border: solid 1px black;
     padding: 12px;
-    
-`;
-
-const SearchButton = styled.button`
-    background-color: rgba(202, 240, 248, 1);
-    padding: 12px;
-    border: solid 1px black;
-    border-radius: 12px;
-
-    &:hover {
-    background-color: rgba(72, 202, 228, 1);
-    }
+    width: 100%;
 `;
 
 const ResultSet = styled.div`
@@ -67,23 +58,57 @@ const ResultRow = styled.div`
 `;
 
 const AddFriendForm = () => {
+
+    const [emails, setEmails] = useState([]);
+    const [searchTerm, setSearchTerm] = useState("");
+    const [filteredEmails, setFilteredEmails] = useState([]);
+
+    const fetchEmails = async () => {
+        const emailsData = await getEmails();
+        setEmails(emailsData);
+    }
+
+    useEffect(() => {
+        fetchEmails();
+    }, []);
+
+    useEffect(() => {
+        const results = emails.filter(email =>
+            email.email.toLowerCase().includes(searchTerm.toLowerCase())
+        );
+        setFilteredEmails(results);
+    }, [searchTerm, emails]);
+
+    const handleSearchChange = (e) => {
+        setSearchTerm(e.target.value);
+    }
+
+    const handleSubmit = (e) => {
+        e.preventDefault();
+    }
+
     return (
         <MainContainer>
             <SearchForm>
-                <SearchInput type={"text"} placeholder={"Podaj email..."}/>
-                <SearchButton type={"submit"}><FaSearch/></SearchButton>
+                <SearchInput type={"text"}
+                             placeholder={"Podaj email..."}
+                             value={searchTerm}
+                             onChange={handleSearchChange}
+                />
             </SearchForm>
             <ResultSet>
                 <h1 style={{textDecoration: "underline"}}>Wyniki wyszukiwania</h1>
-                <ResultRow>
-                    Jan Kowalski <Link to={``}><IoPersonAddSharp style={{ fontSize: "3rem", color: "black"}}/></Link>
-                </ResultRow>
-                <ResultRow>
-                    Jan Kowalski <Link to={``}><IoPersonAddSharp style={{ fontSize: "3rem", color: "black"}}/></Link>
-                </ResultRow>
-                <ResultRow>
-                    Jan Kowalski <Link to={``}><IoPersonAddSharp style={{ fontSize: "3rem", color: "black"}}/></Link>
-                </ResultRow>
+                {!searchTerm ? (
+                        <div>Podaj email, aby rozpocząć wyszukiwanie</div>
+                ) : filteredEmails.length === 0 ? (
+                        <div>Brak rezultatów</div>
+                ) : (
+                    filteredEmails.map((email) => (
+                        <ResultRow key={email.id}>
+                            {email.firstName} {email.lastName} <Link to={``}><IoPersonAddSharp style={{ fontSize: "3rem", color: "black"}}/></Link>
+                        </ResultRow>
+                    ))
+                )}
             </ResultSet>
         </MainContainer>
     );

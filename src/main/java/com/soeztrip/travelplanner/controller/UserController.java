@@ -42,6 +42,12 @@ public class UserController {
         return ResponseEntity.ok(userService.getUserByEmail(authentication.getName()));
     }
 
+    @GetMapping("/user/friends")
+    public ResponseEntity<?> getFriends() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        return ResponseEntity.ok(userService.getFriends(authentication.getName()));
+    }
+
     @PutMapping("/users/{id}")
     public ResponseEntity<?> editUser(@PathVariable Long id,
                                       @Valid @RequestBody UserDto userDto,
@@ -65,15 +71,10 @@ public class UserController {
         userService.deleteUser(id);
         return ResponseEntity.ok().build();
     }
-    @PostMapping("/users/{id}/add-friend")
-    public ResponseEntity<?> addFriend(@PathVariable Long id, @RequestParam Long friendId) {
-        if (!userService.userExists(id)) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found");
-        }
-        if (!userService.userExists(friendId)) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Friend not found");
-        }
-        userService.addFriend(id, friendId);
+    @PostMapping("/users/add-friend/{id}")
+    public ResponseEntity<?> addFriend(@PathVariable Long id) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        userService.addFriend(authentication.getName(), id);
         return ResponseEntity.ok().build();
     }
     @DeleteMapping("/users/{id}/remove-friend")

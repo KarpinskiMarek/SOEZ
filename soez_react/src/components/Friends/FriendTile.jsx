@@ -35,12 +35,12 @@ const FriendName = styled.h1`
   text-decoration: underline;
 `;
 
-const FriendTile = ({id, userName}) => {
+const FriendTile = ({id, firstName, lastName}) => {
     return (
         <Tile>
             <Left>
                 <IoPersonSharp/>
-                <FriendName>{userName}</FriendName>
+                <FriendName>{firstName} {lastName}</FriendName>
             </Left>
             <Right>
                 <Link to={``}><MdDelete style={{ fontSize: "3rem", color: "black"}}/></Link>
