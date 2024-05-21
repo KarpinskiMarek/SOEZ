@@ -20,11 +20,4 @@ public class TripRole {
 
     private String name;
 
-
-    @ManyToOne
-    @JoinColumns({
-            @JoinColumn(name = "user_id", referencedColumnName = "user_id", insertable = false, updatable = false),
-            @JoinColumn(name = "trip_id", referencedColumnName = "trip_id", insertable = false, updatable = false)
-    })
-    private UserTrip userTrip;
 }

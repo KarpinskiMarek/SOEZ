@@ -3,11 +3,7 @@ package com.soeztrip.travelplanner.controller;
 import com.soeztrip.travelplanner.dto.PlaceDto;
 import com.soeztrip.travelplanner.dto.TripDto;
 import com.soeztrip.travelplanner.dto.TripParticipantDTO;
-import com.soeztrip.travelplanner.repository.PlaceRepository;
-import com.soeztrip.travelplanner.repository.TripRepository;
 import com.soeztrip.travelplanner.repository.UserRepository;
-import com.soeztrip.travelplanner.repository.UserTripRepository;
-import com.soeztrip.travelplanner.service.OpenAIService;
 import com.soeztrip.travelplanner.service.PlaceService;
 import com.soeztrip.travelplanner.service.TripService;
 import jakarta.validation.Valid;
@@ -16,7 +12,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
-import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -78,16 +73,16 @@ public class TripController {
 
     @PutMapping("/trips/{id}")
     public ResponseEntity<?> editTrip(@PathVariable Long id,
-                                      @Valid @RequestBody TripDto tripDto,
-                                      BindingResult bindingResult) {
-        if (bindingResult.hasErrors()) {
-            return ResponseEntity.status(HttpStatus.CONFLICT).body("data has errors");
-        }
+                                      @RequestBody TripDto tripDto) {
         if (!tripService.tripExists(id)) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Trip not found");
         }
-        tripDto.setId(id);
-        tripService.updateTrip(id, tripDto);
+        try {
+            tripDto.setId(id);
+            tripService.updateTrip(id, tripDto);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
         return ResponseEntity.ok().body("Trip has been updated successfully");
     }
 
@@ -109,7 +104,11 @@ public class TripController {
         if (!placeService.placeExists(idPlace)) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Place not found");
         }
-        placeService.updatePlace(idPlace, dto);
+        try {
+            placeService.updatePlace(idPlace, dto);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
         return ResponseEntity.ok().body("Place has been updated successfully");
     }
 
@@ -141,6 +140,25 @@ public class TripController {
         try {
             tripService.removeParticipant(id, dto.getEmail());
             return ResponseEntity.ok("User has been removed from the trip successfully.");
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+
+    @PutMapping("/trips/{id}/changeRole")
+    public ResponseEntity<?> changeRole(@PathVariable Long id, @RequestBody TripParticipantDTO dto) {
+        if (!tripService.tripExists(id)) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Trip not found");
+        }
+        if (!userRepository.existsByEmail(dto.getEmail())) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found");
+        }
+        if ("OWNER".equalsIgnoreCase(dto.getRole())) {
+            return ResponseEntity.badRequest().body("Trip owner can not be changed");
+        }
+        try {
+            tripService.changeRole(id, dto.getEmail(), dto.getRole());
+            return ResponseEntity.ok("Participant's role has been changed successfully");
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         }

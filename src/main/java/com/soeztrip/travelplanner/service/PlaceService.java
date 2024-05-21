@@ -6,6 +6,9 @@ import com.soeztrip.travelplanner.model.Place;
 import com.soeztrip.travelplanner.model.Trip;
 import com.soeztrip.travelplanner.repository.PlaceRepository;
 import com.soeztrip.travelplanner.repository.TripRepository;
+import com.soeztrip.travelplanner.repository.UserTripRepository;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -16,14 +19,22 @@ public class PlaceService {
 
     private PlaceRepository placeRepository;
     private TripRepository tripRepository;
+    private UserTripRepository userTripRepository;
 
-    public PlaceService(PlaceRepository placeRepository, TripRepository tripRepository) {
+    public PlaceService(PlaceRepository placeRepository,
+                        TripRepository tripRepository,
+                        UserTripRepository userTripRepository) {
         this.placeRepository = placeRepository;
         this.tripRepository = tripRepository;
+        this.userTripRepository = userTripRepository;
     }
 
 
     public void addNewPlace(Long id, PlaceDto dto) {
+        String requesterRole = this.checkUserRole(id);
+        if (!"OWNER".equals(requesterRole) && !"MANAGER".equals(requesterRole)) {
+            throw new RuntimeException("Only the trip owner or manager can create new places");
+        }
         Place place = new Place();
         place.setName(dto.getName());
         place.setArrive(dto.getArrive());
@@ -43,6 +54,10 @@ public class PlaceService {
     }
 
     public void deletePlace(Long id) {
+        String requesterRole = this.checkUserRole(id);
+        if (!"OWNER".equals(requesterRole) && !"MANAGER".equals(requesterRole)) {
+            throw new RuntimeException("Only the trip owner or manager can delete places");
+        }
         placeRepository.deleteById(id);
     }
 
@@ -85,6 +100,10 @@ public class PlaceService {
     }
 
     public void updatePlace(Long id, PlaceDto dto) {
+        String requesterRole = this.checkUserRole(id);
+        if (!"OWNER".equals(requesterRole) && !"MANAGER".equals(requesterRole)) {
+            throw new RuntimeException("Only the trip owner or manager can modify place properties");
+        }
         Place place=this.placeRepository.findById(id).orElseThrow();
         if (dto.getName() != null) {
             place.setName(dto.getName());
@@ -102,5 +121,11 @@ public class PlaceService {
             place.setCountry(dto.getCountry());
         }
         placeRepository.save(place);
+    }
+
+    private String checkUserRole(Long id) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String requesterEmail = authentication.getName();
+        return userTripRepository.findRole(id, requesterEmail).orElseThrow();
     }
 }
