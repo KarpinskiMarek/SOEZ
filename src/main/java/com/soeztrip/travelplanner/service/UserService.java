@@ -9,11 +9,13 @@ import com.soeztrip.travelplanner.repository.UserRepository;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Service
@@ -31,6 +33,14 @@ public class UserService {
     public List<UserDto> findAllUsers() {
         List<UserEntity> userEntities = userRepository.findAll();
         return userEntities.stream().map(this::mapUserToDto).collect(Collectors.toList());
+    }
+
+    public List<UserDto> getFriends(String email) {
+        Long userId = Objects.requireNonNull(userRepository.findByEmail(email).orElse(null)).getId();
+        List<UserEntity> friendsEntities = userRepository.friendsByUserId(userId);
+        return friendsEntities.stream()
+                .map(this::mapUserToDto)
+                .collect(Collectors.toList());
     }
 
     public UserEntity findUser(Long id) {
@@ -82,7 +92,8 @@ public class UserService {
         userRepository.deleteById(id);
     }
     @Transactional
-    public void addFriend(Long userId, Long friendId) {
+    public void addFriend(String userEmail, Long friendId) {
+        Long userId = Objects.requireNonNull(userRepository.findByEmail(userEmail).orElse(null)).getId();
         UserEntity user = userRepository.findById(userId).orElse(null);
         UserEntity friend = userRepository.findById(friendId).orElse(null);
 
