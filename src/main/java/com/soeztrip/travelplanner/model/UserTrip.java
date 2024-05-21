@@ -29,6 +29,10 @@ public class UserTrip {
     @JoinColumn(name = "trip_id", referencedColumnName = "id")
     private Trip trip;
 
+    @ManyToOne
+    @JoinColumn(name = "trip_role_id", referencedColumnName = "id")
+    private TripRole tripRole;
+
     public void setTrip(Trip trip) {
         this.trip = trip;
         trip.getUserTrips().add(this);
