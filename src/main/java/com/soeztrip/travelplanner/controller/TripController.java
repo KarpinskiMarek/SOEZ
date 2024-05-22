@@ -12,6 +12,8 @@ import com.soeztrip.travelplanner.model.UserEntity;
 import com.soeztrip.travelplanner.model.UserTrip;
 import com.soeztrip.travelplanner.repository.PlaceRepository;
 import com.soeztrip.travelplanner.repository.UserRepository;
+import com.soeztrip.travelplanner.repository.UserTripRepository;
+import com.soeztrip.travelplanner.service.OpenAIService;
 import com.soeztrip.travelplanner.service.PlaceService;
 import com.soeztrip.travelplanner.service.TripService;
 import com.soeztrip.travelplanner.service.WeatherService;
@@ -50,14 +52,8 @@ public class TripController {
         this.placeRepository = placeRepository;
         this.openAIService = openAIService;
         this.userTripRepository = userTripRepository;
-        this.weatherService=weatherService;
+        this.weatherService = weatherService;
 
-    public TripController(TripService tripService,
-                          UserRepository userRepository,
-                          PlaceService placeService) {
-        this.tripService = tripService;
-        this.userRepository = userRepository;
-        this.placeService = placeService;
     }
 
 
