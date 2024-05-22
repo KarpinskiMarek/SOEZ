@@ -1,10 +1,15 @@
 package com.soeztrip.travelplanner.controller;
 
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import com.soeztrip.travelplanner.dto.PlaceDto;
 import com.soeztrip.travelplanner.dto.TripDto;
 import com.soeztrip.travelplanner.dto.TripParticipantDTO;
 import com.soeztrip.travelplanner.dto.WeatherDTO;
 import com.soeztrip.travelplanner.model.Place;
+import com.soeztrip.travelplanner.model.Trip;
+import com.soeztrip.travelplanner.model.UserEntity;
+import com.soeztrip.travelplanner.model.UserTrip;
 import com.soeztrip.travelplanner.repository.PlaceRepository;
 import com.soeztrip.travelplanner.repository.UserRepository;
 import com.soeztrip.travelplanner.repository.UserTripRepository;
@@ -48,6 +53,7 @@ public class TripController {
         this.openAIService = openAIService;
         this.userTripRepository = userTripRepository;
         this.weatherService = weatherService;
+
     }
 
 
