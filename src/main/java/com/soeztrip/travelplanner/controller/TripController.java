@@ -1,11 +1,20 @@
 package com.soeztrip.travelplanner.controller;
 
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import com.soeztrip.travelplanner.dto.PlaceDto;
 import com.soeztrip.travelplanner.dto.TripDto;
 import com.soeztrip.travelplanner.dto.TripParticipantDTO;
+import com.soeztrip.travelplanner.dto.WeatherDTO;
+import com.soeztrip.travelplanner.model.Place;
+import com.soeztrip.travelplanner.model.Trip;
+import com.soeztrip.travelplanner.model.UserEntity;
+import com.soeztrip.travelplanner.model.UserTrip;
+import com.soeztrip.travelplanner.repository.PlaceRepository;
 import com.soeztrip.travelplanner.repository.UserRepository;
 import com.soeztrip.travelplanner.service.PlaceService;
 import com.soeztrip.travelplanner.service.TripService;
+import com.soeztrip.travelplanner.service.WeatherService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -23,6 +32,25 @@ public class TripController {
     private TripService tripService;
     private UserRepository userRepository;
     private PlaceService placeService;
+    private PlaceRepository placeRepository;
+    private OpenAIService openAIService;
+    private UserTripRepository userTripRepository;
+    private WeatherService weatherService;
+
+    public TripController(TripService tripService,
+                          UserRepository userRepository,
+                          PlaceService placeService,
+                          PlaceRepository placeRepository,
+                          OpenAIService openAIService,
+                          UserTripRepository userTripRepository,
+                          WeatherService weatherService) {
+        this.tripService = tripService;
+        this.userRepository = userRepository;
+        this.placeService = placeService;
+        this.placeRepository = placeRepository;
+        this.openAIService = openAIService;
+        this.userTripRepository = userTripRepository;
+        this.weatherService=weatherService;
 
     public TripController(TripService tripService,
                           UserRepository userRepository,
@@ -177,5 +205,23 @@ public class TripController {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Trip not found");
         }
         return ResponseEntity.ok(tripService.findTrip(id));
+    }
+    @GetMapping("/trips/places/{id}/weather")
+    public ResponseEntity<WeatherDTO> getWeatherForPlace(@PathVariable Long id) {
+        Place place = placeRepository.findById(id).orElse(null);
+
+        if (place == null) {
+            return ResponseEntity.notFound().build();
+        }
+
+        String city = place.getName();
+
+        WeatherDTO weatherDTO = weatherService.getWeatherForCity(city);
+
+        if (weatherDTO == null) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+        }
+
+        return ResponseEntity.ok(weatherDTO);
     }
 }
