@@ -1,12 +1,9 @@
 package com.soeztrip.travelplanner.model;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.hibernate.annotations.OnDelete;
-import org.hibernate.annotations.OnDeleteAction;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -14,7 +11,6 @@ import java.util.List;
 
 @Data
 @NoArgsConstructor
-//@AllArgsConstructor
 @Builder
 @Entity
 @Table(name = "places")
@@ -35,9 +31,11 @@ public class Place {
     @Column(length = 2048)
     private String prompt;
 
+    /*
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "country_id")
-    private Country country;
+     */
+    private String country; // type Country
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "trip_id")
@@ -50,7 +48,7 @@ public class Place {
     @OneToMany(mappedBy = "place", cascade = CascadeType.ALL)
     private List<Activity> activities = new ArrayList<>();
 
-    public Place(Long id, String name, Date arrive, Date leave, String ticket, String prompt, Country country, Trip trip, Transport transport, List<Activity> activities) {
+    public Place(Long id, String name, Date arrive, Date leave, String ticket, String prompt, String country, Trip trip, Transport transport, List<Activity> activities) {
         this.id = id;
         this.name = name;
         this.arrive = arrive;

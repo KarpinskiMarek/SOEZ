@@ -12,4 +12,5 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class TripParticipantDTO {
     private String email;
+    private String role;
 }

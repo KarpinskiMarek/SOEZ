@@ -1,7 +1,6 @@
 package com.soeztrip.travelplanner.model;
 
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -30,13 +29,17 @@ public class UserTrip {
     @JoinColumn(name = "trip_id", referencedColumnName = "id")
     private Trip trip;
 
+    @ManyToOne
+    @JoinColumn(name = "trip_role_id", referencedColumnName = "id")
+    private TripRole tripRole;
+
     public void setTrip(Trip trip) {
         this.trip = trip;
-        trip.getUserTrips().add(this); // Update the userTrips collection in Trip entity
+        trip.getUserTrips().add(this);
     }
 
     public void setUser(UserEntity user) {
         this.user = user;
-        user.getUserTrips().add(this); // Update the userTrips collection in UserEntity entity
+        user.getUserTrips().add(this);
     }
 }

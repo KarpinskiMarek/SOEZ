@@ -24,6 +24,8 @@ public class Country {
     @Column(unique = true)
     private String name;
 
+    /*
     @OneToMany(mappedBy = "country", cascade = CascadeType.ALL)
     private List<Place> place;
+    */
 }

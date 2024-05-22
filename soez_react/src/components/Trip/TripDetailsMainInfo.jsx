@@ -11,6 +11,8 @@ const TripInfo = styled.form`
   border: solid 2px black;
   border-radius: 5px;
   width: 50%;
+  background-color: rgba(255, 255, 255, 1);
+  padding: 1rem;
 `;
 
 const Right = styled.div`
@@ -26,6 +28,7 @@ const TripTitle = styled.input`
    border: none;
    font-size: 20px;
    text-align: center;
+   text-decoration: underline;
 `;
 
 const TripDate = styled.input`
@@ -62,7 +65,6 @@ const TripDetailsMainInfo = ({ tripId }) => {
 
     const fetchTrip = async () => {
         const tripData = await getTrip(tripId);
-        console.log(tripData)
         if (tripData) {
             setData(tripData);
         }

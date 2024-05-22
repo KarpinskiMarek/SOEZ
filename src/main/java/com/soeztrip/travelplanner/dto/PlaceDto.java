@@ -19,6 +19,6 @@ public class PlaceDto {
     private Date arrive;
     private Date leave;
     private String ticket;
-    private Country country;
+    private String country;
 
 }

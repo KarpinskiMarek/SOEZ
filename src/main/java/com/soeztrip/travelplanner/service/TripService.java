@@ -4,12 +4,15 @@ package com.soeztrip.travelplanner.service;
 import com.soeztrip.travelplanner.dto.TripDto;
 import com.soeztrip.travelplanner.dto.UserDto;
 import com.soeztrip.travelplanner.model.Trip;
+import com.soeztrip.travelplanner.model.TripRole;
 import com.soeztrip.travelplanner.model.UserEntity;
 import com.soeztrip.travelplanner.model.UserTrip;
 import com.soeztrip.travelplanner.repository.TripRepository;
 import com.soeztrip.travelplanner.repository.UserRepository;
 import com.soeztrip.travelplanner.repository.UserTripRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -20,26 +23,21 @@ public class TripService {
 
     private TripRepository tripRepository;
 
-    private PlaceService placeService;
-
     private UserRepository userRepository;
 
     private UserTripRepository userTripRepository;
 
+    private TripRoleService tripRoleService;
+
     @Autowired
     public TripService(TripRepository tripRepository,
-                       PlaceService placeService,
                        UserRepository userRepository,
-                       UserTripRepository userTripRepository) {
+                       UserTripRepository userTripRepository,
+                       TripRoleService tripRoleService) {
         this.tripRepository = tripRepository;
-        this.placeService = placeService;
         this.userRepository = userRepository;
         this.userTripRepository = userTripRepository;
-    }
-
-    public Trip addUserToTrip(String email) {
-
-        return null;
+        this.tripRoleService = tripRoleService;
     }
 
     public void deleteTrip(Long id) {
@@ -75,6 +73,7 @@ public class TripService {
                 .endingDate(trip.getEndingDate())
                 .finished(trip.getFinished())
                 .title(trip.getTitle())
+                .places(trip.getPlaces())
                 .participants(mapToUserDtoList(trip.getUserTrips()))
                 .build();
         return tripDto;
@@ -91,44 +90,96 @@ public class TripService {
                 .collect(Collectors.toList());
     }
 
-    public Trip saveTrip(Trip trip) {
-        //Trip trip = mapToTrip(tripDto);
-        return tripRepository.save(trip);
+    public void saveTrip(TripDto tripDto) {
+        String email = SecurityContextHolder.getContext().getAuthentication().getName();
+        UserEntity user = this.userRepository.findByEmail(email).orElseThrow();
+        Trip trip = mapToTrip(tripDto);
+        UserTrip userTrip = new UserTrip();
+        userTrip.setUser(user);
+        userTrip.setTrip(trip);
+        TripRole role = tripRoleService.getRoleByName("OWNER");
+        userTrip.setTripRole(role);
+        tripRepository.save(trip);
+        userTripRepository.save(userTrip);
     }
 
     public boolean tripExists(Long id) {
         return tripRepository.existsById(id);
     }
 
+    private String checkUserRole(Long id) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String requesterEmail = authentication.getName();
+        return userTripRepository.findRole(id, requesterEmail).orElseThrow();
+    }
+
     public void updateTrip(Long id, TripDto tripDto) {
+        String requesterRole = this.checkUserRole(id);
+        if (!"OWNER".equals(requesterRole) && !"MANAGER".equals(requesterRole)) {
+            throw new RuntimeException("Only the trip owner or manager can modify trip properties");
+        }
+
         Trip trip = this.tripRepository.findById(id).orElseThrow();
-        trip.setTitle(trip.getTitle());
-        trip.setStartingDate(tripDto.getStartingDate());
-        trip.setEndingDate(tripDto.getEndingDate());
+        if (tripDto.getStartingDate() != null) {
+            trip.setStartingDate(tripDto.getStartingDate());
+        }
+        if (tripDto.getEndingDate() != null) {
+            trip.setEndingDate(tripDto.getEndingDate());
+        }
+        if (tripDto.getFinished() != null) {
+            trip.setFinished(tripDto.getFinished());
+        }
+        if (tripDto.getTitle() != null) {
+            trip.setTitle(tripDto.getTitle());
+        }
+
         tripRepository.save(trip);
     }
 
     public void addParticipant(Long id, String email) {
+        String requesterRole = checkUserRole(id);
+        if (!"OWNER".equals(requesterRole) && !"MANAGER".equals(requesterRole)) {
+            throw new RuntimeException("Only the trip owner or manager can add participants");
+        }
         UserEntity user = this.userRepository.findByEmail(email).orElseThrow();
         Trip trip = this.tripRepository.findById(id).orElseThrow();
         UserTrip userTrip = new UserTrip();
         userTrip.setUser(user);
         userTrip.setTrip(trip);
+        TripRole role = tripRoleService.getRoleByName("PARTICIPANT");
+        userTrip.setTripRole(role);
         userTripRepository.save(userTrip);
-    }
-    public void updateBasicInfo(Long id, TripDto tripDto) {
-        Trip trip = this.tripRepository.findById(id).orElseThrow();
-        trip.setTitle(trip.getTitle());
-        trip.setStartingDate(tripDto.getStartingDate());
-        trip.setEndingDate(tripDto.getEndingDate());
-        tripRepository.save(trip);
     }
 
     public void removeParticipant(Long id, String email) {
+        String requesterRole = checkUserRole(id);
+        if (!"OWNER".equals(requesterRole) && !"MANAGER".equals(requesterRole)) {
+            throw new RuntimeException("Only the trip owner or manager can remove participants");
+        }
+        UserEntity tripOwner = userTripRepository.findOwner(id).orElseThrow();
+        if (tripOwner.getEmail().equals(email)) {
+            throw new RuntimeException("Owner can not be removed from the trip");
+        }
         UserEntity user = this.userRepository.findByEmail(email).orElseThrow();
         Trip trip = this.tripRepository.findById(id).orElseThrow();
         UserTrip userTrip = userTripRepository.findByUserAndTrip(user, trip);
         userTripRepository.delete(userTrip);
         tripRepository.save(trip);
+    }
+
+    public void changeRole(Long id, String email, String role) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String requesterEmail = authentication.getName();
+        UserEntity tripOwner = userTripRepository.findOwner(id).orElseThrow();
+        if (!tripOwner.getEmail().equals(requesterEmail)) {
+            throw new RuntimeException("Only trip owner can change roles");
+        }
+        UserEntity user = this.userRepository.findByEmail(email).orElseThrow();
+        Trip trip = this.tripRepository.findById(id).orElseThrow();
+        UserTrip userTrip = userTripRepository.findByUserAndTrip(user, trip);
+
+        TripRole tripRole = tripRoleService.getRoleByName(role);
+        userTrip.setTripRole(tripRole);
+        userTripRepository.save(userTrip);
     }
 }
