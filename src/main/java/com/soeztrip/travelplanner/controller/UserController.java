@@ -71,13 +71,13 @@ public class UserController {
         userService.deleteUser(id);
         return ResponseEntity.ok().build();
     }
-    @PostMapping("/users/add-friend/{id}")
+    @PostMapping("/add-friend/{id}")
     public ResponseEntity<?> addFriend(@PathVariable Long id) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         userService.addFriend(authentication.getName(), id);
         return ResponseEntity.ok().build();
     }
-    @DeleteMapping("/users/{id}/remove-friend")
+    @DeleteMapping("/{id}/remove-friend")
     public ResponseEntity<?> removeFriend(@PathVariable Long id, @RequestParam Long friendId) {
         if (!userService.userExists(id)) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found");

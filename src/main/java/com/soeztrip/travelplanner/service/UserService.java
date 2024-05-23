@@ -91,18 +91,17 @@ public class UserService {
     public void deleteUser(Long id) {
         userRepository.deleteById(id);
     }
+
     @Transactional
     public void addFriend(String userEmail, Long friendId) {
-        Long userId = Objects.requireNonNull(userRepository.findByEmail(userEmail).orElse(null)).getId();
-        UserEntity user = userRepository.findById(userId).orElse(null);
-        UserEntity friend = userRepository.findById(friendId).orElse(null);
+        UserEntity user = userRepository.findByEmail(userEmail).orElseThrow(() -> new IllegalArgumentException("User not found"));
+        UserEntity friend = userRepository.findById(friendId).orElseThrow(() -> new IllegalArgumentException("Friend not found"));
 
-        if (user != null && friend != null) {
-            user.getFriendList().add(friend);
-            userRepository.save(user);
-        } else {
-            throw new IllegalArgumentException("User or friend not found");
-        }
+        user.getFriendList().add(friend);
+        friend.getFriendList().add(user);
+
+        userRepository.save(user);
+        userRepository.save(friend);
     }
     @Transactional
     public void removeFriend(Long userId, Long friendId) {
@@ -111,10 +110,13 @@ public class UserService {
 
         if (user != null && friend != null) {
             user.getFriendList().remove(friend);
+            friend.getFriendList().remove(user);
+
             userRepository.save(user);
+            userRepository.save(friend);
         } else {
-            // Obsługa przypadku, gdy użytkownik lub znajomy nie istnieje
             throw new IllegalArgumentException("User or friend not found");
         }
     }
+
 }
