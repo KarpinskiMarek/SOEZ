@@ -2,12 +2,15 @@ import {request} from "./AuthenticationConfig";
 
 export const addPlace = async (tripId, name, arrive, leave, ticket, country) => {
     try {
-        return await request("POST", `/trips/places/${tripId}/new`, {
-            name: name,
-            arrive: arrive,
-            leave: leave,
-            ticket: ticket,
-            country: country
+        const formData = new FormData();
+        formData.append('name', name);
+        formData.append('arrive', arrive);
+        formData.append('leave', leave);
+        formData.append('ticketFile', ticket);
+        formData.append('country', country);
+
+        return await request("POST", `trips/places/${tripId}/new`, formData, {
+            'Content-Type': 'multipart/form-data'
         });
 
     } catch (error) {

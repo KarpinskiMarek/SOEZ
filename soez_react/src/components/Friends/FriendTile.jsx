@@ -1,8 +1,9 @@
 import React from "react";
 import styled from "styled-components";
-import {Link} from "react-router-dom";
+import {Link, useNavigate} from "react-router-dom";
 import { MdDelete } from "react-icons/md";
 import { IoPersonSharp } from "react-icons/io5";
+import {removeFriend} from "../../service/FriendsService";
 
 const Tile = styled.div`
   border-radius: 10px;
@@ -35,7 +36,21 @@ const FriendName = styled.h1`
   text-decoration: underline;
 `;
 
+
 const FriendTile = ({id, firstName, lastName}) => {
+
+    const navigate = useNavigate();
+
+    const handleRemoveFriend = async (id) => {
+        try {
+            await removeFriend(id);
+            navigate("/friends");
+        }catch (error) {
+            console.error("Error while deleting friend");
+        }
+    }
+
+
     return (
         <Tile>
             <Left>
@@ -43,7 +58,10 @@ const FriendTile = ({id, firstName, lastName}) => {
                 <FriendName>{firstName} {lastName}</FriendName>
             </Left>
             <Right>
-                <Link to={``}><MdDelete style={{ fontSize: "3rem", color: "black"}}/></Link>
+                <MdDelete
+                    style={{ fontSize: "3rem", color: "black", cursor: "pointer"}}
+                    onClick={() => handleRemoveFriend(id)}
+                />
             </Right>
         </Tile>
     )

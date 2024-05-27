@@ -104,10 +104,9 @@ public class UserService {
         userRepository.save(friend);
     }
     @Transactional
-    public void removeFriend(Long userId, Long friendId) {
-        UserEntity user = userRepository.findById(userId).orElse(null);
+    public void removeFriend(String email, Long friendId) {
+        UserEntity user = userRepository.findByEmail(email).orElse(null);
         UserEntity friend = userRepository.findById(friendId).orElse(null);
-
         if (user != null && friend != null) {
             user.getFriendList().remove(friend);
             friend.getFriendList().remove(user);

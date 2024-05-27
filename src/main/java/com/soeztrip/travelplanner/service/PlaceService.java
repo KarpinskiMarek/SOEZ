@@ -31,10 +31,13 @@ public class PlaceService {
 
 
     public void addNewPlace(Long id, PlaceDto dto) {
+        /*
         String requesterRole = this.checkUserRole(id);
         if (!"OWNER".equals(requesterRole) && !"MANAGER".equals(requesterRole)) {
             throw new RuntimeException("Only the trip owner or manager can create new places");
         }
+
+         */
         Place place = new Place();
         place.setName(dto.getName());
         place.setArrive(dto.getArrive());

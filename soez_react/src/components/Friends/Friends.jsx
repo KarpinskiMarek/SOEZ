@@ -1,7 +1,6 @@
 import styled from "styled-components";
 import React, {useEffect, useState} from "react";
 import LinkButton from "../Home/LinkButton";
-import ParticipantTile from "../Trip/ParticipantTile";
 import FriendTile from "./FriendTile";
 import {getFriends} from "../../service/FriendsService";
 
@@ -48,13 +47,18 @@ const Friends = () => {
         <FriendsDiv>
             <PageTitle>Lista znajomych</PageTitle>
             <AddButton to={"/friends/add"} buttonText={"Dodaj znajomego"} />
-            {friends.map((friend) => (
-                <FriendTile
-                    key={friend.id}
-                    firstName={friend.firstName}
-                    lastName={friend.lastName}
-                />
-            ))}
+            {friends.length === 0 ? (
+                <div style={{marginTop: "2rem", textDecoration:"underline"}}>Brak znajomych</div>
+            ) : (
+                friends.map((friend) => (
+                    <FriendTile
+                        key={friend.id}
+                        firstName={friend.firstName}
+                        lastName={friend.lastName}
+                        id={friend.id}
+                    />
+                ))
+            )}
         </FriendsDiv>
     )
 }

@@ -33,7 +33,10 @@ const TripFormGroup = ({ labelText, type, value, placeholder, errorText, onChang
     return (
       <FormGroupDiv>
           <FormLabel>{labelText}</FormLabel>
-          <FormInput type={type} value={value} placeholder={placeholder} onChange={(e) => onChange(e.target.value)} />
+          <FormInput type={type}
+                     value={type === "file" ? undefined : value}
+                     placeholder={placeholder}
+                     onChange={onChange} />
           <FormSpan>{errorText}</FormSpan>
       </FormGroupDiv>
     );

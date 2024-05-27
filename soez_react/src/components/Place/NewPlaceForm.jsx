@@ -42,7 +42,7 @@ const NewPlaceForm = ( {tripId} ) => {
         name: "",
         arrive: "",
         leave: "",
-        ticket: "",
+        ticket: null,
         country: ""
     });
 
@@ -58,7 +58,9 @@ const NewPlaceForm = ( {tripId} ) => {
 
     const handleSubmit = async (event) => {
         event.preventDefault();
+        console.log(formData);
         try {
+
             const response = await service.addPlace(
                 tripId,
                 formData.name,
@@ -67,13 +69,21 @@ const NewPlaceForm = ( {tripId} ) => {
                 formData.ticket,
                 formData.country
             );
-            console.log(response);
             if (response && response.status === 201) {
                 navigate(`/trips/details/${tripId}`);
             }
+
         } catch (error) {
             console.error("Error while adding new place:", error);
         }
+    }
+
+    const handleOnTicketChange = (event) => {
+        const file = event.target.files[0];
+        setFormData({
+            ...formData,
+            ticket: file
+        });
     }
 
     const validateForm = () => {
@@ -87,28 +97,28 @@ const NewPlaceForm = ( {tripId} ) => {
                 type={"text"}
                 value={formData.name}
                 placeholder={"Podaj nazwę"}
-                onChange={(value) => setFormData({...formData, name: value})}
+                onChange={(e) => setFormData({...formData, name: e.target.value})}
                 errorText={errors.name}
             />
             <TripFormGroup
                 labelText={"Przyjazd: "}
                 type={"date"}
                 value={formData.arrive}
-                onChange={(value) => setFormData({...formData, arrive: value})}
+                onChange={(e) => setFormData({...formData, arrive: e.target.value})}
                 errorText={errors.arrive}
             />
             <TripFormGroup
                 labelText={"Wyjazd: "}
                 type={"date"}
                 value={formData.leave}
-                onChange={(value) => setFormData({...formData, leave: value})}
+                onChange={(e) => setFormData({...formData, leave: e.target.value})}
                 errorText={errors.leave}
             />
             <TripFormGroup
                 labelText={"Bilet na przejazd: "}
                 type={"file"}
                 value={formData.ticket}
-                onChange={(value) => setFormData({...formData, ticket: value})}
+                onChange={handleOnTicketChange}
                 errorText={errors.ticket}
             />
             <TripFormGroup
@@ -116,7 +126,7 @@ const NewPlaceForm = ( {tripId} ) => {
                 type={"text"}
                 value={formData.country}
                 placeholder={"Podaj państwo"}
-                onChange={(value) => setFormData({...formData, country: value})}
+                onChange={(e) => setFormData({...formData, country: e.target.value})}
                 errorText={errors.country}
             />
             <SubmitButton type={"submit"}>Dodaj miejsce</SubmitButton>

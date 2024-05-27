@@ -54,7 +54,6 @@ const NewTripForm = () => {
         event.preventDefault();
         try {
             const response = await service.createTrip(formData.title, formData.startingDate, formData.endingDate);
-            console.log(response);
             if (response && response.status === 201) {
                 navigate("/trips");
             }

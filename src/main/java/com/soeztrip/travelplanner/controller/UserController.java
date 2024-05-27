@@ -77,15 +77,14 @@ public class UserController {
         userService.addFriend(authentication.getName(), id);
         return ResponseEntity.ok().build();
     }
-    @DeleteMapping("/{id}/remove-friend")
-    public ResponseEntity<?> removeFriend(@PathVariable Long id, @RequestParam Long friendId) {
+
+    @DeleteMapping("/user/remove-friend/{id}")
+    public ResponseEntity<?> removeFriend(@PathVariable Long id) {
         if (!userService.userExists(id)) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found");
-        }
-        if (!userService.userExists(friendId)) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Friend not found");
         }
-        userService.removeFriend(id, friendId);
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        userService.removeFriend(authentication.getName(), id);
         return ResponseEntity.ok().build();
     }
 }
