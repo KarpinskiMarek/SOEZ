@@ -7,10 +7,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 @Data
 @NoArgsConstructor
@@ -57,15 +54,23 @@ public class UserEntity {
     )
     private Set<UserEntity> friendList = new HashSet<>();
 
-    @ManyToMany(mappedBy = "friendList")
-    @JsonIgnore
-    private Set<UserEntity> friendsOf = new HashSet<>();
+//    @ManyToMany(mappedBy = "friendList")
+//    @JsonIgnore
+//    private Set<UserEntity> friendsOf = new HashSet<>();
 
     @ManyToMany(mappedBy = "users")
     private Set<ChatRoom> chatRooms = new HashSet<>();
 
     @OneToMany(mappedBy = "sender", cascade = CascadeType.ALL)
     private List<Message> sentMessages = new ArrayList<>();
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        UserEntity that = (UserEntity) o;
+        return Objects.equals(id, that.id);
+    }
 
     @Override
     public String toString() {

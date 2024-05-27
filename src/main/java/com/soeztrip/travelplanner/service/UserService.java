@@ -97,25 +97,24 @@ public class UserService {
         UserEntity user = userRepository.findByEmail(userEmail).orElseThrow(() -> new IllegalArgumentException("User not found"));
         UserEntity friend = userRepository.findById(friendId).orElseThrow(() -> new IllegalArgumentException("Friend not found"));
 
-        user.getFriendList().add(friend);
-        friend.getFriendList().add(user);
-
-        userRepository.save(user);
-        userRepository.save(friend);
-    }
-    @Transactional
-    public void removeFriend(String email, Long friendId) {
-        UserEntity user = userRepository.findByEmail(email).orElse(null);
-        UserEntity friend = userRepository.findById(friendId).orElse(null);
-        if (user != null && friend != null) {
-            user.getFriendList().remove(friend);
-            friend.getFriendList().remove(user);
+        if (!user.getFriendList().contains(friend)) {
+            user.getFriendList().add(friend);
+            friend.getFriendList().add(user);
 
             userRepository.save(user);
             userRepository.save(friend);
-        } else {
-            throw new IllegalArgumentException("User or friend not found :(");
         }
+    }
+    @Transactional
+    public void removeFriend(String userEmail, Long friendId) {
+        UserEntity user = userRepository.findByEmail(userEmail).orElseThrow(() -> new IllegalArgumentException("User not found"));
+        UserEntity friend = userRepository.findById(friendId).orElseThrow(() -> new IllegalArgumentException("Friend not found"));
+
+        user.getFriendList().remove(friend);
+        friend.getFriendList().remove(user);
+
+        userRepository.save(user);
+        userRepository.save(friend);
     }
 
 }
