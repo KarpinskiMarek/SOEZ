@@ -3,9 +3,9 @@ import styled from "styled-components";
 import { FaSearch } from "react-icons/fa";
 import { IoPersonAddSharp } from "react-icons/io5";
 import {MdDelete} from "react-icons/md";
-import {Link} from "react-router-dom";
+import {Link, useNavigate} from "react-router-dom";
 import React from "react";
-import {getEmails} from "../../service/FriendsService";
+import {addFriend, getEmails} from "../../service/FriendsService";
 
 const MainContainer = styled.div`
   display: flex;
@@ -62,6 +62,7 @@ const AddFriendForm = () => {
     const [emails, setEmails] = useState([]);
     const [searchTerm, setSearchTerm] = useState("");
     const [filteredEmails, setFilteredEmails] = useState([]);
+    const navigate = useNavigate();
 
     const fetchEmails = async () => {
         const emailsData = await getEmails();
@@ -87,6 +88,15 @@ const AddFriendForm = () => {
         e.preventDefault();
     }
 
+    const handleAddFriend = async (id) => {
+        try {
+            await addFriend(id);
+            navigate("/friends");
+        } catch (error) {
+            console.error("Error while adding friend", error);
+        }
+    }
+
     return (
         <MainContainer>
             <SearchForm>
@@ -105,7 +115,10 @@ const AddFriendForm = () => {
                 ) : (
                     filteredEmails.map((email) => (
                         <ResultRow key={email.id}>
-                            {email.firstName} {email.lastName} <Link to={``}><IoPersonAddSharp style={{ fontSize: "3rem", color: "black"}}/></Link>
+                            {email.firstName} {email.lastName} <IoPersonAddSharp
+                            style={{ fontSize: "3rem", color: "black", cursor: "pointer"}}
+                            onClick={() => handleAddFriend(email.id)}
+                        />
                         </ResultRow>
                     ))
                 )}

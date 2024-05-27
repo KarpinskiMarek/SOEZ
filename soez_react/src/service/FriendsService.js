@@ -31,3 +31,21 @@ export const getFriends = async () => {
         throw error;
     }
 }
+
+export const addFriend = async (id) => {
+    try {
+        return await request("POST", `/users/add-friend/${id}`);
+    } catch (error) {
+        console.error("Error while adding friend", error);
+        throw error;
+    }
+}
+
+export const removeFriend = async (id) => {
+    try {
+        return await request("DELETE", `/user/remove-friend/${id}`);
+    } catch (error) {
+        console.error("Error while removing friend", error);
+        throw error;
+    }
+}

@@ -15,10 +15,18 @@
 //generować wiele promptów i to będzie baza z której będziemy mogli zaczerpnąć juz wygenerowane propozycje
 //przy tworzeniu nowego place generuje się prompt i zapisuje w polu prompt, jak i w tabeli prompt.
 //Nie jest to troche redundantne? Jak możnaby to inaczej rozwiązać?
-// A może to właśnie dobrze, bo będzie można się odwołać do tego prompta z bazy kiedy indziej, a tutaj np zmienić?
+//A może to właśnie dobrze, bo będzie można się odwołać do tego prompta z bazy kiedy indziej, a tutaj np zmienić?
 
 
 
 8) dodac koncowke ktora edytuje nazwe dateod datedo tripa. // to samo co punkt 3
 
    75$ szacowana cena za 100000 requestów do prompta
+
+------------------------------------------------------------
+
+istnieje zawsze katalog trips_data
+przy tworzeniu nowego tripa tworzy się katalog o nazwie=idtrip
+przy tworzeniu place w odpowiednim katalogu tripa tworzy się katalog o nazwie=idplace
+w tych katalogach zapisują sie bilety, usuwanie dodawanie i modyfikacja biletu to samo dla zdjęć profil
+owych userów
