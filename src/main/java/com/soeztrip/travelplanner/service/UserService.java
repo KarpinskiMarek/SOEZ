@@ -115,7 +115,7 @@ public class UserService {
             userRepository.save(user);
             userRepository.save(friend);
         } else {
-            throw new IllegalArgumentException("User or friend not found");
+            throw new IllegalArgumentException("User or friend not found :(");
         }
     }
 
