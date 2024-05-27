@@ -15,12 +15,12 @@ export const setAuthHeader = (token) => {
 axios.defaults.baseURL = 'http://localhost:8080'
 axios.defaults.headers.post["Content-Type"] = 'application/json'
 
-export const request = (method, url, data) => {
+export const request = (method, url, data, customHeaders = {}) => {
 
-    let headers = {};
+    let headers = customHeaders;
 
     if (getAuthToken() !== null && getAuthToken() !== "null") {
-        headers = {'Authorization': `Bearer ${getAuthToken()}`}
+        headers['Authorization'] = `Bearer ${getAuthToken()}`;
     }
 
     return axios({

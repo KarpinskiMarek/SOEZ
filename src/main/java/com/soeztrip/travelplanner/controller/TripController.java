@@ -24,7 +24,14 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.util.List;
 
 @Controller
@@ -58,7 +65,9 @@ public class TripController {
 
 
     @PostMapping("/trips/places/{id}/new")
-    public ResponseEntity<?> addPlace(@PathVariable Long id, @RequestBody PlaceDto placedto) {
+    public ResponseEntity<?> addPlace(@PathVariable Long id, @ModelAttribute PlaceDto placedto) {
+        String filePath = saveTicketFile(placedto.getTicketFile());
+        placedto.setTicket(filePath);
         placeService.addNewPlace(id, placedto);
         return ResponseEntity.status(HttpStatus.CREATED).body("Trip has been updated successfully");
     }
@@ -219,5 +228,20 @@ public class TripController {
         }
 
         return ResponseEntity.ok(weatherDTO);
+    }
+
+    public String saveTicketFile(MultipartFile ticketFile) {
+        if (ticketFile != null && !ticketFile.isEmpty()) {
+            try {
+                String fileName = ticketFile.getOriginalFilename();
+                Path path = Paths.get("/home/fedora/Studies/inżynierka/SOEZ" + fileName);
+                Files.copy(ticketFile.getInputStream(), path, StandardCopyOption.REPLACE_EXISTING);
+                return path.toString();
+            } catch (IOException e) {
+                e.printStackTrace();
+                throw new RuntimeException("Failed to save the file", e);
+            }
+        }
+        return null;
     }
 }
