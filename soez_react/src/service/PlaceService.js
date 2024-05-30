@@ -21,7 +21,7 @@ export const addPlace = async (tripId, name, arrive, leave, ticket, country) => 
 
 export const getTripPlaces = async (tripId) => {
     try {
-        const response = await request("GET", `/trips/${tripId}`);
+        const response = await request("GET", `/trips/${tripId}`, {}, {});
         return response.data.places;
     } catch (error) {
         console.log("Error while fetching places:", error);
@@ -31,7 +31,7 @@ export const getTripPlaces = async (tripId) => {
 
 export const getPlace = async (placeId) => {
     try {
-        const response = await request("GET", `/places/${placeId}`)
+        const response = await request("GET", `/places/${placeId}`, {}, {})
         return response.data;
     } catch (error) {
         console.log("Error while fetching place", error);

@@ -1,4 +1,6 @@
 import axios from "axios";
+import {useNavigate} from "react-router-dom";
+import {useEffect} from "react";
 
 export const getAuthToken = () => {
     return window.localStorage.getItem('auth_token');
@@ -7,9 +9,37 @@ export const getAuthToken = () => {
 export const setAuthHeader = (token) => {
     if (token !== null) {
         window.localStorage.setItem('auth_token', token);
+        window.localStorage.setItem('auth_token_set_time', new Date().toISOString())
     }else {
         window.localStorage.removeItem('auth_token');
+        window.localStorage.removeItem('auth_token_set_time');
     }
+}
+
+export const isTokenExpired = () => {
+    const tokenSetTime = window.localStorage.getItem('auth_token_set_time');
+    if (tokenSetTime) {
+        const setTime = new Date(tokenSetTime);
+        const currentTime = new Date();
+        const elapsedSeconds = (currentTime - setTime) / 1000;
+        return elapsedSeconds > 30;
+    }
+    return false;
+}
+
+export const useAuth = () => {
+    const navigate = useNavigate();
+    useEffect(() => {
+        const checkTokenValidity = () => {
+            if (isTokenExpired()) {
+                Logout();
+                navigate('/login');
+            }
+        };
+
+        const intervalId = setInterval(checkTokenValidity, 1000);
+        return () => clearInterval(intervalId);
+    }, [navigate]);
 }
 
 axios.defaults.baseURL = 'http://localhost:8080'
