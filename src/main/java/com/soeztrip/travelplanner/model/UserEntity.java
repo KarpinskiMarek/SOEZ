@@ -1,6 +1,5 @@
 package com.soeztrip.travelplanner.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -40,7 +39,7 @@ public class UserEntity {
             joinColumns = @JoinColumn(name = "user_id", referencedColumnName = "id"),
             inverseJoinColumns = @JoinColumn(name = "role_id", referencedColumnName = "id")
     )
-    private List<Role> roles= new ArrayList<>();
+    private List<Role> roles = new ArrayList<>();
 
     @OneToMany(mappedBy = "user")
     private List<UserTrip> userTrips = new ArrayList<>();
@@ -54,9 +53,6 @@ public class UserEntity {
     )
     private Set<UserEntity> friendList = new HashSet<>();
 
-//    @ManyToMany(mappedBy = "friendList")
-//    @JsonIgnore
-//    private Set<UserEntity> friendsOf = new HashSet<>();
 
     @ManyToMany(mappedBy = "users")
     private Set<ChatRoom> chatRooms = new HashSet<>();
