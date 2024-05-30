@@ -15,7 +15,7 @@ export const createTrip = async (title, startingDate, endingDate) => {
 
 export const getAllTrips = async () => {
     try {
-        const response = await request("GET", "/trips");
+        const response = await request("GET", "/trips", {}, {});
         return response.data;
     } catch (error) {
         console.log("Error while fetching trips:", error);
@@ -25,7 +25,7 @@ export const getAllTrips = async () => {
 
 export const getTrip = async (id) => {
     try {
-        const response = await request("GET", `/trips/${id}`);
+        const response = await request("GET", `/trips/${id}`, {}, {});
         return response.data;
     } catch (error) {
         console.log("Error while fetching trips:", error);

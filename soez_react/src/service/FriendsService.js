@@ -34,7 +34,7 @@ export const getFriends = async () => {
 
 export const addFriend = async (id) => {
     try {
-        return await request("POST", `/users/add-friend/${id}`);
+        return await request("POST", `/users/add-friend/${id}`, {});
     } catch (error) {
         console.error("Error while adding friend", error);
         throw error;
