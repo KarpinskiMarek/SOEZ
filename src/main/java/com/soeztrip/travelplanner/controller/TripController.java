@@ -1,19 +1,12 @@
 package com.soeztrip.travelplanner.controller;
 
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
 import com.soeztrip.travelplanner.dto.PlaceDto;
 import com.soeztrip.travelplanner.dto.TripDto;
 import com.soeztrip.travelplanner.dto.TripParticipantDTO;
 import com.soeztrip.travelplanner.dto.WeatherDTO;
 import com.soeztrip.travelplanner.model.Place;
-import com.soeztrip.travelplanner.model.Trip;
-import com.soeztrip.travelplanner.model.UserEntity;
-import com.soeztrip.travelplanner.model.UserTrip;
 import com.soeztrip.travelplanner.repository.PlaceRepository;
 import com.soeztrip.travelplanner.repository.UserRepository;
-import com.soeztrip.travelplanner.repository.UserTripRepository;
-import com.soeztrip.travelplanner.service.OpenAIService;
 import com.soeztrip.travelplanner.service.PlaceService;
 import com.soeztrip.travelplanner.service.TripService;
 import com.soeztrip.travelplanner.service.WeatherService;
@@ -26,7 +19,6 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -42,34 +34,63 @@ public class TripController {
     private UserRepository userRepository;
     private PlaceService placeService;
     private PlaceRepository placeRepository;
-    private OpenAIService openAIService;
-    private UserTripRepository userTripRepository;
     private WeatherService weatherService;
 
     public TripController(TripService tripService,
                           UserRepository userRepository,
                           PlaceService placeService,
                           PlaceRepository placeRepository,
-                          OpenAIService openAIService,
-                          UserTripRepository userTripRepository,
+
                           WeatherService weatherService) {
         this.tripService = tripService;
         this.userRepository = userRepository;
         this.placeService = placeService;
         this.placeRepository = placeRepository;
-        this.openAIService = openAIService;
-        this.userTripRepository = userTripRepository;
         this.weatherService = weatherService;
 
     }
 
 
     @PostMapping("/trips/places/{id}/new")
-    public ResponseEntity<?> addPlace(@PathVariable Long id, @ModelAttribute PlaceDto placedto) {
-        String filePath = saveTicketFile(placedto.getTicketFile());
-        placedto.setTicket(filePath);
-        placeService.addNewPlace(id, placedto);
+    public ResponseEntity<?> addPlace(@PathVariable Long id,
+                                      @ModelAttribute PlaceDto placeDto,
+                                      @RequestParam(value = "ticketFile", required = false) MultipartFile ticketFile) {
+        try {
+            Long placeId = placeService.addNewPlace(id, placeDto);
+            if (ticketFile != null && !ticketFile.isEmpty()) {
+                String filePath = saveTicketFile(id, placeId, ticketFile);
+                placeDto.setTicket(filePath);
+                placeService.updatePlace(placeId, placeDto);
+
+            }
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+
         return ResponseEntity.status(HttpStatus.CREATED).body("Trip has been updated successfully");
+    }
+
+    @PutMapping("/trips/{idTrip}/places/{idPlace}")
+    public ResponseEntity<?> editPlace(@PathVariable Long idTrip,
+                                       @PathVariable Long idPlace,
+                                       @ModelAttribute PlaceDto dto,
+                                       @RequestParam(value = "ticketFile", required = false) MultipartFile ticketFile) {
+        if (!tripService.tripExists(idTrip)) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Trip not found");
+        }
+        if (!placeService.placeExists(idPlace)) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Place not found");
+        }
+        try {
+            if (ticketFile != null && !ticketFile.isEmpty()) {
+                String filePath = saveTicketFile(idTrip, idPlace, ticketFile);
+                dto.setTicket(filePath);
+            }
+            placeService.updatePlace(idPlace, dto);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+        return ResponseEntity.ok().body("Place has been updated successfully");
     }
 
     @PostMapping("/trips/new")
@@ -121,29 +142,12 @@ public class TripController {
 
     @GetMapping("/places/{idPlace}")
     public ResponseEntity<?> getPlace(@PathVariable Long idPlace) {
-        if(!placeService.placeExists(idPlace)) {
+        if (!placeService.placeExists(idPlace)) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Place not found");
         }
         return ResponseEntity.ok(placeService.getPlace(idPlace));
     }
 
-    @PutMapping("/trips/{idTrip}/places/{idPlace}")
-    public ResponseEntity<?> editPlace(@PathVariable Long idTrip,
-                                       @PathVariable Long idPlace,
-                                       @RequestBody PlaceDto dto) {
-        if (!tripService.tripExists(idTrip)) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Trip not found");
-        }
-        if (!placeService.placeExists(idPlace)) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Place not found");
-        }
-        try {
-            placeService.updatePlace(idPlace, dto);
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
-        }
-        return ResponseEntity.ok().body("Place has been updated successfully");
-    }
 
     @PutMapping("/trips/{id}/addPerson")
     public ResponseEntity<?> addPerson(@PathVariable Long id, @RequestBody TripParticipantDTO dto) {
@@ -211,6 +215,7 @@ public class TripController {
         }
         return ResponseEntity.ok(tripService.findTrip(id));
     }
+
     @GetMapping("/trips/places/{id}/weather")
     public ResponseEntity<WeatherDTO> getWeatherForPlace(@PathVariable Long id) {
         Place place = placeRepository.findById(id).orElse(null);
@@ -230,13 +235,20 @@ public class TripController {
         return ResponseEntity.ok(weatherDTO);
     }
 
-    public String saveTicketFile(MultipartFile ticketFile) {
+    public String saveTicketFile(Long tripId, Long placeId, MultipartFile ticketFile) {
         if (ticketFile != null && !ticketFile.isEmpty()) {
             try {
                 String fileName = ticketFile.getOriginalFilename();
-                Path path = Paths.get("/home/fedora/Studies/inżynierka/SOEZ" + fileName);
-                Files.copy(ticketFile.getInputStream(), path, StandardCopyOption.REPLACE_EXISTING);
-                return path.toString();
+                String projectRootDirectory = System.getProperty("user.dir");
+                Path directoryPath = Paths.get(projectRootDirectory, "TripData", tripId.toString(), placeId.toString());
+                if (!Files.exists(directoryPath)) {
+                    Files.createDirectories(directoryPath);
+                }
+                Path filePath = directoryPath.resolve(fileName);
+                Files.copy(ticketFile.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
+
+                return filePath.toString();
+
             } catch (IOException e) {
                 e.printStackTrace();
                 throw new RuntimeException("Failed to save the file", e);

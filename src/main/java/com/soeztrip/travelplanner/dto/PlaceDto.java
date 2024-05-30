@@ -24,6 +24,5 @@ public class PlaceDto {
     private Date leave;
     private String ticket;
     private String country;
-    private MultipartFile ticketFile;
 
 }

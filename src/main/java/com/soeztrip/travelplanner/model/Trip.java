@@ -39,7 +39,13 @@ public class Trip {
     @JsonIgnore
     private List<Place> places = new ArrayList<>();
 
-    public Trip(Long id, Date startingDate, Date endingDate, Boolean finished, String title, List<UserTrip> userTrips, List<Place> places) {
+    public Trip(Long id,
+                Date startingDate,
+                Date endingDate,
+                Boolean finished,
+                String title,
+                List<UserTrip> userTrips,
+                List<Place> places) {
         this.id = id;
         this.startingDate = startingDate;
         this.endingDate = endingDate;
