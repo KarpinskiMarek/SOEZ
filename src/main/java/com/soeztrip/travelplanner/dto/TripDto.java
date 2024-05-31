@@ -1,7 +1,6 @@
 package com.soeztrip.travelplanner.dto;
 
 
-import com.soeztrip.travelplanner.model.Place;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -21,6 +20,6 @@ public class TripDto {
     private Date endingDate;
     private Boolean finished;
     private String title;
-    private List<Place> places;
+    private List<PlaceDto> places;
     private List<UserDto> participants;
 }

@@ -1,13 +1,11 @@
 package com.soeztrip.travelplanner.controller;
 
-import com.soeztrip.travelplanner.dto.PlaceDto;
-import com.soeztrip.travelplanner.dto.TripDto;
-import com.soeztrip.travelplanner.dto.TripParticipantDTO;
-import com.soeztrip.travelplanner.dto.WeatherDTO;
+import com.soeztrip.travelplanner.dto.*;
 import com.soeztrip.travelplanner.model.Place;
 import com.soeztrip.travelplanner.repository.PlaceRepository;
 import com.soeztrip.travelplanner.repository.UserRepository;
 import com.soeztrip.travelplanner.service.PlaceService;
+import com.soeztrip.travelplanner.service.TicketService;
 import com.soeztrip.travelplanner.service.TripService;
 import com.soeztrip.travelplanner.service.WeatherService;
 import jakarta.validation.Valid;
@@ -19,11 +17,6 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.nio.file.StandardCopyOption;
 import java.util.List;
 
 @Controller
@@ -34,63 +27,38 @@ public class TripController {
     private UserRepository userRepository;
     private PlaceService placeService;
     private PlaceRepository placeRepository;
+    private TicketService ticketService;
     private WeatherService weatherService;
+
 
     public TripController(TripService tripService,
                           UserRepository userRepository,
                           PlaceService placeService,
                           PlaceRepository placeRepository,
-
+                          TicketService ticketService,
                           WeatherService weatherService) {
         this.tripService = tripService;
         this.userRepository = userRepository;
         this.placeService = placeService;
         this.placeRepository = placeRepository;
+        this.ticketService = ticketService;
         this.weatherService = weatherService;
 
     }
 
-
-    @PostMapping("/trips/places/{id}/new")
-    public ResponseEntity<?> addPlace(@PathVariable Long id,
-                                      @ModelAttribute PlaceDto placeDto,
-                                      @RequestParam(value = "ticketFile", required = false) MultipartFile ticketFile) {
-        try {
-            Long placeId = placeService.addNewPlace(id, placeDto);
-            if (ticketFile != null && !ticketFile.isEmpty()) {
-                String filePath = saveTicketFile(id, placeId, ticketFile);
-                placeDto.setTicket(filePath);
-                placeService.updatePlace(placeId, placeDto);
-
-            }
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
-        }
-
-        return ResponseEntity.status(HttpStatus.CREATED).body("Trip has been updated successfully");
+    @GetMapping("/trips")
+    public ResponseEntity<List<TripDto>> listTrips() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        List<TripDto> tripDto = tripService.findAllTrips(authentication.getName());
+        return ResponseEntity.ok(tripDto);
     }
 
-    @PutMapping("/trips/{idTrip}/places/{idPlace}")
-    public ResponseEntity<?> editPlace(@PathVariable Long idTrip,
-                                       @PathVariable Long idPlace,
-                                       @ModelAttribute PlaceDto dto,
-                                       @RequestParam(value = "ticketFile", required = false) MultipartFile ticketFile) {
-        if (!tripService.tripExists(idTrip)) {
+    @GetMapping("/trips/{id}")
+    public ResponseEntity<?> listTrip(@PathVariable Long id) {
+        if (!tripService.tripExists(id)) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Trip not found");
         }
-        if (!placeService.placeExists(idPlace)) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Place not found");
-        }
-        try {
-            if (ticketFile != null && !ticketFile.isEmpty()) {
-                String filePath = saveTicketFile(idTrip, idPlace, ticketFile);
-                dto.setTicket(filePath);
-            }
-            placeService.updatePlace(idPlace, dto);
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
-        }
-        return ResponseEntity.ok().body("Place has been updated successfully");
+        return ResponseEntity.ok(tripService.findTrip(id));
     }
 
     @PostMapping("/trips/new")
@@ -99,31 +67,18 @@ public class TripController {
         return ResponseEntity.status(HttpStatus.CREATED).body("Trip has been successfully created");
     }
 
-    @DeleteMapping("/trips/{id}")
-    public ResponseEntity<?> deleteTrip(@PathVariable Long id) {
-        if (!tripService.tripExists(id)) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Trip not found");
-        }
-        tripService.deleteTrip(id);
-        return ResponseEntity.ok().body("Trip has been deleted");
-    }
-
-    @DeleteMapping("/trips/{idTrip}/places/delete/{idPlace}")
-    public ResponseEntity<?> deletePlace(@PathVariable Long idTrip, @PathVariable Long idPlace) {
-        if (!tripService.tripExists(idTrip)) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Trip not found");
-        }
-        if (!placeService.placeExists(idPlace)) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Place not found");
-        }
+    @PostMapping("/trips/places/{id}/new")
+    public ResponseEntity<?> addPlace(@PathVariable Long id,
+                                      @RequestBody PlaceDto placeDto) {
         try {
-            placeService.deletePlace(idPlace);
+            Long placeId = placeService.addNewPlace(id, placeDto);
+            placeService.updatePlace(placeId, placeDto);
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
-        return ResponseEntity.ok().body("Place has been deleted successfully");
-    }
 
+        return ResponseEntity.status(HttpStatus.CREATED).body("Trip has been updated successfully");
+    }
 
     @PutMapping("/trips/{id}")
     public ResponseEntity<?> editTrip(@PathVariable Long id,
@@ -140,14 +95,46 @@ public class TripController {
         return ResponseEntity.ok().body("Trip has been updated successfully");
     }
 
-    @GetMapping("/places/{idPlace}")
-    public ResponseEntity<?> getPlace(@PathVariable Long idPlace) {
+    @PutMapping("/trips/{idTrip}/places/{idPlace}")
+    public ResponseEntity<?> editPlace(@PathVariable Long idTrip,
+                                       @PathVariable Long idPlace,
+                                       @RequestBody PlaceDto dto) {
+        if (!tripService.tripExists(idTrip)) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Trip not found");
+        }
         if (!placeService.placeExists(idPlace)) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Place not found");
         }
-        return ResponseEntity.ok(placeService.getPlace(idPlace));
+        try {
+            placeService.updatePlace(idPlace, dto);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+        return ResponseEntity.ok().body("Place has been updated successfully");
     }
 
+    @PostMapping("/trips/{idTrip}/places/{idPlace}/tickets/new")
+    public ResponseEntity<?> addNewTicket(@PathVariable Long idTrip,
+                                          @PathVariable Long idPlace,
+                                          @ModelAttribute TicketDto dto,
+                                          @RequestParam(value = "ticketFile", required = false) MultipartFile ticketFile) {
+        if (!tripService.tripExists(idTrip)) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Trip not found");
+        }
+        if (!placeService.placeExists(idPlace)) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Place not found");
+        }
+        try {
+            if (ticketFile != null && !ticketFile.isEmpty()) {
+                String filePath = ticketService.saveTicketFile(idTrip, idPlace, ticketFile);
+                dto.setTicketPath(filePath);
+                ticketService.newTicket(idPlace, dto);
+            }
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+        return ResponseEntity.ok().body("Ticket has been successfully added");
+    }
 
     @PutMapping("/trips/{id}/addPerson")
     public ResponseEntity<?> addPerson(@PathVariable Long id, @RequestBody TripParticipantDTO dto) {
@@ -201,19 +188,50 @@ public class TripController {
         }
     }
 
-    @GetMapping("/trips")
-    public ResponseEntity<List<TripDto>> listTrips() {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        List<TripDto> tripDto = tripService.findAllTrips(authentication.getName());
-        return ResponseEntity.ok(tripDto);
-    }
-
-    @GetMapping("/trips/{id}")
-    public ResponseEntity<?> listTrip(@PathVariable Long id) {
+    @DeleteMapping("/trips/{id}")
+    public ResponseEntity<?> deleteTrip(@PathVariable Long id) {
         if (!tripService.tripExists(id)) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Trip not found");
         }
-        return ResponseEntity.ok(tripService.findTrip(id));
+        tripService.deleteTrip(id);
+        return ResponseEntity.ok().body("Trip has been deleted");
+    }
+
+    @DeleteMapping("/trips/{idTrip}/places/delete/{idPlace}")
+    public ResponseEntity<?> deletePlace(@PathVariable Long idTrip, @PathVariable Long idPlace) {
+        if (!tripService.tripExists(idTrip)) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Trip not found");
+        }
+        if (!placeService.placeExists(idPlace)) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Place not found");
+        }
+        try {
+            placeService.deletePlace(idPlace, idTrip);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+        return ResponseEntity.ok().body("Place has been deleted successfully");
+    }
+
+    @DeleteMapping("/trips/{idTrip}/places/{idPlace}/tickets/{idTicket}")
+    public ResponseEntity<?> deleteTicket(@PathVariable Long idTrip,
+                                          @PathVariable Long idPlace,
+                                          @PathVariable Long idTicket) {
+        if (!tripService.tripExists(idTrip)) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Trip not found");
+        }
+        if (!placeService.placeExists(idPlace)) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Place not found");
+        }
+        if (!ticketService.ticketExists(idTicket)) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Ticket not found");
+        }
+        try {
+            ticketService.deleteTicket(idTrip, idPlace, idTicket);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+        return ResponseEntity.ok().body("Ticket has been deleted successfully");
     }
 
     @GetMapping("/trips/places/{id}/weather")
@@ -235,25 +253,4 @@ public class TripController {
         return ResponseEntity.ok(weatherDTO);
     }
 
-    public String saveTicketFile(Long tripId, Long placeId, MultipartFile ticketFile) {
-        if (ticketFile != null && !ticketFile.isEmpty()) {
-            try {
-                String fileName = ticketFile.getOriginalFilename();
-                String projectRootDirectory = System.getProperty("user.dir");
-                Path directoryPath = Paths.get(projectRootDirectory, "TripData", tripId.toString(), placeId.toString());
-                if (!Files.exists(directoryPath)) {
-                    Files.createDirectories(directoryPath);
-                }
-                Path filePath = directoryPath.resolve(fileName);
-                Files.copy(ticketFile.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
-
-                return filePath.toString();
-
-            } catch (IOException e) {
-                e.printStackTrace();
-                throw new RuntimeException("Failed to save the file", e);
-            }
-        }
-        return null;
-    }
 }

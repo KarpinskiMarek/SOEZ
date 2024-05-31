@@ -1,6 +1,7 @@
 package com.soeztrip.travelplanner.dto;
 
 import com.soeztrip.travelplanner.model.Country;
+import com.soeztrip.travelplanner.model.Ticket;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -9,6 +10,7 @@ import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.Date;
+import java.util.List;
 
 @Data
 @Builder
@@ -22,7 +24,8 @@ public class PlaceDto {
     private Date arrive;
     @DateTimeFormat(pattern = "yyyy-MM-dd")
     private Date leave;
-    private String ticket;
+    private String prompt;
     private String country;
+    private List<TicketDto> tickets;
 
 }

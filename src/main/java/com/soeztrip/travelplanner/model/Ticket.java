@@ -11,19 +11,18 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @Builder
 @Entity
-@Table(name = "transports")
-public class Transport {
+@Table(name = "tickets")
+public class Ticket {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String ticket;
+    private String name;
 
-    private String fromDate;
+    private String ticketPath;
 
-    private String toDate;
-
-    @OneToOne(mappedBy = "transport", cascade = CascadeType.ALL)
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "place_id")
     private Place place;
 }

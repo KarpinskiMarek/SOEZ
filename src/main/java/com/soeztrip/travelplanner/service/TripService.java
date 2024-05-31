@@ -1,12 +1,11 @@
 package com.soeztrip.travelplanner.service;
 
 
+import com.soeztrip.travelplanner.dto.PlaceDto;
+import com.soeztrip.travelplanner.dto.TicketDto;
 import com.soeztrip.travelplanner.dto.TripDto;
 import com.soeztrip.travelplanner.dto.UserDto;
-import com.soeztrip.travelplanner.model.Trip;
-import com.soeztrip.travelplanner.model.TripRole;
-import com.soeztrip.travelplanner.model.UserEntity;
-import com.soeztrip.travelplanner.model.UserTrip;
+import com.soeztrip.travelplanner.model.*;
 import com.soeztrip.travelplanner.repository.TripRepository;
 import com.soeztrip.travelplanner.repository.UserRepository;
 import com.soeztrip.travelplanner.repository.UserTripRepository;
@@ -15,6 +14,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -22,26 +22,36 @@ import java.util.stream.Collectors;
 public class TripService {
 
     private TripRepository tripRepository;
-
     private UserRepository userRepository;
-
     private UserTripRepository userTripRepository;
-
     private TripRoleService tripRoleService;
+    private TicketService ticketService;
 
     @Autowired
     public TripService(TripRepository tripRepository,
                        UserRepository userRepository,
                        UserTripRepository userTripRepository,
-                       TripRoleService tripRoleService) {
+                       TripRoleService tripRoleService,
+                       TicketService ticketService) {
         this.tripRepository = tripRepository;
         this.userRepository = userRepository;
         this.userTripRepository = userTripRepository;
         this.tripRoleService = tripRoleService;
+        this.ticketService = ticketService;
     }
 
     public void deleteTrip(Long id) {
+        Trip trip = this.tripRepository.findById(id).orElseThrow();
+        List<Place> placesList = trip.getPlaces();
+        if (placesList != null && !placesList.isEmpty()) {
+            placesList.forEach(place -> {
+                List<Ticket> ticketList = place.getTickets();
+                ticketService.removeFiles(ticketList);
+
+            });
+        }
         tripRepository.deleteById(id);
+
     }
 
     public TripDto findTrip(Long id) {
@@ -55,28 +65,79 @@ public class TripService {
     }
 
     public Trip mapToTrip(TripDto tripDto) {
-        Trip trip = Trip.builder()
-                .id(tripDto.getId())
-                .startingDate(tripDto.getStartingDate())
-                .endingDate(tripDto.getEndingDate())
-                .finished(tripDto.getFinished())
-                .title(tripDto.getTitle())
-                .places(tripDto.getPlaces())
-                .build();
+        Trip trip = new Trip();
+        trip.setId(tripDto.getId());
+        trip.setStartingDate(tripDto.getStartingDate());
+        trip.setEndingDate(tripDto.getEndingDate());
+        trip.setFinished(tripDto.getFinished());
+        trip.setTitle(tripDto.getTitle());
+
+        List<Place> places = (tripDto.getPlaces() != null) ?
+                tripDto.getPlaces().stream().map(this::mapToPlace).collect(Collectors.toList()) :
+                new ArrayList<>();
+        trip.setPlaces(places);
         return trip;
     }
 
+    public Place mapToPlace(PlaceDto placeDto) {
+        Place place = new Place();
+        place.setId(placeDto.getId());
+        place.setName(placeDto.getName());
+        place.setArrive(placeDto.getArrive());
+        place.setLeave(placeDto.getLeave());
+        place.setPrompt(placeDto.getPrompt());
+        place.setCountry(placeDto.getCountry());
+
+        List<Ticket> tickets = (placeDto.getTickets() != null) ?
+                placeDto.getTickets().stream().map(this::mapToTicket).collect(Collectors.toList()) :
+                new ArrayList<>();
+        place.setTickets(tickets);
+        return place;
+    }
+
+    public Ticket mapToTicket(TicketDto ticketDto) {
+        Ticket ticket = new Ticket();
+        ticket.setId(ticketDto.getId());
+        ticket.setName(ticketDto.getName());
+        return ticket;
+    }
+
     public TripDto mapToTripDto(Trip trip) {
-        TripDto tripDto = TripDto.builder()
-                .id(trip.getId())
-                .startingDate(trip.getStartingDate())
-                .endingDate(trip.getEndingDate())
-                .finished(trip.getFinished())
-                .title(trip.getTitle())
-                .places(trip.getPlaces())
-                .participants(mapToUserDtoList(trip.getUserTrips()))
-                .build();
+        TripDto tripDto = new TripDto();
+        tripDto.setId(trip.getId());
+        tripDto.setStartingDate(trip.getStartingDate());
+        tripDto.setEndingDate(trip.getEndingDate());
+        tripDto.setFinished(trip.getFinished());
+        tripDto.setTitle(trip.getTitle());
+        List<PlaceDto> placeDtos = trip.getPlaces().stream().map(this::mapToPlaceDto).collect(Collectors.toList());
+
+        tripDto.setPlaces(placeDtos);
+        tripDto.setParticipants(mapToUserDtoList(trip.getUserTrips()));
+
         return tripDto;
+    }
+
+    public PlaceDto mapToPlaceDto(Place place) {
+        PlaceDto placeDto = new PlaceDto();
+        placeDto.setId(place.getId());
+        placeDto.setName(place.getName());
+        placeDto.setArrive(place.getArrive());
+        placeDto.setLeave(place.getLeave());
+        placeDto.setPrompt(place.getPrompt());
+        placeDto.setCountry(place.getCountry());
+
+        List<TicketDto> ticketDtos = place.getTickets().stream().map(this::mapToTicketDto).collect(Collectors.toList());
+        placeDto.setTickets(ticketDtos);
+
+        return placeDto;
+    }
+
+    public TicketDto mapToTicketDto(Ticket ticket) {
+        TicketDto ticketDto = new TicketDto();
+        ticketDto.setId(ticket.getId());
+        ticketDto.setName(ticket.getName());
+
+        return ticketDto;
     }
 
     private List<UserDto> mapToUserDtoList(List<UserTrip> userTrips) {
@@ -107,14 +168,9 @@ public class TripService {
         return tripRepository.existsById(id);
     }
 
-    private String checkUserRole(Long id) {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String requesterEmail = authentication.getName();
-        return userTripRepository.findRole(id, requesterEmail).orElseThrow();
-    }
 
     public void updateTrip(Long id, TripDto tripDto) {
-        String requesterRole = this.checkUserRole(id);
+        String requesterRole = tripRoleService.checkUserRole(id);
         if (!"OWNER".equals(requesterRole) && !"MANAGER".equals(requesterRole)) {
             throw new RuntimeException("Only the trip owner or manager can modify trip properties");
         }
@@ -137,7 +193,7 @@ public class TripService {
     }
 
     public void addParticipant(Long id, String email) {
-        String requesterRole = checkUserRole(id);
+        String requesterRole = tripRoleService.checkUserRole(id);
         if (!"OWNER".equals(requesterRole) && !"MANAGER".equals(requesterRole)) {
             throw new RuntimeException("Only the trip owner or manager can add participants");
         }
@@ -152,7 +208,7 @@ public class TripService {
     }
 
     public void removeParticipant(Long id, String email) {
-        String requesterRole = checkUserRole(id);
+        String requesterRole = tripRoleService.checkUserRole(id);
         if (!"OWNER".equals(requesterRole) && !"MANAGER".equals(requesterRole)) {
             throw new RuntimeException("Only the trip owner or manager can remove participants");
         }
@@ -182,4 +238,5 @@ public class TripService {
         userTrip.setTripRole(tripRole);
         userTripRepository.save(userTrip);
     }
+
 }
