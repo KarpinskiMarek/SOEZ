@@ -20,10 +20,9 @@ public class Transport {
 
     private String ticket;
 
-    private String fromDate;
+    private String ticketPath;
 
-    private String toDate;
-
-    @OneToOne(mappedBy = "transport", cascade = CascadeType.ALL)
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "place_id")
     private Place place;
 }
