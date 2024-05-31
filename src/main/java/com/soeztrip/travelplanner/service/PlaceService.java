@@ -2,35 +2,38 @@ package com.soeztrip.travelplanner.service;
 
 import com.soeztrip.travelplanner.dto.PlaceDto;
 import com.soeztrip.travelplanner.model.Place;
+import com.soeztrip.travelplanner.model.Ticket;
 import com.soeztrip.travelplanner.model.Trip;
 import com.soeztrip.travelplanner.repository.PlaceRepository;
 import com.soeztrip.travelplanner.repository.TripRepository;
-import com.soeztrip.travelplanner.repository.UserTripRepository;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 public class PlaceService {
 
     private PlaceRepository placeRepository;
     private TripRepository tripRepository;
-    private UserTripRepository userTripRepository;
+    private TripService tripService;
+    private TicketService ticketService;
+    private TripRoleService tripRoleService;
 
     public PlaceService(PlaceRepository placeRepository,
                         TripRepository tripRepository,
-                        UserTripRepository userTripRepository) {
+                        TripService tripService,
+                        TicketService ticketService,
+                        TripRoleService tripRoleService) {
         this.placeRepository = placeRepository;
         this.tripRepository = tripRepository;
-        this.userTripRepository = userTripRepository;
+        this.tripService = tripService;
+        this.ticketService = ticketService;
+        this.tripRoleService = tripRoleService;
     }
 
 
     public Long addNewPlace(Long tripId, PlaceDto dto) {
-        String requesterRole = this.checkUserRole(tripId);
+        String requesterRole = tripRoleService.checkUserRole(tripId);
         if (!"OWNER".equals(requesterRole) && !"MANAGER".equals(requesterRole)) {
             throw new RuntimeException("Only the trip owner or manager can create new places");
         }
@@ -39,11 +42,9 @@ public class PlaceService {
         place.setName(dto.getName());
         place.setArrive(dto.getArrive());
         place.setLeave(dto.getLeave());
-        place.setTicket(dto.getTicket());
         place.setCountry(dto.getCountry());
         Trip trip = this.tripRepository.findById(tripId).orElseThrow();
         place.setTrip(trip);
-
 
         Place theCreatedPlace = placeRepository.save(place);
         trip.getPlaces().add(place);
@@ -51,51 +52,22 @@ public class PlaceService {
         return theCreatedPlace.getId();
     }
 
-    public PlaceDto getPlace(Long id) {
-        Place place = placeRepository.findById(id).get();
-        return mapToPlaceDto(place);
-    }
-
-    public void deletePlace(Long id) {
-        String requesterRole = this.checkUserRole(id);
+    public void deletePlace(Long placeId, Long tripId) {
+        String requesterRole = tripRoleService.checkUserRole(tripId);
         if (!"OWNER".equals(requesterRole) && !"MANAGER".equals(requesterRole)) {
             throw new RuntimeException("Only the trip owner or manager can delete places");
         }
-        placeRepository.deleteById(id);
-    }
-
-    public List<PlaceDto> findAllPlaces() {
-        List<Place> places = placeRepository.findAll();
-        return places.stream().map(this::mapToPlaceDto).collect(Collectors.toList());
-    }
-
-    protected PlaceDto mapToPlaceDto(Place place) {
-        PlaceDto placeDto = PlaceDto.builder()
-                .id(place.getId())
-                .name(place.getName())
-                .arrive(place.getArrive())
-                .leave(place.getLeave())
-                .ticket(place.getTicket())
-                .country(place.getCountry())
-                .build();
-        return placeDto;
+        Place place = this.placeRepository.findById(placeId).orElseThrow();
+        List<Ticket> ticketList = place.getTickets();
+        if(ticketList!=null&&!ticketList.isEmpty()){
+            ticketList.stream().map(Ticket::getTicketPath).forEach(ticketService::removeFile);
+        }
+        placeRepository.deleteById(placeId);
     }
 
     public Place savePlace(PlaceDto placeDto) {
-        Place place = mapToPlace(placeDto);
+        Place place = tripService.mapToPlace(placeDto);
         return placeRepository.save(place);
-    }
-
-    public Place mapToPlace(PlaceDto placeDto) {
-        Place place = Place.builder()
-                .id(placeDto.getId())
-                .name(placeDto.getName())
-                .arrive(placeDto.getArrive())
-                .leave(placeDto.getLeave())
-                .ticket(placeDto.getTicket())
-                .country(placeDto.getCountry())
-                .build();
-        return place;
     }
 
     public boolean placeExists(Long id) {
@@ -105,7 +77,7 @@ public class PlaceService {
     public void updatePlace(Long placeId, PlaceDto dto) {
         Place place = this.placeRepository.findById(placeId).orElseThrow();
         Long tripId = place.getTrip().getId();
-        String requesterRole = this.checkUserRole(tripId);
+        String requesterRole = tripRoleService.checkUserRole(tripId);
         if (!"OWNER".equals(requesterRole) && !"MANAGER".equals(requesterRole)) {
             throw new RuntimeException("Only the trip owner or manager can modify place properties");
         }
@@ -119,21 +91,12 @@ public class PlaceService {
         if (dto.getLeave() != null) {
             place.setLeave(dto.getLeave());
         }
-        if (dto.getTicket() != null) {
-            place.setTicket(dto.getTicket());
-        }
         if (dto.getCountry() != null) {
             place.setCountry(dto.getCountry());
         }
+        if (dto.getPrompt() != null) {
+            place.setPrompt(dto.getPrompt());
+        }
         placeRepository.save(place);
     }
-
-    private String checkUserRole(Long id) {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String requesterEmail = authentication.getName();
-        return userTripRepository.findRole(id, requesterEmail)
-                .orElseThrow(() -> new IllegalArgumentException(
-                        "Role not found for user with email: " + requesterEmail));
-    }
-
 }

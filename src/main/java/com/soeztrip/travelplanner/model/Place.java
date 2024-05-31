@@ -1,5 +1,6 @@
 package com.soeztrip.travelplanner.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Data;
@@ -26,8 +27,6 @@ public class Place {
 
     private Date leave;
 
-    private String ticket;
-
     @Column(length = 2048)
     private String prompt;
 
@@ -41,23 +40,22 @@ public class Place {
     @JoinColumn(name = "trip_id")
     private Trip trip;
 
-    @OneToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "transport_id", referencedColumnName = "id")
-    private Transport transport;
+    @OneToMany(mappedBy = "place", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonIgnore
+    private List<Ticket> tickets = new ArrayList<>();
 
     @OneToMany(mappedBy = "place", cascade = CascadeType.ALL)
     private List<Activity> activities = new ArrayList<>();
 
-    public Place(Long id, String name, Date arrive, Date leave, String ticket, String prompt, String country, Trip trip, Transport transport, List<Activity> activities) {
+    public Place(Long id, String name, Date arrive, Date leave, String prompt, String country, Trip trip, List<Ticket> transports, List<Activity> activities) {
         this.id = id;
         this.name = name;
         this.arrive = arrive;
         this.leave = leave;
-        this.ticket = ticket;
         this.prompt = prompt;
         this.country = country;
         this.trip = trip;
-        this.transport = transport;
+        this.tickets = new ArrayList<>();
         this.activities = activities;
     }
 }

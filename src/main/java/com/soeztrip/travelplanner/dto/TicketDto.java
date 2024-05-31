@@ -1,15 +1,19 @@
 package com.soeztrip.travelplanner.dto;
 
 
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
 @Builder
-public class TransportDto {
+@AllArgsConstructor
+@NoArgsConstructor
+public class TicketDto {
 
     private Long id;
-    private String ticket;
-    private String fromDate;
-    private String toDate;
+    private String name;
+    private String ticketPath;
+
 }

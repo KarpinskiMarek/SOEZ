@@ -1,52 +1,110 @@
 package com.soeztrip.travelplanner.service;
 
-import com.soeztrip.travelplanner.dto.TransportDto;
-import com.soeztrip.travelplanner.model.Transport;
-import com.soeztrip.travelplanner.repository.TransportRepository;
+import com.soeztrip.travelplanner.dto.TicketDto;
+import com.soeztrip.travelplanner.model.Place;
+import com.soeztrip.travelplanner.model.Ticket;
+import com.soeztrip.travelplanner.repository.PlaceRepository;
+import com.soeztrip.travelplanner.repository.TicketRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
-public class TransportService {
+public class TicketService {
 
-    private TransportRepository transportRepository;
+    private TicketRepository ticketRepository;
+    private PlaceRepository placeRepository;
+    private TripRoleService tripRoleService;
 
-    public TransportService(TransportRepository transportRepository) {
-        this.transportRepository = transportRepository;
+    public TicketService(TicketRepository ticketRepository,
+                         PlaceRepository placeRepository,
+                         TripRoleService tripRoleService) {
+        this.ticketRepository = ticketRepository;
+        this.placeRepository = placeRepository;
+        this.tripRoleService = tripRoleService;
     }
 
-    public void deleteTransport(Long id){
-        transportRepository.deleteById(id);
+    public void newTicket(Long placeId, TicketDto dto) {
+        Ticket ticket = new Ticket();
+        Place place = this.placeRepository.findById(placeId).orElseThrow();
+        ticket.setName(dto.getName());
+        ticket.setTicketPath(dto.getTicketPath());
+        ticket.setPlace(place);
+        ticketRepository.save(ticket);
+        place.getTickets().add(ticket);
+        placeRepository.save(place);
     }
 
-    public List<TransportDto> findAllTransports(){
-        List<Transport>transports=transportRepository.findAll();
-        return transports.stream().map(this::mapToTransportDto).collect(Collectors.toList());
+    public void editTicket(){
+
+    }
+    public void deleteTicket(Long tripId, Long placeId, Long ticketId ){
+        String requesterRole = tripRoleService.checkUserRole(tripId);
+        if (!"OWNER".equals(requesterRole) && !"MANAGER".equals(requesterRole)) {
+            throw new RuntimeException("Only the trip owner or manager can delete places");
+        }
+        Ticket ticket = this.ticketRepository.findById(ticketId).orElseThrow();
+        removeFile(ticket.getTicketPath());
+        ticketRepository.deleteById(ticketId);
+
     }
 
-    private TransportDto mapToTransportDto(Transport transport){
-        TransportDto transportDto=TransportDto.builder()
-                .id(transport.getId())
-                .ticket(transport.getTicket())
-                .fromDate(transport.getFromDate())
-                .toDate(transport.getToDate())
-                .build();
-        return transportDto;
+    public String saveTicketFile(Long tripId, Long placeId, MultipartFile ticketFile) {
+        if (ticketFile != null && !ticketFile.isEmpty()) {
+            try {
+                String fileName = ticketFile.getOriginalFilename();
+                String projectRootDirectory = System.getProperty("user.dir");
+                Path directoryPath = Paths.get(projectRootDirectory, "TripData", tripId.toString(), placeId.toString());
+                if (!Files.exists(directoryPath)) {
+                    Files.createDirectories(directoryPath);
+                }
+                Path filePath = directoryPath.resolve(fileName);
+                Files.copy(ticketFile.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
+
+                return filePath.toString();
+
+            } catch (IOException e) {
+                e.printStackTrace();
+                throw new RuntimeException("Failed to save the file", e);
+            }
+        }
+        return null;
     }
-    public Transport saveTransport(TransportDto transportDto){
-        Transport transport=mapToTransport(transportDto);
-        return transportRepository.save(transport);
+    protected void removeFile(String ticketPath) {
+        if (ticketPath != null && !ticketPath.isEmpty()) {
+            Path path = Paths.get(ticketPath);
+            try {
+                if (Files.exists(path)) {
+                    Files.delete(path);
+                    System.out.println("File deleted successfully: " + ticketPath);
+                } else {
+                    System.out.println("File not found: " + ticketPath);
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+                throw new RuntimeException("Failed to delete the file", e);
+            }
+        }
+    }
+    protected void removeFiles(List<Ticket> ticketList){
+        if (ticketList != null && !ticketList.isEmpty()) {
+            for (Ticket ticket : ticketList) {
+                String ticketPath = ticket.getTicketPath();
+                if (ticketPath != null && !ticketPath.isEmpty()) {
+                    removeFile(ticketPath);
+                }
+            }
+        }
     }
 
-    private Transport mapToTransport(TransportDto transportDto) {
-        Transport transport=Transport.builder()
-                .id(transportDto.getId())
-                .ticket(transportDto.getTicket())
-                .fromDate(transportDto.getFromDate())
-                .toDate(transportDto.getToDate())
-                .build();
-        return transport;
+    public boolean ticketExists(Long id) {
+        return ticketRepository.existsById(id);
     }
+
 }
