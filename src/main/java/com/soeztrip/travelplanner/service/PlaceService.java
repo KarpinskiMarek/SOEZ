@@ -1,6 +1,7 @@
 package com.soeztrip.travelplanner.service;
 
 import com.soeztrip.travelplanner.dto.PlaceDto;
+import com.soeztrip.travelplanner.dto.TicketDto;
 import com.soeztrip.travelplanner.model.Place;
 import com.soeztrip.travelplanner.model.Ticket;
 import com.soeztrip.travelplanner.model.Trip;
@@ -9,6 +10,7 @@ import com.soeztrip.travelplanner.repository.TripRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class PlaceService {
@@ -59,7 +61,7 @@ public class PlaceService {
         }
         Place place = this.placeRepository.findById(placeId).orElseThrow();
         List<Ticket> ticketList = place.getTickets();
-        if(ticketList!=null&&!ticketList.isEmpty()){
+        if (ticketList != null && !ticketList.isEmpty()) {
             ticketList.stream().map(Ticket::getTicketPath).forEach(ticketService::removeFile);
         }
         placeRepository.deleteById(placeId);
@@ -98,5 +100,12 @@ public class PlaceService {
             place.setPrompt(dto.getPrompt());
         }
         placeRepository.save(place);
+    }
+
+    public List<TicketDto> getTickets(Long id) {
+        Place place = this.placeRepository.findById(id).orElseThrow();
+        List<Ticket> ticketList = place.getTickets();
+        List<TicketDto> ticketDtoList = ticketList.stream().map(tripService::mapToTicketDto).collect(Collectors.toList());
+        return ticketDtoList;
     }
 }

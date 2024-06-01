@@ -8,6 +8,7 @@ import com.soeztrip.travelplanner.repository.TicketRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -41,10 +42,11 @@ public class TicketService {
         placeRepository.save(place);
     }
 
-    public void editTicket(){
+    public void editTicket() {
 
     }
-    public void deleteTicket(Long tripId, Long placeId, Long ticketId ){
+
+    public void deleteTicket(Long tripId, Long placeId, Long ticketId) {
         String requesterRole = tripRoleService.checkUserRole(tripId);
         if (!"OWNER".equals(requesterRole) && !"MANAGER".equals(requesterRole)) {
             throw new RuntimeException("Only the trip owner or manager can delete places");
@@ -76,6 +78,7 @@ public class TicketService {
         }
         return null;
     }
+
     protected void removeFile(String ticketPath) {
         if (ticketPath != null && !ticketPath.isEmpty()) {
             Path path = Paths.get(ticketPath);
@@ -92,7 +95,8 @@ public class TicketService {
             }
         }
     }
-    protected void removeFiles(List<Ticket> ticketList){
+
+    protected void removeFiles(List<Ticket> ticketList) {
         if (ticketList != null && !ticketList.isEmpty()) {
             for (Ticket ticket : ticketList) {
                 String ticketPath = ticket.getTicketPath();
@@ -107,4 +111,8 @@ public class TicketService {
         return ticketRepository.existsById(id);
     }
 
+    public File downloadTicket(Long id) {
+        Ticket ticket = this.ticketRepository.findById(id).orElseThrow();
+        return new File(ticket.getTicketPath());
+    }
 }
