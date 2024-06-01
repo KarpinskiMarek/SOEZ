@@ -25,4 +25,15 @@ public class Ticket {
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "place_id")
     private Place place;
+
+
+    @Override
+    public String toString() {
+        return "Ticket{" +
+                "id=" + id +
+                ", name='" + name + '\'' +
+                ", ticketPath='" + ticketPath + '\'' +
+                ", placeId=" + (place != null ? place.getId() : "null") +
+                '}';
+    }
 }

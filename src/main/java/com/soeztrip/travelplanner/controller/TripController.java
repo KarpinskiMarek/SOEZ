@@ -9,7 +9,10 @@ import com.soeztrip.travelplanner.service.TicketService;
 import com.soeztrip.travelplanner.service.TripService;
 import com.soeztrip.travelplanner.service.WeatherService;
 import jakarta.validation.Valid;
+import org.springframework.core.io.InputStreamResource;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -17,6 +20,9 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.util.List;
 
 @Controller
@@ -61,6 +67,34 @@ public class TripController {
         return ResponseEntity.ok(tripService.findTrip(id));
     }
 
+    @GetMapping("/tickets/{id}/download")
+    public ResponseEntity<?> downloadFile(@PathVariable Long id) throws FileNotFoundException {
+        if (!ticketService.ticketExists(id)) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Ticket not found");
+        }
+        try {
+            File file = this.ticketService.downloadTicket(id);
+            InputStreamResource resource = new InputStreamResource(
+                    new FileInputStream(file));
+            return ResponseEntity.ok()
+                    .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + file.getName() + "\"")
+                    .contentLength(file.length())
+                    .contentType(MediaType.APPLICATION_OCTET_STREAM)
+                    .body(resource);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to download the file");
+        }
+    }
+
+    @GetMapping("place/{id}/tickets")
+    public ResponseEntity<?> getTickets(@PathVariable Long id) {
+        if (!placeService.placeExists(id)) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Place not found");
+        }
+        return ResponseEntity.ok().body(this.placeService.getTickets(id));
+    }
+
     @PostMapping("/trips/new")
     public ResponseEntity<?> createTrip(@RequestBody @Valid TripDto tripDto) {
         tripService.saveTrip(tripDto);
@@ -77,7 +111,7 @@ public class TripController {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
 
-        return ResponseEntity.status(HttpStatus.CREATED).body("Trip has been updated successfully");
+        return ResponseEntity.status(HttpStatus.CREATED).body("Place has been updated successfully");
     }
 
     @PutMapping("/trips/{id}")
