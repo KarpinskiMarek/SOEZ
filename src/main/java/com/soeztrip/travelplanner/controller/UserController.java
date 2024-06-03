@@ -3,14 +3,18 @@ package com.soeztrip.travelplanner.controller;
 import com.soeztrip.travelplanner.dto.UserDto;
 import com.soeztrip.travelplanner.service.UserService;
 import jakarta.validation.Valid;
+import org.springframework.core.io.Resource;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.net.MalformedURLException;
 import java.net.URI;
 
 
@@ -48,6 +52,18 @@ public class UserController {
         return ResponseEntity.ok(userService.getFriends(authentication.getName()));
     }
 
+    @GetMapping("/users/{id}/profilePicture")
+    public ResponseEntity<?> getProfilePicture(@PathVariable Long id) throws MalformedURLException {
+        if(!userService.userExists(id)){
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found");
+        }
+        Resource resource = this.userService.getPictureResource(id);
+        return ResponseEntity.ok()
+                .contentType(MediaType.IMAGE_PNG)
+                .body(resource);
+
+    }
+
     @PutMapping("/users/{id}")
     public ResponseEntity<?> editUser(@PathVariable Long id,
                                       @Valid @RequestBody UserDto userDto,
@@ -63,6 +79,22 @@ public class UserController {
         return ResponseEntity.created(URI.create("/" + userDto.getId())).body(userDto);
     }
 
+    @PutMapping("/users/{id}/uploadPP")
+    public ResponseEntity<?> uploadPhoto(@PathVariable Long id,
+                                         @RequestParam(value = "profilePicture",
+                                                 required = true) MultipartFile pictureFile) {
+        if (!userService.userExists(id)) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found");
+        }
+        try {
+            String filePath = userService.saveProfilePicture(id,pictureFile);
+            userService.updateProfilePicture(id, filePath);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+        return ResponseEntity.ok().body("Profile picture has been uploaded successfully");
+    }
+
     @DeleteMapping("/users/{id}")
     public ResponseEntity<?> deleteUser(@PathVariable Long id) {
         if (!userService.userExists(id)) {
@@ -71,6 +103,7 @@ public class UserController {
         userService.deleteUser(id);
         return ResponseEntity.ok().build();
     }
+
     @PostMapping("users/add-friend/{friendId}")
     public ResponseEntity<?> addFriend(@PathVariable Long friendId) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();

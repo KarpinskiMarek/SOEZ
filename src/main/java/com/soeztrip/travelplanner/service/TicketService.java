@@ -14,7 +14,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
-import java.util.List;
 
 @Service
 public class TicketService {
@@ -22,13 +21,16 @@ public class TicketService {
     private TicketRepository ticketRepository;
     private PlaceRepository placeRepository;
     private TripRoleService tripRoleService;
+    private FileService fileService;
 
     public TicketService(TicketRepository ticketRepository,
                          PlaceRepository placeRepository,
-                         TripRoleService tripRoleService) {
+                         TripRoleService tripRoleService,
+                         FileService fileService) {
         this.ticketRepository = ticketRepository;
         this.placeRepository = placeRepository;
         this.tripRoleService = tripRoleService;
+        this.fileService = fileService;
     }
 
     public void newTicket(Long placeId, TicketDto dto) {
@@ -42,68 +44,32 @@ public class TicketService {
         placeRepository.save(place);
     }
 
-    public void editTicket() {
-
-    }
-
     public void deleteTicket(Long tripId, Long placeId, Long ticketId) {
         String requesterRole = tripRoleService.checkUserRole(tripId);
         if (!"OWNER".equals(requesterRole) && !"MANAGER".equals(requesterRole)) {
             throw new RuntimeException("Only the trip owner or manager can delete places");
         }
         Ticket ticket = this.ticketRepository.findById(ticketId).orElseThrow();
-        removeFile(ticket.getTicketPath());
+        fileService.removeFile(ticket.getTicketPath());
         ticketRepository.deleteById(ticketId);
 
     }
 
     public String saveTicketFile(Long tripId, Long placeId, MultipartFile ticketFile) {
-        if (ticketFile != null && !ticketFile.isEmpty()) {
-            try {
-                String fileName = ticketFile.getOriginalFilename();
-                String projectRootDirectory = System.getProperty("user.dir");
-                Path directoryPath = Paths.get(projectRootDirectory, "TripData", tripId.toString(), placeId.toString());
-                if (!Files.exists(directoryPath)) {
-                    Files.createDirectories(directoryPath);
-                }
-                Path filePath = directoryPath.resolve(fileName);
-                Files.copy(ticketFile.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
-
-                return filePath.toString();
-
-            } catch (IOException e) {
-                e.printStackTrace();
-                throw new RuntimeException("Failed to save the file", e);
+        try {
+            String fileName = ticketFile.getOriginalFilename();
+            String projectRootDirectory = System.getProperty("user.dir");
+            Path directoryPath = Paths.get(projectRootDirectory, "TripData", tripId.toString(), placeId.toString());
+            if (!Files.exists(directoryPath)) {
+                Files.createDirectories(directoryPath);
             }
-        }
-        return null;
-    }
+            Path filePath = directoryPath.resolve(fileName);
+            Files.copy(ticketFile.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
 
-    protected void removeFile(String ticketPath) {
-        if (ticketPath != null && !ticketPath.isEmpty()) {
-            Path path = Paths.get(ticketPath);
-            try {
-                if (Files.exists(path)) {
-                    Files.delete(path);
-                    System.out.println("File deleted successfully: " + ticketPath);
-                } else {
-                    System.out.println("File not found: " + ticketPath);
-                }
-            } catch (IOException e) {
-                e.printStackTrace();
-                throw new RuntimeException("Failed to delete the file", e);
-            }
-        }
-    }
+            return filePath.toString();
 
-    protected void removeFiles(List<Ticket> ticketList) {
-        if (ticketList != null && !ticketList.isEmpty()) {
-            for (Ticket ticket : ticketList) {
-                String ticketPath = ticket.getTicketPath();
-                if (ticketPath != null && !ticketPath.isEmpty()) {
-                    removeFile(ticketPath);
-                }
-            }
+        } catch (IOException e) {
+            throw new RuntimeException("Failed to save the ticket", e);
         }
     }
 

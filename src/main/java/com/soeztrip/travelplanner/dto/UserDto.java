@@ -29,4 +29,6 @@ public class UserDto {
     @NotEmpty(message = "password can not be empty")
     private String password;
 
+    private String profilePicturePath;
+
 }

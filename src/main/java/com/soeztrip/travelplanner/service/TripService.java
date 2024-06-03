@@ -25,19 +25,19 @@ public class TripService {
     private UserRepository userRepository;
     private UserTripRepository userTripRepository;
     private TripRoleService tripRoleService;
-    private TicketService ticketService;
+    private FileService fileService;
 
     @Autowired
     public TripService(TripRepository tripRepository,
                        UserRepository userRepository,
                        UserTripRepository userTripRepository,
                        TripRoleService tripRoleService,
-                       TicketService ticketService) {
+                       FileService fileService) {
         this.tripRepository = tripRepository;
         this.userRepository = userRepository;
         this.userTripRepository = userTripRepository;
         this.tripRoleService = tripRoleService;
-        this.ticketService = ticketService;
+        this.fileService = fileService;
     }
 
     public void deleteTrip(Long id) {
@@ -46,8 +46,7 @@ public class TripService {
         if (placesList != null && !placesList.isEmpty()) {
             placesList.forEach(place -> {
                 List<Ticket> ticketList = place.getTickets();
-                ticketService.removeFiles(ticketList);
-
+                fileService.removeFiles(ticketList);
             });
         }
         tripRepository.deleteById(id);

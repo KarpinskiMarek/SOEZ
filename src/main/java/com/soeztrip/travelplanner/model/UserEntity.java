@@ -32,6 +32,9 @@ public class UserEntity {
     @Column(nullable = false)
     private String password;
 
+    @Column
+    private String profilePicturePath;
+
 
     @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     @JoinTable(
