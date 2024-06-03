@@ -18,18 +18,18 @@ public class PlaceService {
     private PlaceRepository placeRepository;
     private TripRepository tripRepository;
     private TripService tripService;
-    private TicketService ticketService;
+    private FileService fileService;
     private TripRoleService tripRoleService;
 
     public PlaceService(PlaceRepository placeRepository,
                         TripRepository tripRepository,
                         TripService tripService,
-                        TicketService ticketService,
+                        FileService fileService,
                         TripRoleService tripRoleService) {
         this.placeRepository = placeRepository;
         this.tripRepository = tripRepository;
         this.tripService = tripService;
-        this.ticketService = ticketService;
+        this.fileService = fileService;
         this.tripRoleService = tripRoleService;
     }
 
@@ -62,7 +62,7 @@ public class PlaceService {
         Place place = this.placeRepository.findById(placeId).orElseThrow();
         List<Ticket> ticketList = place.getTickets();
         if (ticketList != null && !ticketList.isEmpty()) {
-            ticketList.stream().map(Ticket::getTicketPath).forEach(ticketService::removeFile);
+            ticketList.stream().map(Ticket::getTicketPath).forEach(fileService::removeFile);
         }
         placeRepository.deleteById(placeId);
     }

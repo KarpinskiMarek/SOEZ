@@ -2,18 +2,23 @@ package com.soeztrip.travelplanner.service;
 
 import com.soeztrip.travelplanner.dto.UserDto;
 import com.soeztrip.travelplanner.dto.UserNameDto;
-import com.soeztrip.travelplanner.model.Role;
 import com.soeztrip.travelplanner.model.UserEntity;
 import com.soeztrip.travelplanner.repository.RoleRepository;
 import com.soeztrip.travelplanner.repository.UserRepository;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
-import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.userdetails.User;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.UrlResource;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
-import java.util.Arrays;
+import java.io.IOException;
+import java.net.MalformedURLException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -22,11 +27,14 @@ import java.util.stream.Collectors;
 public class UserService {
 
     private UserRepository userRepository;
-
+    private FileService fileService;
     private RoleRepository roleRepository;
 
-    public UserService(UserRepository userRepository, RoleRepository roleRepository) {
+    public UserService(UserRepository userRepository,
+                       FileService fileService,
+                       RoleRepository roleRepository) {
         this.userRepository = userRepository;
+        this.fileService = fileService;
         this.roleRepository = roleRepository;
     }
 
@@ -88,6 +96,34 @@ public class UserService {
         userRepository.save(existingUser);
     }
 
+    public String saveProfilePicture(Long userId, MultipartFile photoFile) {
+        try {
+            String fileName = photoFile.getOriginalFilename();
+            String projectRootDirectory = System.getProperty("user.dir");
+            Path directoryPath = Paths.get(projectRootDirectory, "UserData", userId.toString());
+            if (!Files.exists(directoryPath)) {
+                Files.createDirectories(directoryPath);
+            }
+            Path filePath = directoryPath.resolve(fileName);
+            Files.copy(photoFile.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
+
+            return filePath.toString();
+
+        } catch (IOException e) {
+
+            throw new RuntimeException("Failed to save the photo", e);
+        }
+    }
+
+
+    public void updateProfilePicture(Long id, String filePath) {
+        UserEntity user = this.userRepository.findById(id).orElseThrow(
+                () -> new UsernameNotFoundException("User not found"));
+        fileService.removeFile(user.getProfilePicturePath());
+        user.setProfilePicturePath(filePath);
+        this.userRepository.save(user);
+    }
+
     public void deleteUser(Long id) {
         userRepository.deleteById(id);
     }
@@ -105,6 +141,7 @@ public class UserService {
             userRepository.save(friend);
         }
     }
+
     @Transactional
     public void removeFriend(String userEmail, Long friendId) {
         UserEntity user = userRepository.findByEmail(userEmail).orElseThrow(() -> new IllegalArgumentException("User not found"));
@@ -117,4 +154,9 @@ public class UserService {
         userRepository.save(friend);
     }
 
+    public Resource getPictureResource(Long id) throws MalformedURLException {
+        UserEntity user = this.userRepository.findById(id).orElseThrow();
+        Path path = Paths.get(user.getProfilePicturePath());
+        return new UrlResource(path.toUri());
+    }
 }
