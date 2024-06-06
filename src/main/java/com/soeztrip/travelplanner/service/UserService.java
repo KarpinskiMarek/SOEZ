@@ -1,7 +1,7 @@
 package com.soeztrip.travelplanner.service;
 
+import com.soeztrip.travelplanner.dto.UserDataDto;
 import com.soeztrip.travelplanner.dto.UserDto;
-import com.soeztrip.travelplanner.dto.UserNameDto;
 import com.soeztrip.travelplanner.model.UserEntity;
 import com.soeztrip.travelplanner.repository.RoleRepository;
 import com.soeztrip.travelplanner.repository.UserRepository;
@@ -55,16 +55,17 @@ public class UserService {
         return userRepository.findById(id).get();
     }
 
-    public UserNameDto getUserByEmail(String email) {
+    public UserDataDto getUserByEmail(String email) {
         UserEntity user = userRepository.findByEmail(email).orElseThrow(() -> new UsernameNotFoundException("email not found"));
         return mapUserToUserNameDto(user);
     }
 
-    private UserNameDto mapUserToUserNameDto(UserEntity userEntity) {
-        UserNameDto userDto = UserNameDto.builder()
+    private UserDataDto mapUserToUserNameDto(UserEntity userEntity) {
+        return UserDataDto.builder()
                 .firstName(userEntity.getFirstName())
+                .email(userEntity.getEmail())
+                .id(userEntity.getId())
                 .lastName(userEntity.getLastName()).build();
-        return userDto;
     }
 
     private UserDto mapUserToDto(UserEntity userEntity) {
