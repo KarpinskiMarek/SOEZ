@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Button, Container, TextField, styled, Box } from "@mui/material";
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { createTrip } from '../../services/TripsService';
 
 const FormContainer = styled(Container)(({ theme }) => ({
@@ -53,7 +53,11 @@ const NewTripForm = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
-            const response = await createTrip(formData.title, formData.startingDate, formData.endingDate);
+            const response = await createTrip(
+                formData.title,
+                formData.startingDate, 
+                formData.endingDate
+            );
             if (response && response.status === 201) {
                 navigate("/trips");
             }

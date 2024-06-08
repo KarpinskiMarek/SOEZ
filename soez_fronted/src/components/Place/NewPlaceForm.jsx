@@ -1,6 +1,7 @@
 import { Box, Container, TextField, styled, Button } from "@mui/material";
 import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
+import { addPlace } from "../../services/PlaceService";
 
 const FormContainer = styled(Container)(({ theme }) => ({
     display: 'flex',
@@ -23,11 +24,12 @@ const Form = styled('form')(({ theme }) => ({
 
 const NewPlaceForm = () => {
 
+    const { id } = useParams();
+
     const [formData, setFormData] = useState({
         name: '',
         arrive: '',
         leave: '',
-        ticket: '',
         country: ''
     });
 
@@ -35,7 +37,6 @@ const NewPlaceForm = () => {
         name: '',
         arrive: '',
         leave: '',
-        ticket: '',
         country: ''
     });
 
@@ -53,9 +54,23 @@ const NewPlaceForm = () => {
         });
     };
 
-    const handleSubmit = () => {
+    const handleSubmit = async (e) => {
+        e.preventDefault();
         if (validateForm) {
-            console.log(formData);
+            try {
+                const response = await addPlace(
+                    id,
+                    formData.name,
+                    formData.arrive,
+                    formData.leave,
+                    formData.country
+                );
+                if (response && response.status === 201) {
+                    navigate(`/trips/details/${id}`)
+                }
+            } catch (error) {
+                console.error("Error while adding place", error);
+            }
         }
     }
 
@@ -101,21 +116,6 @@ const NewPlaceForm = () => {
                         onChange={handleChange}
                         error={!!errors.leave}
                         helperText={errors.leave}
-                        fullWidth
-                        sx={{ margin: '10px' }}
-                    />
-                    <TextField
-                        id="ticket"
-                        label="Ticket"
-                        type="file"
-                        InputLabelProps={{
-                            shrink: true
-                        }}
-                        variant="outlined"
-                        value={formData.ticket}
-                        onChange={handleChange}
-                        error={!!errors.ticket}
-                        helperText={errors.ticket}
                         fullWidth
                         sx={{ margin: '10px' }}
                     />

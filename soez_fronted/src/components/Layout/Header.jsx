@@ -55,7 +55,6 @@ const Header = ({ isUserLoggedIn, navigate }) => {
   const fetchData = async () => {
     if (isUserLoggedIn) {
       const data = await getCurrentUserName();
-      console.log(data);
       if (data) {
         setUserData(data);
         setUserInitials(getUserInitials(data.firstName, data.lastName));

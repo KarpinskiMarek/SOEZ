@@ -1,9 +1,11 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Container, styled, Paper, Box, TextField, Button, Typography, Grid, Card, CardMedia, CardContent, CardActions, Pagination } from "@mui/material";
 import EditIcon from '@mui/icons-material/Edit';
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import InfoIcon from '@mui/icons-material/Info';
 import DeleteIcon from '@mui/icons-material/Delete';
+import { editTrip, formatDate, formatDateInput, getTrip } from "../../services/TripsService";
+import { deletePlace, getTripPlaces } from "../../services/PlaceService";
 
 const MainDataContainer = styled(Container)(({ theme }) => ({
     marginTop: '2rem',
@@ -66,6 +68,8 @@ const cards = [1, 2, 3, 4, 5, 6, 7, 8, 9]
 
 const TripDetails = () => {
 
+    const { id } = useParams();
+
     const [isEditing, setIsEditing] = useState(false);
     const [places, setPlaces] = useState([]);
     const [page, setPage] = useState(1);
@@ -90,7 +94,9 @@ const TripDetails = () => {
         setIsEditing(true);
     };
 
-    const handleApplyClick = () => {
+    const handleApplyClick = (e) => {
+        e.preventDefault();
+        handleSubmit(e);
         setIsEditing(false);
     };
 
@@ -105,6 +111,53 @@ const TripDetails = () => {
             [id]: value
         }));
     };
+
+    const fetchPlaces = async () => {
+        const places = await getTripPlaces(id);
+        if (places) {
+            setPlaces(places);
+        }
+    }
+
+    useEffect(() => {
+        fetchPlaces();
+    }, [])
+
+    const fetchTrip = async () => {
+        const tripData = await getTrip(id);
+        if (tripData) {
+            setFormData({
+                ...tripData,
+                startingDate: formatDateInput(tripData.startingDate),
+                endingDate: formatDateInput(tripData.endingDate)
+            });
+        }
+    }
+
+    useEffect(() => {
+        fetchTrip();
+    }, [id]);
+
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        try {
+            const response = await editTrip(id, formData.startingDate, formData.endingDate, formData.title);
+            if (response && response.status === 201) {
+                window.location.reload();
+            }
+        } catch (error) {
+            console.error("Error while editing trip", error);
+        }
+    };
+    
+    const handleDeletePlace = async (tripId, placeId) => {
+        try {
+            await deletePlace(tripId, placeId);
+            setPlaces(prevPlaces => prevPlaces.filter(place => place.id !== placeId));
+        } catch (erorr) {
+            console.erorr("Error while deleting place: ", erorr)
+        }
+    }
 
     return (
         <>
@@ -189,7 +242,7 @@ const TripDetails = () => {
                 <div>
                     <Grid container spacing={2} justifyContent={"center"}>
                         <Grid item>
-                            <Button variant="contained" color="primary">
+                            <Button variant="contained" color="primary" onClick={() => navigate(`/trips/${id}/places/new`)}>
                                 Add new place
                             </Button>
                         </Grid>
@@ -199,8 +252,8 @@ const TripDetails = () => {
             <CardGrid maxWidth="md">
                 <Grid container spacing={4}>
                     {
-                        cards.map((card) => (
-                            <Grid item key={card} xs={12} sm={6} md={4}>
+                        paginatedPlaces.map((place) => (
+                            <Grid item key={place.id} xs={12} sm={6} md={4}>
                                 <StyledCard>
                                     <StyledCardMedia
                                         image="https://source.unsplash.com/random"
@@ -208,10 +261,10 @@ const TripDetails = () => {
                                     />
                                     <CardContent>
                                         <Typography gutterBottom variant="h5">
-                                            Heading
+                                            {place.name}
                                         </Typography>
                                         <Typography>
-                                            This is media card. You can use this section to describe the content
+                                        {formatDate(place.arrive)} - {formatDate(place.leave)}
                                         </Typography>
                                     </CardContent>
                                     <CardActions>
@@ -225,6 +278,7 @@ const TripDetails = () => {
                                             <Button
                                                 size="small"
                                                 variant="contained"
+                                                onClick={() => handleDeletePlace(id, place.id)}
                                                 startIcon={<DeleteIcon />}>
                                                 Delete
                                             </Button>

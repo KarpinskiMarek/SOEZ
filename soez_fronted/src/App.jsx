@@ -22,8 +22,6 @@ const App = () => {
                     <Route index element={<Home />} />
                     <Route path={'/login'} element={<LoginForm />}/>
                     <Route path={'/register'} element={<RegisterForm />}/>
-                    <Route path={'/trips/details'} element={<TripDetails/>}/>
-                    <Route path={'/trips/places/new'} element={<NewPlaceForm/>}/>
                     <Route path={'/trips/places/details'} element={<PlaceDetails/>}/>
                 </Route>
                 <Route path={"/"} element={<Layout />}>
@@ -33,6 +31,8 @@ const App = () => {
                         <Route path={'/friends'} element={<Friends />}/>
                         <Route path={'/friends/add'} element={<AddFriendsForm/>}/>
                         <Route path={'/profile/me'} element={<MyProfile/>}/>
+                        <Route path={'/trips/details/:id'} element={<TripDetails/>}/>
+                        <Route path={'/trips/:id/places/new'} element={<NewPlaceForm/>}/>
                     </Route>
                 </Route>
             </Routes>

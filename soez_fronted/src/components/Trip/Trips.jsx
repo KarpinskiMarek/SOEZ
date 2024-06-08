@@ -90,7 +90,8 @@ const Trip = () => {
                                     <CardActions>
                                         <Button 
                                             size="small" 
-                                            variant="contained" 
+                                            variant="contained"
+                                            onClick={() => navigate(`/trips/details/${trip.id}`)} 
                                             startIcon={<InfoIcon/>}>
                                                 Details
                                         </Button>
