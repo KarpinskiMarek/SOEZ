@@ -54,6 +54,12 @@ public class PlaceService {
         return theCreatedPlace.getId();
     }
 
+    public PlaceDto getPlace(Long placeId) {
+        Place place = this.placeRepository.findById(placeId).orElseThrow();
+        TripService service = new TripService();
+        return service.mapToPlaceDto(place);
+    }
+
     public void deletePlace(Long placeId, Long tripId) {
         String requesterRole = tripRoleService.checkUserRole(tripId);
         if (!"OWNER".equals(requesterRole) && !"MANAGER".equals(requesterRole)) {
