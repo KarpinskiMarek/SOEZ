@@ -272,6 +272,7 @@ const TripDetails = () => {
                                             <Button
                                                 size="small"
                                                 variant="contained"
+                                                onClick={() => navigate(`/trips/${id}/places/details/${place.id}`)}
                                                 startIcon={<InfoIcon />}>
                                                 Details
                                             </Button>

@@ -14,7 +14,7 @@ public class WeatherService {
     private final RestTemplate restTemplate;
     private final String apiKey;
     @Value("${weather.api.url}")
-    private String url;
+    private String API;
 
     public WeatherService(RestTemplate restTemplate, @Value("${weather.api.key}") String apiKey) {
         this.restTemplate = restTemplate;
@@ -22,8 +22,8 @@ public class WeatherService {
     }
 
     public WeatherDTO getWeatherForCity(String city) {
-        url+=city + "&appid=" + apiKey;
-
+        String url = API + city + "&appid=" + apiKey;
+        System.out.println(url);
         try {
             String response = restTemplate.getForObject(url, String.class);
             if (response != null) {

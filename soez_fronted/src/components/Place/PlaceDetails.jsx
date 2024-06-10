@@ -2,7 +2,11 @@ import { Container, styled, Typography, Box, Paper, Button, TextField } from "@m
 import EditIcon from '@mui/icons-material/Edit';
 import SmartToyIcon from '@mui/icons-material/SmartToy';
 import React, { useEffect, useState } from "react";
-import { LoadScript, GoogleMap, Marker } from "@react-google-maps/api";
+import { useParams } from "react-router-dom";
+import { editPlace, getPlace, getPlaceWeather } from "../../services/PlaceService";
+import { formatDateInput } from "../../services/TripsService";
+import { getWeatherIconPath } from "../../services/WeatherIconService";
+import Map from "../Maps/MyMap";
 
 const MainDataContainer = styled(Container)(({ theme }) => ({
     marginTop: '2rem',
@@ -54,50 +58,38 @@ const MapBox = styled(Box)(({ theme }) => ({
     marginTop: '2rem'
 }));
 
-const Map = ({ location }) => {
-    const mapContainerStyle = {
-        height: '100%',
-        width: '100%'
-    };
-
-    const [center, setCenter] = useState({ lat: 0, lng: 0 });
-    const APIkey = '';
-
-    useEffect(() => {
-        if (location.name && location.country) {
-            const geocoder = new window.google.maps.Geocoder()
-            geocoder.geocode({ address: `${location.name}, ${location.country}` }, (results, status) => {
-                if (status === "OK") {
-                    setCenter(results[0].geometry.location);
-                }
-            });
-        }
-    }, [location]);
-
-    return (
-        <LoadScript googleMapsApiKey={APIkey}>
-            <GoogleMap mapContainerStyle={mapContainerStyle} center={center} zoom={10}>
-                <Marker position={center} />
-            </GoogleMap>
-        </LoadScript>
-    );
-};
+const WeatherStatusInfo = styled(Typography)(({ theme }) => ({
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center'
+}));
 
 const PlaceDetails = () => {
 
+    const { tripId, placeId } = useParams();
     const [isEditing, setIsEditing] = useState(false);
+    
     const [formData, setFormData] = useState({
-        name: 'Mumbai',
-        arrive: '06.06.2024',
-        leave: '08.06.2024',
-        country: 'India'
+        name: '',
+        arrive: '',
+        leave: '',
+        country: '',
+        prompt: ''
+    });
+
+    const [weatherData, setWeatherData] = useState({
+        city: '',
+        temperature: '',
+        description: ''
     });
 
     const handleEditClick = () => {
         setIsEditing(true);
     };
 
-    const handleApplyClick = () => {
+    const handleApplyClick = (e) => {
+        e.preventDefault();
+        handleSubmit(e);
         setIsEditing(false);
     };
 
@@ -112,6 +104,48 @@ const PlaceDetails = () => {
             [id]: value
         }));
     };
+
+    const fetchPlace = async () => {
+        const placeData = await getPlace(placeId);
+        if (placeData) {
+            setFormData({
+                ...placeData,
+                arrive: formatDateInput(placeData.arrive),
+                leave: formatDateInput(placeData.leave)
+            });
+        }
+    };
+
+    const fetchWeather = async () => {
+        const weatherData = await getPlaceWeather(placeId);
+        if (weatherData) {
+            setWeatherData(weatherData.data);
+        }
+    };
+
+    useEffect(() => {
+        fetchPlace();
+        fetchWeather();
+    }, [tripId, placeId]);
+
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        try {
+            const response = await editPlace(
+                tripId, 
+                placeId, 
+                formData.name,
+                formData.arrive,
+                formData.leave,
+                formData.country
+            );
+            if (response && response.status === 201) {
+                window.location.reload();
+            }
+        } catch (error) {
+            console.error("Error while editing place");
+        }
+    }
 
     return (
         <>
@@ -210,9 +244,10 @@ const PlaceDetails = () => {
                     <Typography variant="h5" align="center" color="textPrimary" gutterBottom>
                         Current weather
                     </Typography>
-                    <Typography variant="h5" align="center" color="textPrimary" gutterBottom>
-                        34°C 
-                    </Typography>
+                    <WeatherStatusInfo variant="h5" color="textPrimary" gutterBottom>
+                        {weatherData.temperature}°C
+                        <img src={getWeatherIconPath(weatherData.description)} alt={weatherData.description} style={{ width: 30, height: 30, marginLeft: 8 }} /> 
+                    </WeatherStatusInfo>
                 </ComponentSpace>
                 <ComponentSpace>
                     <Typography variant="h5" align="center" color="textPrimary" gutterBottom>

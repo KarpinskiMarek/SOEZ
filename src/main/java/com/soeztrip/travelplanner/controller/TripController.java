@@ -67,6 +67,14 @@ public class TripController {
         return ResponseEntity.ok(tripService.findTrip(id));
     }
 
+    @GetMapping("/places/{id}")
+    public ResponseEntity<?> getPlace(@PathVariable Long id) {
+        if (!placeService.placeExists(id)) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Place not found");
+        }
+        return ResponseEntity.ok(placeService.getPlace(id));
+    }
+
     @GetMapping("/tickets/{id}/download")
     public ResponseEntity<?> downloadFile(@PathVariable Long id) throws FileNotFoundException {
         if (!ticketService.ticketExists(id)) {
