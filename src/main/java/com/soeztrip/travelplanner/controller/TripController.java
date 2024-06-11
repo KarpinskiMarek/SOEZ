@@ -155,6 +155,24 @@ public class TripController {
         return ResponseEntity.ok().body("Place has been updated successfully");
     }
 
+    @PostMapping("/trips/{idTrip}/places/{idPlace}/prompt")
+    public ResponseEntity<?> addPrompt(@PathVariable Long idTrip,
+                                       @PathVariable Long idPlace,
+                                       @RequestBody PlaceDto dto){
+        if (!tripService.tripExists(idTrip)) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Trip not found");
+        }
+        if (!placeService.placeExists(idPlace)) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Place not found");
+        }
+        try {
+            placeService.addPrompt(idPlace, dto);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+        return ResponseEntity.ok().body("Prompt has been updated successfully");
+    }
+
     @PostMapping("/trips/{idTrip}/places/{idPlace}/tickets/new")
     public ResponseEntity<?> addNewTicket(@PathVariable Long idTrip,
                                           @PathVariable Long idPlace,
@@ -229,6 +247,7 @@ public class TripController {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
     }
+
 
     @DeleteMapping("/trips/{id}")
     public ResponseEntity<?> deleteTrip(@PathVariable Long id) {

@@ -20,17 +20,20 @@ public class PlaceService {
     private TripService tripService;
     private FileService fileService;
     private TripRoleService tripRoleService;
+    private OpenAIService openAIService;
 
     public PlaceService(PlaceRepository placeRepository,
                         TripRepository tripRepository,
                         TripService tripService,
                         FileService fileService,
-                        TripRoleService tripRoleService) {
+                        TripRoleService tripRoleService,
+                        OpenAIService openAIService) {
         this.placeRepository = placeRepository;
         this.tripRepository = tripRepository;
         this.tripService = tripService;
         this.fileService = fileService;
         this.tripRoleService = tripRoleService;
+        this.openAIService = openAIService;
     }
 
 
@@ -60,6 +63,7 @@ public class PlaceService {
         return service.mapToPlaceDto(place);
     }
 
+
     public void deletePlace(Long placeId, Long tripId) {
         String requesterRole = tripRoleService.checkUserRole(tripId);
         if (!"OWNER".equals(requesterRole) && !"MANAGER".equals(requesterRole)) {
@@ -80,6 +84,17 @@ public class PlaceService {
 
     public boolean placeExists(Long id) {
         return placeRepository.existsById(id);
+    }
+
+    public void addPrompt(Long idPlace, PlaceDto dto) {
+        Place place = this.placeRepository.findById(idPlace).orElseThrow();
+        Long tripId = place.getTrip().getId();
+        String requesterRole = tripRoleService.checkUserRole(tripId);
+        if (!"OWNER".equals(requesterRole) && !"MANAGER".equals(requesterRole)) {
+            throw new RuntimeException("Only the trip owner or manager can modify place properties");
+        }
+        place.setPrompt(this.openAIService.processResponse(dto.getName()));
+        placeRepository.save(place);
     }
 
     public void updatePlace(Long placeId, PlaceDto dto) {
@@ -114,4 +129,5 @@ public class PlaceService {
         List<TicketDto> ticketDtoList = ticketList.stream().map(tripService::mapToTicketDto).collect(Collectors.toList());
         return ticketDtoList;
     }
+
 }
