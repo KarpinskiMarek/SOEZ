@@ -5,6 +5,7 @@ import InfoIcon from '@mui/icons-material/Info';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { useNavigate } from "react-router-dom";
 import { deleteTrip, formatDate, getAllTrips } from "../../services/TripsService";
+import { getRandomPhoto } from "../../services/PhotoService";
 
 const MainContainer = styled(Container)(({ theme }) => ({
     marginTop: '2rem'
@@ -76,7 +77,7 @@ const Trip = () => {
                             <Grid item key={trip.id} xs={12} sm={6} md={4}>
                                 <StyledCard>
                                     <StyledCardMedia
-                                        image="https://source.unsplash.com/random"
+                                        image={getRandomPhoto()}
                                         title="Image title"
                                     />
                                     <CardContent>
