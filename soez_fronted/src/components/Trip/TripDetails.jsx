@@ -1,11 +1,12 @@
 import React, { useEffect, useState } from "react";
-import { Container, styled, Paper, Box, TextField, Button, Typography, Grid, Card, CardMedia, CardContent, CardActions, Pagination } from "@mui/material";
+import { Container, IconButton, List, ListItem, ListItemAvatar, Avatar, ListItemText, styled, Paper, Box, TextField, Button, Typography, Grid, Card, CardMedia, CardContent, CardActions, Pagination } from "@mui/material";
 import EditIcon from '@mui/icons-material/Edit';
 import { useNavigate, useParams } from "react-router-dom";
 import InfoIcon from '@mui/icons-material/Info';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { editTrip, formatDate, formatDateInput, getTrip } from "../../services/TripsService";
 import { deletePlace, getTripPlaces } from "../../services/PlaceService";
+import { getRandomPhoto } from "../../services/PhotoService";
 
 const MainDataContainer = styled(Container)(({ theme }) => ({
     marginTop: '2rem',
@@ -22,6 +23,18 @@ const MainTripDataForm = styled(Paper)(({ theme }) => ({
     maxWidth: 'xs',
     padding: '1rem',
     width: '100%'
+}));
+
+const ComponentSpace = styled(Paper)(({ theme }) => ({
+    display: 'flex',
+    alignItems: 'center',
+    flexDirection: 'column',
+    marginTop: '2rem',
+    boxShadow: theme.shadows[5],
+    maxWidth: 'xs',
+    padding: '1rem',
+    width: '100%',
+    marginBottom: '2rem'
 }));
 
 const MainBox = styled(Box)(({ theme }) => ({
@@ -66,10 +79,25 @@ const StyledCard = styled(Card)(({ theme }) => ({
 
 const cards = [1, 2, 3, 4, 5, 6, 7, 8, 9]
 
+function generate(element) {
+    return [0, 1, 2].map((value) =>
+        React.cloneElement(element, {
+            key: value,
+        }),
+    );
+}
+
+const FriendsDiv = styled('div')(({ theme }) => ({
+    backgroundColor: theme.palette.background.paper,
+    margin: '3rem',
+    boxShadow: theme.shadows[5]
+}));
+
 const TripDetails = () => {
 
     const { id } = useParams();
-
+    const [dense, setDense] = React.useState(false);
+    const [secondary, setSecondary] = React.useState(false);
     const [isEditing, setIsEditing] = useState(false);
     const [places, setPlaces] = useState([]);
     const [page, setPage] = useState(1);
@@ -149,7 +177,7 @@ const TripDetails = () => {
             console.error("Error while editing trip", error);
         }
     };
-    
+
     const handleDeletePlace = async (tripId, placeId) => {
         try {
             await deletePlace(tripId, placeId);
@@ -165,7 +193,7 @@ const TripDetails = () => {
                 <Typography variant="h2" align="center" color="textPrimary" marginTop="4rem" gutterBottom>
                     Trip details
                 </Typography>
-                <MainTripDataForm>
+                <ComponentSpace>
                     <MainBox>
                         <TextFieldsBox>
                             <TextField
@@ -233,7 +261,40 @@ const TripDetails = () => {
                             Edit
                         </Button>
                     )}
-                </MainTripDataForm>
+                </ComponentSpace>
+                <ComponentSpace>
+                    <Typography sx={{ mt: 4, mb: 2, textDecoration: 'underline' }} variant="h6" align="center">
+                        Participants
+                    </Typography>
+                    <List dense={dense} sx={{ width: '100%' }}>
+                        {generate(
+                            <ListItem
+                                secondaryAction={
+                                    <Box>
+                                        <IconButton edge="end" aria-label="delete" sx={{marginRight: '5px'}}>
+                                            <InfoIcon />
+                                        </IconButton>
+                                        <IconButton edge="end" aria-label="delete">
+                                            <DeleteIcon />
+                                        </IconButton>
+                                    </Box>
+                                }
+                            >
+                                <ListItemAvatar>
+                                    <Avatar>
+                                    </Avatar>
+                                </ListItemAvatar>
+                                <ListItemText
+                                    primary="Single-line item"
+                                    secondary={secondary ? 'Secondary text' : null}
+                                />
+                            </ListItem>
+                        )}
+                    </List>
+                    <Button variant="contained" sx={{ margin: '10px' }}>
+                        Add participant
+                    </Button>
+                </ComponentSpace>
             </MainDataContainer>
             <Container maxWidth="sm">
                 <Typography variant="h3" align="center" color="textPrimary" marginTop="4rem" gutterBottom>
@@ -256,7 +317,7 @@ const TripDetails = () => {
                             <Grid item key={place.id} xs={12} sm={6} md={4}>
                                 <StyledCard>
                                     <StyledCardMedia
-                                        image="https://source.unsplash.com/random"
+                                        image={getRandomPhoto()}
                                         title="Image title"
                                     />
                                     <CardContent>
@@ -264,7 +325,7 @@ const TripDetails = () => {
                                             {place.name}
                                         </Typography>
                                         <Typography>
-                                        {formatDate(place.arrive)} - {formatDate(place.leave)}
+                                            {formatDate(place.arrive)} - {formatDate(place.leave)}
                                         </Typography>
                                     </CardContent>
                                     <CardActions>
