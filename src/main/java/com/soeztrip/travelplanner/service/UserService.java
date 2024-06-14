@@ -51,8 +51,9 @@ public class UserService {
                 .collect(Collectors.toList());
     }
 
-    public UserEntity findUser(Long id) {
-        return userRepository.findById(id).get();
+    public UserDataDto findUser(Long id) {
+        UserEntity user =  userRepository.findById(id).orElseThrow(() -> new UsernameNotFoundException("No user"));
+        return mapUserToUserNameDto(user);
     }
 
     public UserDataDto getUserByEmail(String email) {

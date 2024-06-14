@@ -14,17 +14,6 @@ const MainDataContainer = styled(Container)(({ theme }) => ({
     flexDirection: 'column',
 }));
 
-const MainTripDataForm = styled(Paper)(({ theme }) => ({
-    display: 'flex',
-    alignItems: 'center',
-    flexDirection: 'column',
-    marginTop: '2rem',
-    boxShadow: theme.shadows[5],
-    maxWidth: 'xs',
-    padding: '1rem',
-    width: '100%'
-}));
-
 const ComponentSpace = styled(Paper)(({ theme }) => ({
     display: 'flex',
     alignItems: 'center',
@@ -77,8 +66,6 @@ const StyledCard = styled(Card)(({ theme }) => ({
     flexDirection: 'column'
 }));
 
-const cards = [1, 2, 3, 4, 5, 6, 7, 8, 9]
-
 function generate(element) {
     return [0, 1, 2].map((value) =>
         React.cloneElement(element, {
@@ -86,12 +73,6 @@ function generate(element) {
         }),
     );
 }
-
-const FriendsDiv = styled('div')(({ theme }) => ({
-    backgroundColor: theme.palette.background.paper,
-    margin: '3rem',
-    boxShadow: theme.shadows[5]
-}));
 
 const TripDetails = () => {
 
@@ -117,6 +98,8 @@ const TripDetails = () => {
         startingDate: '',
         endingDate: ''
     });
+
+    const [participants, setParticipants] = useState([]);
 
     const handleEditClick = () => {
         setIsEditing(true);
@@ -159,6 +142,7 @@ const TripDetails = () => {
                 startingDate: formatDateInput(tripData.startingDate),
                 endingDate: formatDateInput(tripData.endingDate)
             });
+            setParticipants(tripData.participants);
         }
     }
 
@@ -267,11 +251,12 @@ const TripDetails = () => {
                         Participants
                     </Typography>
                     <List dense={dense} sx={{ width: '100%' }}>
-                        {generate(
+                        {participants.map(participant => (
                             <ListItem
+                                key={participant.id}
                                 secondaryAction={
                                     <Box>
-                                        <IconButton edge="end" aria-label="delete" sx={{marginRight: '5px'}}>
+                                        <IconButton edge="end" aria-label="delete" sx={{ marginRight: '5px' }} onClick={() => navigate(`/users/profile/${participant.id}`)}>
                                             <InfoIcon />
                                         </IconButton>
                                         <IconButton edge="end" aria-label="delete">
@@ -285,13 +270,13 @@ const TripDetails = () => {
                                     </Avatar>
                                 </ListItemAvatar>
                                 <ListItemText
-                                    primary="Single-line item"
+                                    primary={`${participant.firstName} ${participant.lastName}`}
                                     secondary={secondary ? 'Secondary text' : null}
                                 />
                             </ListItem>
-                        )}
+                        ))}
                     </List>
-                    <Button variant="contained" sx={{ margin: '10px' }}>
+                    <Button variant="contained" sx={{ margin: '10px' }} onClick={() => navigate(`/trips/${id}/add-friend`)}>
                         Add participant
                     </Button>
                 </ComponentSpace>

@@ -61,6 +61,22 @@ export const getPlaceWeather = async (placeId) => {
     }
 }
 
-export const generatePlacePlan = async () => {
-    
+export const generatePlacePlan = async (placeId, tripId, placeName) => {
+    try {
+        return await request("POST", `/trips/${tripId}/places/${placeId}/prompt`, {
+            name: placeName
+        }, {}, {})
+    } catch (error) {
+        console.error("Error while generating plan", error);
+    }
+}
+
+export const editPlacePlan = async (tripId, placeId, plan) => {
+    try {
+        return await request("PUT", `/trips/${tripId}/places/${placeId}`, {
+            prompt: plan
+        }, {}, {})
+    } catch (error) {
+        console.error("Error while editing plan");
+    }
 }

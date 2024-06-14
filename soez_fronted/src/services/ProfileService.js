@@ -13,7 +13,6 @@ export const getCurrentUserData = async () => {
 export const getProfileData = async (id) => {
     try {
         const resposne = await request("GET", `/users/${id}`, {}, {});
-        console.log("Profile photo response: ", resposne);
         return resposne.data;
     } catch(e) {
         console.error("Error while getting profile data: ", e);

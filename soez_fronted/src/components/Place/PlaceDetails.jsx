@@ -3,7 +3,7 @@ import EditIcon from '@mui/icons-material/Edit';
 import SmartToyIcon from '@mui/icons-material/SmartToy';
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import { editPlace, getPlace, getPlaceWeather } from "../../services/PlaceService";
+import { editPlace, editPlacePlan, generatePlacePlan, getPlace, getPlaceWeather } from "../../services/PlaceService";
 import { formatDateInput } from "../../services/TripsService";
 import { getWeatherIconPath } from "../../services/WeatherIconService";
 import Map from "../Maps/MyMap";
@@ -77,6 +77,8 @@ const PlaceDetails = () => {
         prompt: ''
     });
 
+    const [plan, setPlan] = useState('');
+
     const [weatherData, setWeatherData] = useState({
         city: '',
         temperature: '',
@@ -85,6 +87,10 @@ const PlaceDetails = () => {
 
     const handleEditClick = () => {
         setIsEditing(true);
+    };
+
+    const handlePlanChange = (event) => {
+        setPlan(event.target.value);
     };
 
     const handleApplyClick = (e) => {
@@ -113,6 +119,7 @@ const PlaceDetails = () => {
                 arrive: formatDateInput(placeData.arrive),
                 leave: formatDateInput(placeData.leave)
             });
+            setPlan(placeData.prompt);
         }
     };
 
@@ -144,6 +151,30 @@ const PlaceDetails = () => {
             }
         } catch (error) {
             console.error("Error while editing place");
+        }
+    }
+
+    const handleGeneratePlan = async () => {
+        try {
+            const response = await generatePlacePlan(placeId, tripId, formData.name);
+            console.log(response);
+            if (response && response.status === 200) {
+                window.location.reload();
+            }
+        } catch(error) {
+            console.error("Error while generating plan", error);
+        }
+    }
+
+    const handleEditPlan = async () => {
+        try {
+            const response = await editPlacePlan(tripId, placeId, plan);
+            console.log(response);
+            if (response && response.status === 201) {
+                window.location.reload();
+            }
+        } catch (error) {
+            console.error("Error while editing plan", error);
         }
     }
 
@@ -258,14 +289,15 @@ const PlaceDetails = () => {
                         label="Enter trip plan here..."
                         multiline
                         rows={12}
-                        defaultValue=""
+                        value={plan}
+                        onChange={handlePlanChange}
                         fullWidth
                     />
                     <Box sx={{ display: 'flex', gap: '10px', margin: '2rem' }}>
-                        <Button variant="contained" endIcon={<EditIcon />}>
+                        <Button variant="contained" onClick={handleEditPlan} endIcon={<EditIcon />}>
                             Edit
                         </Button>
-                        <Button variant="outlined" endIcon={<SmartToyIcon/>}>
+                        <Button variant="outlined" onClick={handleGeneratePlan} endIcon={<SmartToyIcon/>}>
                             Generate
                         </Button>
                     </Box>
@@ -274,7 +306,6 @@ const PlaceDetails = () => {
                     <Typography variant="h5" align="center" color="textPrimary" gutterBottom>
                         Tickets
                     </Typography>
-                    
                 </ComponentSpace>
             </MainDataContainer>
         </>
