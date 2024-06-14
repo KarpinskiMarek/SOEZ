@@ -56,6 +56,16 @@ export const deleteTrip = async (id) => {
     }
 }
 
+export const addPersonToTrip = async (tripId, email) => {
+    try {
+        return await request("PUT", `/trips/${tripId}/addPerson`, {
+            email: email
+        })
+    } catch (error) {
+        console.error("Error while adding friend to trip")
+    }
+} 
+
 export const formatDate = (timestamp) => {
     const date = new Date(timestamp);
     const day = String(date.getDate()).padStart(2, '0');

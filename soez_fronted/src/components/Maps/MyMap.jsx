@@ -10,8 +10,10 @@ const MyMap = ({ location }) => {
 
         const loadMap = async () => {
 
-            const geocoder = new window.google.maps.Geocoder();
-            geocoder.geocode({ address: `${location.name}, ${location.country}` }, (results, status) => {
+            
+
+            const gc = new window.google.maps.Geocoder()
+            gc.geocode({ address: `${location.name}, ${location.country}` }, (results, status) => {
                 if (status === "OK") {
                     setCenter(results[0].geometry.location);
                 }
@@ -26,6 +28,7 @@ const MyMap = ({ location }) => {
     }, [location]);
 
     return (
+        
         <APIProvider apiKey={APIkey}>
             <Map
                 style={{ height: '100%', width: '100%' }}
