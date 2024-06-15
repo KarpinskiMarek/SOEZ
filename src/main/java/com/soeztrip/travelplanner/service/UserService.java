@@ -2,11 +2,9 @@ package com.soeztrip.travelplanner.service;
 
 
 import com.soeztrip.travelplanner.dto.ProfileStatsDto;
-import com.soeztrip.travelplanner.dto.UserDto;
-import com.soeztrip.travelplanner.dto.UserNameDto;
-import com.soeztrip.travelplanner.model.Place;
-import com.soeztrip.travelplanner.model.Trip;
 import com.soeztrip.travelplanner.dto.UserDataDto;
+import com.soeztrip.travelplanner.dto.UserDto;
+import com.soeztrip.travelplanner.model.Trip;
 import com.soeztrip.travelplanner.model.UserEntity;
 import com.soeztrip.travelplanner.model.UserTrip;
 import com.soeztrip.travelplanner.repository.RoleRepository;
@@ -15,7 +13,6 @@ import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -59,11 +56,11 @@ public class UserService {
         ProfileStatsDto profileStatsDto = new ProfileStatsDto();
         profileStatsDto.setTrips(user.getUserTrips().size());
         List<UserTrip> userTrips = user.getUserTrips();
-        List<Trip>trips = userTrips.stream()
+        List<Trip> trips = userTrips.stream()
                 .map(UserTrip::getTrip)
                 .collect(Collectors.toList());
 
-        int placeCount = trips.stream().flatMap(trip-> trip.getPlaces().stream()).mapToInt(place->1).sum();
+        int placeCount = trips.stream().flatMap(trip -> trip.getPlaces().stream()).mapToInt(place -> 1).sum();
         profileStatsDto.setPlaces(placeCount);
         profileStatsDto.setFriends(user.getFriendList().size());
         return profileStatsDto;
@@ -78,7 +75,7 @@ public class UserService {
     }
 
     public UserDataDto findUser(Long id) {
-        UserEntity user =  userRepository.findById(id).orElseThrow(() -> new UsernameNotFoundException("No user"));
+        UserEntity user = userRepository.findById(id).orElseThrow(() -> new UsernameNotFoundException("No user"));
         return mapUserToUserNameDto(user);
     }
 
