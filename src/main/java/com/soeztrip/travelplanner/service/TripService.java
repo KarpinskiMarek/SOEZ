@@ -70,7 +70,6 @@ public class TripService {
         trip.setEndingDate(tripDto.getEndingDate());
         trip.setFinished(tripDto.getFinished());
         trip.setTitle(tripDto.getTitle());
-
         List<Place> places = (tripDto.getPlaces() != null) ?
                 tripDto.getPlaces().stream().map(this::mapToPlace).collect(Collectors.toList()) :
                 new ArrayList<>();
@@ -135,6 +134,7 @@ public class TripService {
         TicketDto ticketDto = new TicketDto();
         ticketDto.setId(ticket.getId());
         ticketDto.setName(ticket.getName());
+        ticketDto.setTicketPath(ticket.getTicketPath());
 
         return ticketDto;
     }
@@ -146,6 +146,7 @@ public class TripService {
                         .firstName(userTrip.getUser().getFirstName())
                         .lastName(userTrip.getUser().getLastName())
                         .email(userTrip.getUser().getEmail())
+                        .role(userTrip.getTripRole().getName())
                         .build())
                 .collect(Collectors.toList());
     }
@@ -166,7 +167,6 @@ public class TripService {
     public boolean tripExists(Long id) {
         return tripRepository.existsById(id);
     }
-
 
     public void updateTrip(Long id, TripDto tripDto) {
         String requesterRole = tripRoleService.checkUserRole(id);

@@ -105,7 +105,9 @@ public class PlaceService {
     public List<TicketDto> getTickets(Long id) {
         Place place = this.placeRepository.findById(id).orElseThrow();
         List<Ticket> ticketList = place.getTickets();
-        List<TicketDto> ticketDtoList = ticketList.stream().map(tripService::mapToTicketDto).collect(Collectors.toList());
+        List<TicketDto> ticketDtoList = ticketList.stream()
+                .map(tripService::mapToTicketDto)
+                .collect(Collectors.toList());
         return ticketDtoList;
     }
 }
