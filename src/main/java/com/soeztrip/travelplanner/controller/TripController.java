@@ -69,6 +69,14 @@ public class TripController {
         return ResponseEntity.ok(tripService.findTrip(id));
     }
 
+    @GetMapping("/places/{id}")
+    public ResponseEntity<?> getPlace(@PathVariable Long id) {
+        if (!placeService.placeExists(id)) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Place not found");
+        }
+        return ResponseEntity.ok(placeService.getPlace(id));
+    }
+
     @GetMapping("/tickets/{id}/download")
     public ResponseEntity<?> downloadFile(@PathVariable Long id) throws FileNotFoundException {
         if (!ticketService.ticketExists(id)) {
@@ -170,6 +178,7 @@ public class TripController {
         return ResponseEntity.ok().body("Place has been updated successfully");
     }
 
+
     @PostMapping("/trips/{idTrip}/photo")
     public ResponseEntity<?> addTripPhoto(@PathVariable Long idTrip,
                                           @RequestParam(value = "photo", required = false) MultipartFile photo) {
@@ -202,6 +211,24 @@ public class TripController {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
         return ResponseEntity.ok().body("Place photo has been uploaded successfully");
+    }
+      
+@PostMapping("/trips/{idTrip}/places/{idPlace}/prompt")
+    public ResponseEntity<?> addPrompt(@PathVariable Long idTrip,
+                                       @PathVariable Long idPlace,
+                                       @RequestBody PlaceDto dto){
+        if (!tripService.tripExists(idTrip)) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Trip not found");
+        }
+        if (!placeService.placeExists(idPlace)) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Place not found");
+        }
+        try {
+            placeService.addPrompt(idPlace, dto);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+        return ResponseEntity.ok().body("Prompt has been updated successfully");
     }
 
     @PostMapping("/trips/{idTrip}/places/{idPlace}/tickets/new")
@@ -278,6 +305,7 @@ public class TripController {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
     }
+
 
     @DeleteMapping("/trips/{id}")
     public ResponseEntity<?> deleteTrip(@PathVariable Long id) {

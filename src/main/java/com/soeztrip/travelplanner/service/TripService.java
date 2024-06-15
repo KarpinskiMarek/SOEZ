@@ -49,6 +49,10 @@ public class TripService {
         this.fileService = fileService;
     }
 
+    public TripService() {
+
+    }
+
     public void deleteTrip(Long id) {
         Trip trip = this.tripRepository.findById(id).orElseThrow();
         List<Place> placesList = trip.getPlaces();
