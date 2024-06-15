@@ -4,12 +4,10 @@ import com.soeztrip.travelplanner.dto.*;
 import com.soeztrip.travelplanner.model.Place;
 import com.soeztrip.travelplanner.repository.PlaceRepository;
 import com.soeztrip.travelplanner.repository.UserRepository;
-import com.soeztrip.travelplanner.service.PlaceService;
-import com.soeztrip.travelplanner.service.TicketService;
-import com.soeztrip.travelplanner.service.TripService;
-import com.soeztrip.travelplanner.service.WeatherService;
+import com.soeztrip.travelplanner.service.*;
 import jakarta.validation.Valid;
 import org.springframework.core.io.InputStreamResource;
+import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -23,6 +21,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.net.MalformedURLException;
 import java.util.List;
 
 @Controller
@@ -35,6 +34,7 @@ public class TripController {
     private PlaceRepository placeRepository;
     private TicketService ticketService;
     private WeatherService weatherService;
+    private FileService fileService;
 
 
     public TripController(TripService tripService,
@@ -42,13 +42,15 @@ public class TripController {
                           PlaceService placeService,
                           PlaceRepository placeRepository,
                           TicketService ticketService,
-                          WeatherService weatherService) {
+                          WeatherService weatherService,
+                          FileService fileService) {
         this.tripService = tripService;
         this.userRepository = userRepository;
         this.placeService = placeService;
         this.placeRepository = placeRepository;
         this.ticketService = ticketService;
         this.weatherService = weatherService;
+        this.fileService = fileService;
 
     }
 
@@ -87,13 +89,34 @@ public class TripController {
         }
     }
 
-    @GetMapping("place/{id}/tickets")
+    @GetMapping("/place/{id}/tickets")
     public ResponseEntity<?> getTickets(@PathVariable Long id) {
         if (!placeService.placeExists(id)) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Place not found");
         }
         return ResponseEntity.ok().body(this.placeService.getTickets(id));
     }
+    @GetMapping("/trips/{idTrip}/photo")
+    public ResponseEntity<?>getTripPhoto(@PathVariable Long idTrip) throws MalformedURLException {
+        if (!tripService.tripExists(idTrip)) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Trip not found");
+        }
+        Resource resource = this.tripService.getPhotoResource(idTrip);
+        return ResponseEntity.ok()
+                .contentType(MediaType.IMAGE_PNG)
+                .body(resource);
+    }
+    @GetMapping("/place/{idPlace}/photo")
+    public ResponseEntity<?>getPlacePhoto(@PathVariable Long idPlace) throws MalformedURLException {
+        if (!placeService.placeExists(idPlace)) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Place not found");
+        }
+        Resource resource = this.placeService.getPhotoResource(idPlace);
+        return ResponseEntity.ok()
+                .contentType(MediaType.IMAGE_PNG)
+                .body(resource);
+    }
+
 
     @PostMapping("/trips/new")
     public ResponseEntity<?> createTrip(@RequestBody @Valid TripDto tripDto) {
@@ -147,6 +170,40 @@ public class TripController {
         return ResponseEntity.ok().body("Place has been updated successfully");
     }
 
+    @PostMapping("/trips/{idTrip}/photo")
+    public ResponseEntity<?> addTripPhoto(@PathVariable Long idTrip,
+                                          @RequestParam(value = "photo", required = false) MultipartFile photo) {
+        if (!tripService.tripExists(idTrip)) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Trip not found");
+        }
+        try {
+            String photoFilePath = tripService.saveTripPhoto(idTrip, photo);
+            tripService.updateTripPhoto(idTrip, photoFilePath);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+        return ResponseEntity.ok().body("Trip photo has been uploaded successfully");
+    }
+
+    @PostMapping("/trips/{idTrip}/places/{idPlace}/photo")
+    public ResponseEntity<?> addPlacePhoto(@PathVariable Long idTrip,
+                                           @PathVariable Long idPlace,
+                                           @RequestParam(value = "photo", required = false) MultipartFile photo) {
+        if (!tripService.tripExists(idTrip)) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Trip not found");
+        }
+        if (!placeService.placeExists(idPlace)) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Place not found");
+        }
+        try {
+            String photoFilePath = fileService.savePlaceFile(idTrip,idPlace, photo);
+            placeService.updatePlacePhoto(idPlace, photoFilePath);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+        return ResponseEntity.ok().body("Place photo has been uploaded successfully");
+    }
+
     @PostMapping("/trips/{idTrip}/places/{idPlace}/tickets/new")
     public ResponseEntity<?> addNewTicket(@PathVariable Long idTrip,
                                           @PathVariable Long idPlace,
@@ -160,7 +217,7 @@ public class TripController {
         }
         try {
             if (ticketFile != null && !ticketFile.isEmpty()) {
-                String filePath = ticketService.saveTicketFile(idTrip, idPlace, ticketFile);
+                String filePath = fileService.savePlaceFile(idTrip, idPlace, ticketFile);
                 dto.setTicketPath(filePath);
                 ticketService.newTicket(idPlace, dto);
             }
