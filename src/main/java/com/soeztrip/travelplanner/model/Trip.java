@@ -26,14 +26,12 @@ public class Trip {
     private Long id;
     private Date startingDate;
     private Date endingDate;
-    private Boolean finished;
+    private String photoFilePath;
     private String title;
-
 
     @OneToMany(mappedBy = "trip", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonIgnore
     private List<UserTrip> userTrips = new ArrayList<>();
-
 
     @OneToMany(mappedBy = "trip", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonIgnore
@@ -42,14 +40,14 @@ public class Trip {
     public Trip(Long id,
                 Date startingDate,
                 Date endingDate,
-                Boolean finished,
+                String photoFilePath,
                 String title,
                 List<UserTrip> userTrips,
                 List<Place> places) {
         this.id = id;
         this.startingDate = startingDate;
         this.endingDate = endingDate;
-        this.finished = finished;
+        this.photoFilePath = photoFilePath;
         this.title = title;
         this.userTrips = new ArrayList<>();
         this.places = new ArrayList<>();
@@ -60,7 +58,7 @@ public class Trip {
                 "id=" + id +
                 ", startingDate=" + startingDate +
                 ", endingDate=" + endingDate +
-                ", finished=" + finished +
+                ", photoFilePath=" + photoFilePath +
                 ", title='" + title + '\'' +
                 '}';
     }

@@ -46,6 +46,14 @@ public class UserController {
         return ResponseEntity.ok(userService.getUserByEmail(authentication.getName()));
     }
 
+    @GetMapping("/users/{id}/stats")
+    public ResponseEntity<?>getProfileStats(@PathVariable Long id){
+        if(!userService.userExists(id)){
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found");
+        }
+        return ResponseEntity.ok(userService.getStats(id));
+    }
+
     @GetMapping("/user/friends")
     public ResponseEntity<?> getFriends() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -61,7 +69,6 @@ public class UserController {
         return ResponseEntity.ok()
                 .contentType(MediaType.IMAGE_PNG)
                 .body(resource);
-
     }
 
     @PutMapping("/users/{id}")
