@@ -1,7 +1,8 @@
 import { Avatar, Container, TextField, Box, styled, Paper, Button, IconButton, Typography, Divider, Grid } from "@mui/material";
 import EditIcon from '@mui/icons-material/Edit';
 import React, { useEffect, useState } from "react";
-import { arrayBufferToBase64, getCurrentUserData, getProfilePhoto, setProfilePhoto } from "../../services/ProfileService";
+import { arrayBufferToBase64, getCurrentUserData, getProfileData, getProfilePhoto, setProfilePhoto } from "../../services/ProfileService";
+import { useParams } from "react-router-dom";
 
 const ProfilePicture = styled(Avatar)(({ theme }) => ({
     width: '100px',
@@ -67,10 +68,10 @@ const StatItem = styled(Box)(({ theme }) => ({
     padding: '0 1rem'
 }));
 
-const MyProfile = () => {
+const UserProfile = () => {
 
+    const { id } = useParams();
     const [profilePicture, setProfilePicture] = useState(null);
-    const [isEditing, setIsEditing] = useState(false);
     const [userInitials, setUserInitials] = useState('');
     const [formData, setFormData] = useState({
         id: '',
@@ -78,10 +79,6 @@ const MyProfile = () => {
         lastName: '',
         email: ''
     });
-
-    const handleProfilePictureClick = () => {
-        document.getElementById('profilePictureInput').click();
-    };
 
     const getUserInitials = (firstName, lastName) => {
         if (!firstName || !lastName) {
@@ -93,33 +90,6 @@ const MyProfile = () => {
         return firstInitial + lastInitial;
     };
 
-    const handleProfilePictureChange = async (event) => {
-        const file = event.target.files[0];
-        console.log(file);
-        if (file) {
-            try {
-                const response = await setProfilePhoto(formData.id, file);
-                if (response && response.status === 200) {
-                    window.location.reload();
-                }
-            } catch (e) {
-                console.error("Error while setting photo", e);
-            }
-        }
-    };
-
-    const handleEditClick = () => {
-        setIsEditing(true);
-    };
-
-    const handleApplyClick = () => {
-        setIsEditing(false);
-    };
-
-    const handleCancelClick = () => {
-        setIsEditing(false);
-    };
-
     const handleInputChange = (e) => {
         const { id, value } = e.target;
         setFormData((prevFormData) => ({
@@ -129,7 +99,7 @@ const MyProfile = () => {
     };
 
     const fetchUserData = async () => {
-        const data = await getCurrentUserData();
+        const data = await getProfileData(id);
         if (data) {
             setFormData(data);
             setUserInitials(getUserInitials(formData.firstName, formData.lastName));
@@ -162,23 +132,16 @@ const MyProfile = () => {
             <MainContainer maxWidth="sm">
                 <MainProfileDataForm>
                     <MainBox>
-                        <IconButton onClick={handleProfilePictureClick} style={{ padding: 0 }}>
+                        <IconButton style={{ padding: 0 }}>
                             {profilePicture ? (
                                 <ProfilePicture src={profilePicture} alt="Profile Picture" />
                             ) : (
                                 <ProfilePicture>{userInitials}</ProfilePicture>
                             )}
                         </IconButton>
-                        <input
-                            id="profilePictureInput"
-                            type="file"
-                            style={{ display: 'none' }}
-                            onChange={handleProfilePictureChange}
-                        />
                         <TextFieldsBox>
                             <TextField
                                 value={formData.firstName}
-                                disabled={!isEditing}
                                 id="firstName"
                                 label="Name"
                                 variant="standard"
@@ -193,7 +156,6 @@ const MyProfile = () => {
                             />
                             <TextField
                                 value={formData.lastName}
-                                disabled={!isEditing}
                                 id="lastName"
                                 label="Surname"
                                 variant="standard"
@@ -208,7 +170,6 @@ const MyProfile = () => {
                             />
                             <TextField
                                 value={formData.email}
-                                disabled={!isEditing}
                                 id="email"
                                 label="Email"
                                 variant="standard"
@@ -223,20 +184,6 @@ const MyProfile = () => {
                             />
                         </TextFieldsBox>
                     </MainBox>
-                    {isEditing ? (
-                        <Box sx={{ display: 'flex', gap: '10px' }}>
-                            <Button variant="contained" onClick={handleApplyClick}>
-                                Apply
-                            </Button>
-                            <Button variant="outlined" onClick={handleCancelClick}>
-                                Cancel
-                            </Button>
-                        </Box>
-                    ) : (
-                        <Button variant="contained" endIcon={<EditIcon />} onClick={handleEditClick}>
-                            Edit
-                        </Button>
-                    )}
                 </MainProfileDataForm>
                 <ProfileStats>
                     <Grid container justifyContent="center" alignItems="center" spacing={2}>
@@ -265,4 +212,4 @@ const MyProfile = () => {
     )
 };
 
-export default MyProfile;
+export default UserProfile;

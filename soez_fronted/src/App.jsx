@@ -13,6 +13,8 @@ import MyProfile from './components/Profile/MyProfile';
 import TripDetails from './components/Trip/TripDetails';
 import NewPlaceForm from './components/Place/NewPlaceForm';
 import PlaceDetails from './components/Place/PlaceDetails';
+import UserProfile from './components/Profile/UserProfile';
+import AddFriendToTrip from './components/Trip/AddFriendToTrip';
 
 const App = () => {
     return (
@@ -30,9 +32,11 @@ const App = () => {
                         <Route path={'/friends'} element={<Friends />}/>
                         <Route path={'/friends/add'} element={<AddFriendsForm/>}/>
                         <Route path={'/profile/me'} element={<MyProfile/>}/>
+                        <Route path={'/users/profile/:id'} element={<UserProfile/>}/>
                         <Route path={'/trips/details/:id'} element={<TripDetails/>}/>
                         <Route path={'/trips/:id/places/new'} element={<NewPlaceForm/>}/>
                         <Route path={'/trips/:tripId/places/details/:placeId'} element={<PlaceDetails/>}/>
+                        <Route path={'/trips/:tripId/add-friend'} element={<AddFriendToTrip/>}/>
                     </Route>
                 </Route>
             </Routes>

@@ -73,7 +73,7 @@ const Friends = () => {
                                     <ListItem
                                         key={friend.id}
                                         secondaryAction={
-                                            <IconButton edge="end" aria-label="add-friend">
+                                            <IconButton edge="end" aria-label="add-friend" onClick={() => navigate(`/users/profile/${friend.id}`)}>
                                                 <InfoIcon />
                                             </IconButton>
                                         }

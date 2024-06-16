@@ -11,10 +11,19 @@ import com.soeztrip.travelplanner.repository.TripRepository;
 import com.soeztrip.travelplanner.repository.UserRepository;
 import com.soeztrip.travelplanner.repository.UserTripRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.UrlResource;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
+import java.net.MalformedURLException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -76,9 +85,7 @@ public class TripService {
         trip.setId(tripDto.getId());
         trip.setStartingDate(tripDto.getStartingDate());
         trip.setEndingDate(tripDto.getEndingDate());
-        trip.setFinished(tripDto.getFinished());
         trip.setTitle(tripDto.getTitle());
-
         List<Place> places = (tripDto.getPlaces() != null) ?
                 tripDto.getPlaces().stream().map(this::mapToPlace).collect(Collectors.toList()) :
                 new ArrayList<>();
@@ -114,7 +121,6 @@ public class TripService {
         tripDto.setId(trip.getId());
         tripDto.setStartingDate(trip.getStartingDate());
         tripDto.setEndingDate(trip.getEndingDate());
-        tripDto.setFinished(trip.getFinished());
         tripDto.setTitle(trip.getTitle());
         List<PlaceDto> placeDtos = trip.getPlaces().stream().map(this::mapToPlaceDto).collect(Collectors.toList());
 
@@ -143,6 +149,7 @@ public class TripService {
         TicketDto ticketDto = new TicketDto();
         ticketDto.setId(ticket.getId());
         ticketDto.setName(ticket.getName());
+        ticketDto.setTicketPath(ticket.getTicketPath());
 
         return ticketDto;
     }
@@ -154,6 +161,7 @@ public class TripService {
                         .firstName(userTrip.getUser().getFirstName())
                         .lastName(userTrip.getUser().getLastName())
                         .email(userTrip.getUser().getEmail())
+                        .role(userTrip.getTripRole().getName())
                         .build())
                 .collect(Collectors.toList());
     }
@@ -181,7 +189,6 @@ public class TripService {
         return tripRepository.existsById(id);
     }
 
-
     public void updateTrip(Long id, TripDto tripDto) {
         String requesterRole = tripRoleService.checkUserRole(id);
         if (!"OWNER".equals(requesterRole) && !"MANAGER".equals(requesterRole)) {
@@ -194,9 +201,6 @@ public class TripService {
         }
         if (tripDto.getEndingDate() != null) {
             trip.setEndingDate(tripDto.getEndingDate());
-        }
-        if (tripDto.getFinished() != null) {
-            trip.setFinished(tripDto.getFinished());
         }
         if (tripDto.getTitle() != null) {
             trip.setTitle(tripDto.getTitle());
@@ -255,4 +259,35 @@ public class TripService {
         userTripRepository.save(userTrip);
     }
 
+    public String saveTripPhoto(Long idTrip, MultipartFile photoFile) {
+        try {
+            String fileName = photoFile.getOriginalFilename();
+            String projectRootDirectory = System.getProperty("user.dir");
+            Path directoryPath = Paths.get(projectRootDirectory, "TripData", idTrip.toString());
+            if (!Files.exists(directoryPath)) {
+                Files.createDirectories(directoryPath);
+            }
+            assert fileName != null;
+            Path filePath = directoryPath.resolve(fileName);
+            Files.copy(photoFile.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
+
+            return filePath.toString();
+
+        } catch (IOException e) {
+            throw new RuntimeException("Failed to save the photo", e);
+        }
+    }
+
+    public void updateTripPhoto(Long idTrip, String photoFilePath) {
+        Trip trip = this.tripRepository.findById(idTrip).orElseThrow();
+        trip.setPhotoFilePath(photoFilePath);
+        this.tripRepository.save(trip);
+    }
+
+
+    public Resource getPhotoResource(Long idTrip) throws MalformedURLException {
+        Trip trip = this.tripRepository.findById(idTrip).orElseThrow();
+        Path path = Paths.get(trip.getPhotoFilePath());
+        return new UrlResource(path.toUri());
+    }
 }

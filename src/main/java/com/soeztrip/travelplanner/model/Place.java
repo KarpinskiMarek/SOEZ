@@ -30,11 +30,9 @@ public class Place {
     @Column(length = 2048)
     private String prompt;
 
-    /*
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "country_id")
-     */
-    private String country; // type Country
+    private String country;
+
+    private String photoFilePath;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "trip_id")
@@ -43,8 +41,7 @@ public class Place {
     @OneToMany(mappedBy = "place", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonIgnore
     private List<Ticket> tickets = new ArrayList<>();
-
-
+  
     public Place(Long id, String name, Date arrive, Date leave, String prompt, String country, Trip trip, List<Ticket> transports) {
         this.id = id;
         this.name = name;

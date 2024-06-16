@@ -55,23 +55,7 @@ public class TicketService {
 
     }
 
-    public String saveTicketFile(Long tripId, Long placeId, MultipartFile ticketFile) {
-        try {
-            String fileName = ticketFile.getOriginalFilename();
-            String projectRootDirectory = System.getProperty("user.dir");
-            Path directoryPath = Paths.get(projectRootDirectory, "TripData", tripId.toString(), placeId.toString());
-            if (!Files.exists(directoryPath)) {
-                Files.createDirectories(directoryPath);
-            }
-            Path filePath = directoryPath.resolve(fileName);
-            Files.copy(ticketFile.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
 
-            return filePath.toString();
-
-        } catch (IOException e) {
-            throw new RuntimeException("Failed to save the ticket", e);
-        }
-    }
 
     public boolean ticketExists(Long id) {
         return ticketRepository.existsById(id);
