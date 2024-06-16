@@ -49,10 +49,8 @@ public class ChatRoomController {
         message.setContent(chatMessage.getContent());
         message.setTimestamp(new Timestamp(System.currentTimeMillis()));
         messageRepository.save(message);
-
         messagingTemplate.convertAndSend("/topic/chatroom/" + chatRoomId, chatMessage);
     }
-
     @MessageMapping("/chat.addUser/{chatRoomId}")
     public void addUser(ChatMessage chatMessage, @DestinationVariable Long chatRoomId) {
         chatMessage.setContent(chatMessage.getSender() + " joined");

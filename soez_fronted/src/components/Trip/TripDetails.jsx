@@ -7,6 +7,7 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import { editTrip, formatDate, formatDateInput, getTrip } from "../../services/TripsService";
 import { deletePlace, getTripPlaces } from "../../services/PlaceService";
 import { getRandomPhoto } from "../../services/PhotoService";
+import Chat from "../Chat/Chat";
 
 const MainDataContainer = styled(Container)(({ theme }) => ({
     marginTop: '2rem',
@@ -279,6 +280,12 @@ const TripDetails = () => {
                     <Button variant="contained" sx={{ margin: '10px' }} onClick={() => navigate(`/trips/${id}/add-friend`)}>
                         Add participant
                     </Button>
+                </ComponentSpace>
+                <ComponentSpace>
+                    <Typography sx={{ mt: 4, mb: 2, textDecoration: 'underline' }} variant="h6" align="center">
+                        Group chat
+                    </Typography>
+                    <Chat />
                 </ComponentSpace>
             </MainDataContainer>
             <Container maxWidth="sm">
