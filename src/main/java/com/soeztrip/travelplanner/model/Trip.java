@@ -38,6 +38,7 @@ public class Trip {
     private List<Place> places = new ArrayList<>();
 
     @OneToOne(mappedBy = "trip", cascade = CascadeType.ALL)
+    @JsonIgnore
     private ChatRoom chatRoom;
 
     public Trip(Long id,

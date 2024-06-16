@@ -39,4 +39,14 @@ public class ChatRoom {
         this.users = new ArrayList<>();
         this.messages = new ArrayList<>();
     }
+
+    @Override
+    public String toString() {
+        return "ChatRoom{" +
+                "id=" + id +
+                ", trip=" + trip +
+                ", users=" + users +
+                ", messages=" + messages +
+                '}';
+    }
 }

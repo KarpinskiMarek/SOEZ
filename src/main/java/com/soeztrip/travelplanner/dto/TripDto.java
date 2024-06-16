@@ -22,4 +22,5 @@ public class TripDto {
     private String title;
     private List<PlaceDto> places;
     private List<UserDto> participants;
+    private Long chatRoomId;
 }

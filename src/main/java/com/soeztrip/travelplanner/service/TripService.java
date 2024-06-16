@@ -126,6 +126,7 @@ public class TripService {
 
         tripDto.setPlaces(placeDtos);
         tripDto.setParticipants(mapToUserDtoList(trip.getUserTrips()));
+        tripDto.setChatRoomId(trip.getChatRoom().getId());
 
         return tripDto;
     }

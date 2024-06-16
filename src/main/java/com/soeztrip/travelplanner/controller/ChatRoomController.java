@@ -7,13 +7,17 @@ import com.soeztrip.travelplanner.model.Message;
 import com.soeztrip.travelplanner.repository.ChatRoomRepository;
 import com.soeztrip.travelplanner.repository.MessageRepository;
 import com.soeztrip.travelplanner.repository.UserRepository;
+import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 
 import java.sql.Timestamp;
+import java.util.List;
 
 @Controller
 @CrossOrigin(origins = "http://localhost:3000")
@@ -51,6 +55,12 @@ public class ChatRoomController {
     public void addUser(ChatMessage chatMessage, @DestinationVariable Long chatRoomId) {
         chatMessage.setContent(chatMessage.getSender() + " joined");
         messagingTemplate.convertAndSend("/topic/chatroom/" + chatRoomId, chatMessage);
+    }
+
+    @GetMapping("/chat/{chatRoomId}/history")
+    public ResponseEntity<?> getHistory(@PathVariable Long chatRoomId){
+        List<Message>messageList=this.messageRepository.findByChatRoomId(chatRoomId);
+        return ResponseEntity.ok().body(messageList);
     }
     //    private final ChatRoomService chatRoomService;
 //    private final UserRepository userRepository;
