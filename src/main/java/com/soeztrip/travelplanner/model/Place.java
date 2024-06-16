@@ -41,14 +41,15 @@ public class Place {
     @OneToMany(mappedBy = "place", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonIgnore
     private List<Ticket> tickets = new ArrayList<>();
-  
-    public Place(Long id, String name, Date arrive, Date leave, String prompt, String country, Trip trip, List<Ticket> transports) {
+
+    public Place(Long id, String name, Date arrive, Date leave, String prompt, String country, String photoFilePath, Trip trip, List<Ticket> transports) {
         this.id = id;
         this.name = name;
         this.arrive = arrive;
         this.leave = leave;
         this.prompt = prompt;
         this.country = country;
+        this.photoFilePath = photoFilePath;
         this.trip = trip;
         this.tickets = new ArrayList<>();
     }
