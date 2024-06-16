@@ -6,14 +6,24 @@ import com.soeztrip.travelplanner.dto.TicketDto;
 import com.soeztrip.travelplanner.dto.TripDto;
 import com.soeztrip.travelplanner.dto.UserDto;
 import com.soeztrip.travelplanner.model.*;
+import com.soeztrip.travelplanner.repository.ChatRoomRepository;
 import com.soeztrip.travelplanner.repository.TripRepository;
 import com.soeztrip.travelplanner.repository.UserRepository;
 import com.soeztrip.travelplanner.repository.UserTripRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.UrlResource;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
+import java.net.MalformedURLException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -26,18 +36,21 @@ public class TripService {
     private UserTripRepository userTripRepository;
     private TripRoleService tripRoleService;
     private FileService fileService;
+    private ChatRoomRepository chatRoomRepository;
 
     @Autowired
     public TripService(TripRepository tripRepository,
                        UserRepository userRepository,
                        UserTripRepository userTripRepository,
                        TripRoleService tripRoleService,
-                       FileService fileService) {
+                       FileService fileService,
+                       ChatRoomRepository chatRoomRepository) {
         this.tripRepository = tripRepository;
         this.userRepository = userRepository;
         this.userTripRepository = userTripRepository;
         this.tripRoleService = tripRoleService;
         this.fileService = fileService;
+        this.chatRoomRepository = chatRoomRepository;
     }
 
     public TripService() {
@@ -72,9 +85,7 @@ public class TripService {
         trip.setId(tripDto.getId());
         trip.setStartingDate(tripDto.getStartingDate());
         trip.setEndingDate(tripDto.getEndingDate());
-        trip.setFinished(tripDto.getFinished());
         trip.setTitle(tripDto.getTitle());
-
         List<Place> places = (tripDto.getPlaces() != null) ?
                 tripDto.getPlaces().stream().map(this::mapToPlace).collect(Collectors.toList()) :
                 new ArrayList<>();
@@ -110,7 +121,6 @@ public class TripService {
         tripDto.setId(trip.getId());
         tripDto.setStartingDate(trip.getStartingDate());
         tripDto.setEndingDate(trip.getEndingDate());
-        tripDto.setFinished(trip.getFinished());
         tripDto.setTitle(trip.getTitle());
         List<PlaceDto> placeDtos = trip.getPlaces().stream().map(this::mapToPlaceDto).collect(Collectors.toList());
 
@@ -150,6 +160,7 @@ public class TripService {
                         .firstName(userTrip.getUser().getFirstName())
                         .lastName(userTrip.getUser().getLastName())
                         .email(userTrip.getUser().getEmail())
+                        .role(userTrip.getTripRole().getName())
                         .build())
                 .collect(Collectors.toList());
     }
@@ -164,13 +175,18 @@ public class TripService {
         TripRole role = tripRoleService.getRoleByName("OWNER");
         userTrip.setTripRole(role);
         tripRepository.save(trip);
+        ChatRoom chatRoom = new ChatRoom();
+        chatRoom.setTrip(trip);
+        List<UserEntity>userList=new ArrayList<>();
+        userList.add(user);
+        chatRoom.setUsers(userList);
+        chatRoomRepository.save(chatRoom);
         userTripRepository.save(userTrip);
     }
 
     public boolean tripExists(Long id) {
         return tripRepository.existsById(id);
     }
-
 
     public void updateTrip(Long id, TripDto tripDto) {
         String requesterRole = tripRoleService.checkUserRole(id);
@@ -184,9 +200,6 @@ public class TripService {
         }
         if (tripDto.getEndingDate() != null) {
             trip.setEndingDate(tripDto.getEndingDate());
-        }
-        if (tripDto.getFinished() != null) {
-            trip.setFinished(tripDto.getFinished());
         }
         if (tripDto.getTitle() != null) {
             trip.setTitle(tripDto.getTitle());
@@ -207,6 +220,9 @@ public class TripService {
         userTrip.setTrip(trip);
         TripRole role = tripRoleService.getRoleByName("PARTICIPANT");
         userTrip.setTripRole(role);
+        ChatRoom chatRoom = chatRoomRepository.findByTripId(id);
+        chatRoom.getUsers().add(user);
+        chatRoomRepository.save(chatRoom);
         userTripRepository.save(userTrip);
     }
 
@@ -242,4 +258,35 @@ public class TripService {
         userTripRepository.save(userTrip);
     }
 
+    public String saveTripPhoto(Long idTrip, MultipartFile photoFile) {
+        try {
+            String fileName = photoFile.getOriginalFilename();
+            String projectRootDirectory = System.getProperty("user.dir");
+            Path directoryPath = Paths.get(projectRootDirectory, "TripData", idTrip.toString());
+            if (!Files.exists(directoryPath)) {
+                Files.createDirectories(directoryPath);
+            }
+            assert fileName != null;
+            Path filePath = directoryPath.resolve(fileName);
+            Files.copy(photoFile.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
+
+            return filePath.toString();
+
+        } catch (IOException e) {
+            throw new RuntimeException("Failed to save the photo", e);
+        }
+    }
+
+    public void updateTripPhoto(Long idTrip, String photoFilePath) {
+        Trip trip = this.tripRepository.findById(idTrip).orElseThrow();
+        trip.setPhotoFilePath(photoFilePath);
+        this.tripRepository.save(trip);
+    }
+
+
+    public Resource getPhotoResource(Long idTrip) throws MalformedURLException {
+        Trip trip = this.tripRepository.findById(idTrip).orElseThrow();
+        Path path = Paths.get(trip.getPhotoFilePath());
+        return new UrlResource(path.toUri());
+    }
 }

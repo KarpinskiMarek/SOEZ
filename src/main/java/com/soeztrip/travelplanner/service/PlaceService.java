@@ -7,8 +7,13 @@ import com.soeztrip.travelplanner.model.Ticket;
 import com.soeztrip.travelplanner.model.Trip;
 import com.soeztrip.travelplanner.repository.PlaceRepository;
 import com.soeztrip.travelplanner.repository.TripRepository;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.UrlResource;
 import org.springframework.stereotype.Service;
 
+import java.net.MalformedURLException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -126,8 +131,21 @@ public class PlaceService {
     public List<TicketDto> getTickets(Long id) {
         Place place = this.placeRepository.findById(id).orElseThrow();
         List<Ticket> ticketList = place.getTickets();
-        List<TicketDto> ticketDtoList = ticketList.stream().map(tripService::mapToTicketDto).collect(Collectors.toList());
+        List<TicketDto> ticketDtoList = ticketList.stream()
+                .map(tripService::mapToTicketDto)
+                .collect(Collectors.toList());
         return ticketDtoList;
+    }
+    public void updatePlacePhoto(Long idPlace, String photoFilePath) {
+        Place place=this.placeRepository.findById(idPlace).orElseThrow();
+        place.setPhotoFilePath(photoFilePath);
+        this.placeRepository.save(place);
+    }
+
+    public Resource getPhotoResource(Long idPlace) throws MalformedURLException {
+        Place place = this.placeRepository.findById(idPlace).orElseThrow();
+        Path path = Paths.get(place.getPhotoFilePath());
+        return new UrlResource(path.toUri());
     }
 
 }

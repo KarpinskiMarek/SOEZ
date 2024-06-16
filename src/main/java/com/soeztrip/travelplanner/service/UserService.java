@@ -1,8 +1,12 @@
 package com.soeztrip.travelplanner.service;
 
+
+import com.soeztrip.travelplanner.dto.ProfileStatsDto;
 import com.soeztrip.travelplanner.dto.UserDataDto;
 import com.soeztrip.travelplanner.dto.UserDto;
+import com.soeztrip.travelplanner.model.Trip;
 import com.soeztrip.travelplanner.model.UserEntity;
+import com.soeztrip.travelplanner.model.UserTrip;
 import com.soeztrip.travelplanner.repository.RoleRepository;
 import com.soeztrip.travelplanner.repository.UserRepository;
 import jakarta.persistence.EntityNotFoundException;
@@ -38,9 +42,28 @@ public class UserService {
         this.roleRepository = roleRepository;
     }
 
+    public boolean userExists(Long id) {
+        return userRepository.existsById(id);
+    }
+
     public List<UserDto> findAllUsers() {
         List<UserEntity> userEntities = userRepository.findAll();
         return userEntities.stream().map(this::mapUserToDto).collect(Collectors.toList());
+    }
+
+    public ProfileStatsDto getStats(Long id) {
+        UserEntity user = this.userRepository.findById(id).orElseThrow();
+        ProfileStatsDto profileStatsDto = new ProfileStatsDto();
+        profileStatsDto.setTrips(user.getUserTrips().size());
+        List<UserTrip> userTrips = user.getUserTrips();
+        List<Trip> trips = userTrips.stream()
+                .map(UserTrip::getTrip)
+                .collect(Collectors.toList());
+
+        int placeCount = trips.stream().flatMap(trip -> trip.getPlaces().stream()).mapToInt(place -> 1).sum();
+        profileStatsDto.setPlaces(placeCount);
+        profileStatsDto.setFriends(user.getFriendList().size());
+        return profileStatsDto;
     }
 
     public List<UserDto> getFriends(String email) {
@@ -52,7 +75,7 @@ public class UserService {
     }
 
     public UserDataDto findUser(Long id) {
-        UserEntity user =  userRepository.findById(id).orElseThrow(() -> new UsernameNotFoundException("No user"));
+        UserEntity user = userRepository.findById(id).orElseThrow(() -> new UsernameNotFoundException("No user"));
         return mapUserToUserNameDto(user);
     }
 
@@ -80,11 +103,6 @@ public class UserService {
 
     }
 
-    public boolean userExists(Long id) {
-        return userRepository.existsById(id);
-    }
-
-
     public void updateUser(UserDto userDto) {
         UserEntity existingUser = userRepository.findById(userDto.getId()).orElse(null);
         if (existingUser == null) {
@@ -106,6 +124,7 @@ public class UserService {
             if (!Files.exists(directoryPath)) {
                 Files.createDirectories(directoryPath);
             }
+            assert fileName != null;
             Path filePath = directoryPath.resolve(fileName);
             Files.copy(photoFile.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
 
@@ -116,7 +135,6 @@ public class UserService {
             throw new RuntimeException("Failed to save the photo", e);
         }
     }
-
 
     public void updateProfilePicture(Long id, String filePath) {
         UserEntity user = this.userRepository.findById(id).orElseThrow(
@@ -132,8 +150,11 @@ public class UserService {
 
     @Transactional
     public void addFriend(String userEmail, Long friendId) {
-        UserEntity user = userRepository.findByEmail(userEmail).orElseThrow(() -> new IllegalArgumentException("User not found"));
-        UserEntity friend = userRepository.findById(friendId).orElseThrow(() -> new IllegalArgumentException("Friend not found"));
+
+        UserEntity user = userRepository.findByEmail(userEmail).orElseThrow(()
+                -> new IllegalArgumentException("User not found"));
+        UserEntity friend = userRepository.findById(friendId).orElseThrow(()
+                -> new IllegalArgumentException("Friend not found"));
 
         if (!user.getFriendList().contains(friend)) {
             user.getFriendList().add(friend);
@@ -146,8 +167,11 @@ public class UserService {
 
     @Transactional
     public void removeFriend(String userEmail, Long friendId) {
-        UserEntity user = userRepository.findByEmail(userEmail).orElseThrow(() -> new IllegalArgumentException("User not found"));
-        UserEntity friend = userRepository.findById(friendId).orElseThrow(() -> new IllegalArgumentException("Friend not found"));
+
+        UserEntity user = userRepository.findByEmail(userEmail).orElseThrow(()
+                -> new IllegalArgumentException("User not found"));
+        UserEntity friend = userRepository.findById(friendId).orElseThrow(()
+                -> new IllegalArgumentException("Friend not found"));
 
         user.getFriendList().remove(friend);
         friend.getFriendList().remove(user);
