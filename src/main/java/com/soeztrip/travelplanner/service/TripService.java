@@ -6,6 +6,7 @@ import com.soeztrip.travelplanner.dto.TicketDto;
 import com.soeztrip.travelplanner.dto.TripDto;
 import com.soeztrip.travelplanner.dto.UserDto;
 import com.soeztrip.travelplanner.model.*;
+import com.soeztrip.travelplanner.repository.ChatRoomRepository;
 import com.soeztrip.travelplanner.repository.TripRepository;
 import com.soeztrip.travelplanner.repository.UserRepository;
 import com.soeztrip.travelplanner.repository.UserTripRepository;
@@ -35,18 +36,21 @@ public class TripService {
     private UserTripRepository userTripRepository;
     private TripRoleService tripRoleService;
     private FileService fileService;
+    private ChatRoomRepository chatRoomRepository;
 
     @Autowired
     public TripService(TripRepository tripRepository,
                        UserRepository userRepository,
                        UserTripRepository userTripRepository,
                        TripRoleService tripRoleService,
-                       FileService fileService) {
+                       FileService fileService,
+                       ChatRoomRepository chatRoomRepository) {
         this.tripRepository = tripRepository;
         this.userRepository = userRepository;
         this.userTripRepository = userTripRepository;
         this.tripRoleService = tripRoleService;
         this.fileService = fileService;
+        this.chatRoomRepository = chatRoomRepository;
     }
 
     public TripService() {
@@ -172,6 +176,12 @@ public class TripService {
         TripRole role = tripRoleService.getRoleByName("OWNER");
         userTrip.setTripRole(role);
         tripRepository.save(trip);
+        ChatRoom chatRoom = new ChatRoom();
+        chatRoom.setTrip(trip);
+        List<UserEntity>userList=new ArrayList<>();
+        userList.add(user);
+        chatRoom.setUsers(userList);
+        chatRoomRepository.save(chatRoom);
         userTripRepository.save(userTrip);
     }
 
@@ -211,6 +221,9 @@ public class TripService {
         userTrip.setTrip(trip);
         TripRole role = tripRoleService.getRoleByName("PARTICIPANT");
         userTrip.setTripRole(role);
+        ChatRoom chatRoom = chatRoomRepository.findByTripId(id);
+        chatRoom.getUsers().add(user);
+        chatRoomRepository.save(chatRoom);
         userTripRepository.save(userTrip);
     }
 

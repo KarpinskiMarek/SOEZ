@@ -37,13 +37,17 @@ public class Trip {
     @JsonIgnore
     private List<Place> places = new ArrayList<>();
 
+    @OneToOne(mappedBy = "trip", cascade = CascadeType.ALL)
+    private ChatRoom chatRoom;
+
     public Trip(Long id,
                 Date startingDate,
                 Date endingDate,
                 String photoFilePath,
                 String title,
                 List<UserTrip> userTrips,
-                List<Place> places) {
+                List<Place> places,
+                ChatRoom chatRoom) {
         this.id = id;
         this.startingDate = startingDate;
         this.endingDate = endingDate;
@@ -51,7 +55,9 @@ public class Trip {
         this.title = title;
         this.userTrips = new ArrayList<>();
         this.places = new ArrayList<>();
+        this.chatRoom = chatRoom;
     }
+
     @Override
     public String toString() {
         return "Trip{" +

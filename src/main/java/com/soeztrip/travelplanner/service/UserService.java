@@ -150,10 +150,11 @@ public class UserService {
 
     @Transactional
     public void addFriend(String userEmail, Long friendId) {
-        UserEntity user = userRepository.findByEmail(userEmail).orElseThrow(() ->
-                new IllegalArgumentException("User not found"));
-        UserEntity friend = userRepository.findById(friendId).orElseThrow(() ->
-                new IllegalArgumentException("Friend not found"));
+
+        UserEntity user = userRepository.findByEmail(userEmail).orElseThrow(()
+                -> new IllegalArgumentException("User not found"));
+        UserEntity friend = userRepository.findById(friendId).orElseThrow(()
+                -> new IllegalArgumentException("Friend not found"));
 
         if (!user.getFriendList().contains(friend)) {
             user.getFriendList().add(friend);
@@ -166,10 +167,11 @@ public class UserService {
 
     @Transactional
     public void removeFriend(String userEmail, Long friendId) {
-        UserEntity user = userRepository.findByEmail(userEmail).orElseThrow(() ->
-                new IllegalArgumentException("User not found"));
-        UserEntity friend = userRepository.findById(friendId).orElseThrow(() ->
-                new IllegalArgumentException("Friend not found"));
+
+        UserEntity user = userRepository.findByEmail(userEmail).orElseThrow(()
+                -> new IllegalArgumentException("User not found"));
+        UserEntity friend = userRepository.findById(friendId).orElseThrow(()
+                -> new IllegalArgumentException("Friend not found"));
 
         user.getFriendList().remove(friend);
         friend.getFriendList().remove(user);
