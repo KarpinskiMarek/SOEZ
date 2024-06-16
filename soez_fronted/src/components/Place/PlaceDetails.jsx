@@ -1,9 +1,13 @@
-import { Container, styled, Typography, Box, Paper, Button, TextField } from "@mui/material";
+import { Container, styled, Typography, Box, Paper, Button, TextField, List, ListItem, IconButton, ListItemAvatar, Avatar, ListItemText } from "@mui/material";
 import EditIcon from '@mui/icons-material/Edit';
 import SmartToyIcon from '@mui/icons-material/SmartToy';
+import DeleteIcon from '@mui/icons-material/Delete';
+import InsertDriveFileIcon from '@mui/icons-material/InsertDriveFile';
+import FileDownloadIcon from '@mui/icons-material/FileDownload';
+import FileUploadIcon from '@mui/icons-material/FileUpload';
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import { editPlace, editPlacePlan, generatePlacePlan, getPlace, getPlaceWeather } from "../../services/PlaceService";
+import { deleteTicket, downloadTicket, editPlace, editPlacePlan, generatePlacePlan, getPlace, getPlaceTickets, getPlaceWeather, uploadTicket } from "../../services/PlaceService";
 import { formatDateInput } from "../../services/TripsService";
 import { getWeatherIconPath } from "../../services/WeatherIconService";
 import Map from "../Maps/MyMap";
@@ -64,11 +68,20 @@ const WeatherStatusInfo = styled(Typography)(({ theme }) => ({
     justifyContent: 'center'
 }));
 
+function generate(element) {
+    return [0, 1, 2].map((value) =>
+        React.cloneElement(element, {
+            key: value,
+        }),
+    );
+}
+
 const PlaceDetails = () => {
 
     const { tripId, placeId } = useParams();
     const [isEditing, setIsEditing] = useState(false);
-    
+    const [dense, setDense] = React.useState(false);
+    const [secondary, setSecondary] = React.useState(false);
     const [formData, setFormData] = useState({
         name: '',
         arrive: '',
@@ -78,7 +91,7 @@ const PlaceDetails = () => {
     });
 
     const [plan, setPlan] = useState('');
-
+    const [tickets, setTickets] = useState([]);
     const [weatherData, setWeatherData] = useState({
         city: '',
         temperature: '',
@@ -123,6 +136,19 @@ const PlaceDetails = () => {
         }
     };
 
+    const fetchTickets = async () => {
+        const response = await getPlaceTickets(placeId);
+        if (response && response.data) {
+            const ticketsData = response.data;
+            console.log(ticketsData);
+            const formatedTickets = ticketsData.map(ticket => ({
+                id: ticket.id,
+                name: ticket.ticketPath.split('/').pop()
+            }));
+            setTickets(formatedTickets);
+        }
+    }
+
     const fetchWeather = async () => {
         const weatherData = await getPlaceWeather(placeId);
         if (weatherData) {
@@ -133,14 +159,15 @@ const PlaceDetails = () => {
     useEffect(() => {
         fetchPlace();
         fetchWeather();
+        fetchTickets();
     }, [tripId, placeId]);
-
+    
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
             const response = await editPlace(
-                tripId, 
-                placeId, 
+                tripId,
+                placeId,
                 formData.name,
                 formData.arrive,
                 formData.leave,
@@ -161,7 +188,7 @@ const PlaceDetails = () => {
             if (response && response.status === 200) {
                 window.location.reload();
             }
-        } catch(error) {
+        } catch (error) {
             console.error("Error while generating plan", error);
         }
     }
@@ -175,6 +202,40 @@ const PlaceDetails = () => {
             }
         } catch (error) {
             console.error("Error while editing plan", error);
+        }
+    }
+
+    const handleUploadFile = async (event) => {
+        const file = event.target.files[0];
+        console.log(file);
+        if (file) {
+            try {
+                const response = await uploadTicket(tripId, placeId, file);
+                if (response && response.status === 201) {
+                    window.location.reload();
+                }
+            } catch (error) {
+                console.error("Error while uploading file", error);
+            }
+        }
+    }
+
+    const handleDeleteTicket = async (id) => {
+        try {
+            const response = await deleteTicket(tripId, placeId, id);
+            if (response && response.status === 200) {
+                setTickets(prevTickets => prevTickets.filter(ticket => ticket.id !== id));
+            }
+        } catch (error) {
+            console.error("Error while deleting ticket")
+        }
+    }
+
+    const handleDownloadTicket = async (ticket) => {
+        try {
+            await downloadTicket(ticket.id);
+        } catch (error) {
+            console.error("Error while downloding ticket", error)
         }
     }
 
@@ -277,7 +338,7 @@ const PlaceDetails = () => {
                     </Typography>
                     <WeatherStatusInfo variant="h5" color="textPrimary" gutterBottom>
                         {weatherData.temperature}°C
-                        <img src={getWeatherIconPath(weatherData.description)} alt={weatherData.description} style={{ width: 30, height: 30, marginLeft: 8 }} /> 
+                        <img src={getWeatherIconPath(weatherData.description)} alt={weatherData.description} style={{ width: 30, height: 30, marginLeft: 8 }} />
                     </WeatherStatusInfo>
                 </ComponentSpace>
                 <ComponentSpace>
@@ -297,15 +358,63 @@ const PlaceDetails = () => {
                         <Button variant="contained" onClick={handleEditPlan} endIcon={<EditIcon />}>
                             Edit
                         </Button>
-                        <Button variant="outlined" onClick={handleGeneratePlan} endIcon={<SmartToyIcon/>}>
+                        <Button variant="outlined" onClick={handleGeneratePlan} endIcon={<SmartToyIcon />}>
                             Generate
                         </Button>
                     </Box>
                 </ComponentSpace>
                 <ComponentSpace>
-                    <Typography variant="h5" align="center" color="textPrimary" gutterBottom>
+                    <Typography sx={{ mt: 4, mb: 2, textDecoration: 'underline' }} variant="h6" align="center">
                         Tickets
                     </Typography>
+                    <List dense={dense} sx={{ width: '100%' }}>
+                        {tickets.map((ticket) => (
+                            <ListItem
+                            key={ticket.id}
+                            secondaryAction={
+                                <Box>
+                                    <IconButton 
+                                        edge="end" 
+                                        aria-label="delete" 
+                                        sx={{ marginRight: '5px' }}
+                                        onClick={() => handleDeleteTicket(ticket.id)}
+                                    >
+                                        <DeleteIcon />
+                                    </IconButton>
+                                    <IconButton 
+                                        edge="end" 
+                                        aria-label="delete"
+                                        onClick={() => handleDownloadTicket(ticket)}
+                                    >
+                                        <FileDownloadIcon />
+                                    </IconButton>
+                                </Box>
+                            }
+                            >   
+                            <ListItemAvatar>
+                                <Avatar>
+                                    <InsertDriveFileIcon />
+                                </Avatar>
+                            </ListItemAvatar>
+                            <ListItemText
+                                primary={ticket.name}
+                                secondary={secondary ? 'Secondary text' : null}
+                            />
+                        </ListItem>
+                        ))}
+                    </List>
+                    <Button
+                        variant="contained"
+                        component="label"
+                        endIcon={<FileUploadIcon />}
+                    >
+                        Upload File
+                        <input
+                            type="file"
+                            hidden
+                            onChange={handleUploadFile}
+                        />
+                    </Button>
                 </ComponentSpace>
             </MainDataContainer>
         </>

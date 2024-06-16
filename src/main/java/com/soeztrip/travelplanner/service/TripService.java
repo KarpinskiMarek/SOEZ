@@ -139,7 +139,7 @@ public class TripService {
         TicketDto ticketDto = new TicketDto();
         ticketDto.setId(ticket.getId());
         ticketDto.setName(ticket.getName());
-
+        ticketDto.setTicketPath(ticket.getTicketPath());
         return ticketDto;
     }
 
