@@ -80,3 +80,46 @@ export const editPlacePlan = async (tripId, placeId, plan) => {
         console.error("Error while editing plan");
     }
 }
+
+export const uploadTicket = async (tripId, placeId, ticket) => {
+    try {
+        const formData = new FormData();
+        formData.append('ticketFile', ticket);
+        return await request("POST", `/trips/${tripId}/places/${placeId}/tickets/new`, formData, {
+            'Content-Type': 'multipart/form-data'
+        });
+    } catch (error) {
+        console.error("Error while uploading ticket")
+    }
+}
+
+export const getPlaceTickets = async (placeId) => {
+    try {
+        return await request("GET", `/place/${placeId}/tickets`);
+    } catch (error) {
+        console.error("Error while getting tickets")
+    }
+}
+
+export const deleteTicket = async (tripId, placeId, ticketId) => {
+    try {
+        return await request("DELETE", `/trips/${tripId}/places/${placeId}/tickets/${ticketId}`);
+    } catch (error) {
+        console.error("Erro while deleting ticekt");
+    }
+}
+
+export const downloadTicket = async (ticketId) => {
+    try {
+        const response = await request("GET", `/tickets/${ticketId}/download`, null, {}, { responseType: 'blob' });
+        const url = window.URL.createObjectURL(new Blob([response.data]));
+        const link = document.createElement('a');
+        link.href = url;
+        link.setAttribute('download', `ticket_${ticketId}.pdf`);
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    } catch (error) {
+        console.error("Error while downloading ticket");
+    }
+}

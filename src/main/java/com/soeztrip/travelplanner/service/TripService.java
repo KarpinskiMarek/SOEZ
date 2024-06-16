@@ -150,7 +150,6 @@ public class TripService {
         ticketDto.setId(ticket.getId());
         ticketDto.setName(ticket.getName());
         ticketDto.setTicketPath(ticket.getTicketPath());
-
         return ticketDto;
     }
 

@@ -4,7 +4,7 @@ import { APIProvider, Map } from "@vis.gl/react-google-maps";
 const MyMap = ({ location }) => {
     
     const [center, setCenter] = useState({ lat: 0, lng: 0 });
-    const APIkey = '';
+    const APIkey = 'AIzaSyCI2TCN3tdrOnykqkVYnmAYBzgP1M5ym-4';
     
     useEffect(() => {
 
