@@ -44,10 +44,8 @@ public class Place {
     @JsonIgnore
     private List<Ticket> tickets = new ArrayList<>();
 
-    @OneToMany(mappedBy = "place", cascade = CascadeType.ALL)
-    private List<Activity> activities = new ArrayList<>();
 
-    public Place(Long id, String name, Date arrive, Date leave, String prompt, String country, Trip trip, List<Ticket> transports, List<Activity> activities) {
+    public Place(Long id, String name, Date arrive, Date leave, String prompt, String country, Trip trip, List<Ticket> transports) {
         this.id = id;
         this.name = name;
         this.arrive = arrive;
@@ -56,6 +54,5 @@ public class Place {
         this.country = country;
         this.trip = trip;
         this.tickets = new ArrayList<>();
-        this.activities = activities;
     }
 }

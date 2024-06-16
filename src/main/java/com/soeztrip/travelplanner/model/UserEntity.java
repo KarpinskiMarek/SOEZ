@@ -60,8 +60,8 @@ public class UserEntity {
     @ManyToMany(mappedBy = "users")
     private Set<ChatRoom> chatRooms = new HashSet<>();
 
-    @OneToMany(mappedBy = "sender", cascade = CascadeType.ALL)
-    private List<Message> sentMessages = new ArrayList<>();
+//    @OneToMany(mappedBy = "sender", cascade = CascadeType.ALL)
+//    private List<Message> sentMessages = new ArrayList<>();
 
     @Override
     public boolean equals(Object o) {
