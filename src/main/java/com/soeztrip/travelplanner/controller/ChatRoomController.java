@@ -48,9 +48,11 @@ public class ChatRoomController {
                 -> new UserNotFoundException("User not found")));
         message.setContent(chatMessage.getContent());
         message.setTimestamp(new Timestamp(System.currentTimeMillis()));
-        messageRepository.save(message);
+        Message savedMessage = messageRepository.save(message);
+        chatMessage.setMessageId(savedMessage.getId());
         messagingTemplate.convertAndSend("/topic/chatroom/" + chatRoomId, chatMessage);
     }
+
     @MessageMapping("/chat.addUser/{chatRoomId}")
     public void addUser(ChatMessage chatMessage, @DestinationVariable Long chatRoomId) {
         chatMessage.setContent(chatMessage.getSender() + " joined");
