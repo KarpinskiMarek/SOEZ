@@ -6,6 +6,7 @@ import MessageForm from './MessageForm';
 import { getCurrentUserData } from '../../services/ProfileService';
 import SockJS from 'sockjs-client';
 import { Stomp } from '@stomp/stompjs';
+import { getChatHistory } from '../../services/ChatService';
 
 const ChatContainer = styled(Box)(({ theme }) => ({
     width: '100%',
@@ -26,30 +27,7 @@ const MessageFormContainer = styled(Box)(({ theme }) => ({
     marginTop: '20px',
 }));
 
-const initialMessages = [
-    {
-        id: 1,
-        user: {
-            id: 2,
-            name: 'Jane Smith',
-            avatar: 'https://via.placeholder.com/40'
-        },
-        text: 'Hello, everyone!',
-        timestamp: '2023-06-10T10:00:00Z',
-    },
-    {
-        id: 2,
-        user: {
-            id: 1,
-            name: 'John Doe',
-            avatar: 'https://via.placeholder.com/40'
-        },
-        text: 'Hi, Jane!',
-        timestamp: '2023-06-10T10:05:00Z',
-    },
-];
-
-const Chat = (tripId) => {
+const Chat = ({chatRoomId}) => {
 
     const [messages, setMessages] = useState([]);
     const [stompClient, setStompClient] = useState(null);
@@ -68,18 +46,48 @@ const Chat = (tripId) => {
         })
     }
 
+    const fetchMessageHistory = async () => {
+        const data = await getChatHistory(chatRoomId);
+        if (data) {
+            setMessages(data);
+        }
+    }
+
     useEffect(() => {
         fetchUserData();
-    }, [])
+        fetchMessageHistory();
+        const socket = new SockJS('http://localhost:8080/ws');
+        const client = Stomp.over(socket);
+
+        client.connect({}, () => {
+            client.subscribe(`/topic/chatroom/${chatRoomId}`, (msg) => {
+                const newMessage = JSON.parse(msg.body);
+                console.log(msg);
+                console.log(newMessage);
+                setMessages((prevMessages) => [...prevMessages, newMessage]);
+            });
+        });
+
+        setStompClient(client);
+
+        return () => {
+            if (stompClient) {
+                stompClient.disconnect();
+            }
+        };
+
+    }, [chatRoomId]);
 
     const handleSendMessage = (text) => {
-        const newMessage = {
-            id: messages.length + 1,
-            user:currentUser,
-            text,
-            timestamp: new Date().toISOString(),
-        };
-        setMessages([...messages, newMessage]);
+        if (stompClient && text.trim()) {
+            const chatMessage = {
+                content: text,
+                sender: currentUser.name,
+                userId: currentUser.id,
+                type: "CHAT"
+            };
+            stompClient.send(`/app/chat.sendMessage/${chatRoomId}`, {}, JSON.stringify(chatMessage));
+        }
     };
 
     return (
@@ -87,7 +95,7 @@ const Chat = (tripId) => {
             <ChatBox>
                 <List>
                     {messages.map((msg) => (
-                        <Message key={msg.id} message={msg} currentUser={currentUser} />
+                        <Message key={msg.messageId} message={msg} currentUser={currentUser} />
                     ))}
                 </List>
             </ChatBox>

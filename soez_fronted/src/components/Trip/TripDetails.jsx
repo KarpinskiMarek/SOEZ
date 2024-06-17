@@ -100,6 +100,10 @@ const TripDetails = () => {
         endingDate: ''
     });
 
+    const [tripData, setTripData] = useState({});
+
+    const [chatroomId, setChatroomId] = useState(null);
+
     const [participants, setParticipants] = useState([]);
 
     const handleEditClick = () => {
@@ -137,6 +141,7 @@ const TripDetails = () => {
 
     const fetchTrip = async () => {
         const tripData = await getTrip(id);
+        console.log(tripData);
         if (tripData) {
             setFormData({
                 ...tripData,
@@ -144,6 +149,7 @@ const TripDetails = () => {
                 endingDate: formatDateInput(tripData.endingDate)
             });
             setParticipants(tripData.participants);
+            setTripData(tripData);
         }
     }
 
@@ -285,7 +291,7 @@ const TripDetails = () => {
                     <Typography sx={{ mt: 4, mb: 2, textDecoration: 'underline' }} variant="h6" align="center">
                         Group chat
                     </Typography>
-                    <Chat />
+                    <Chat chatRoomId={tripData.chatRoomId}/>
                 </ComponentSpace>
             </MainDataContainer>
             <Container maxWidth="sm">
