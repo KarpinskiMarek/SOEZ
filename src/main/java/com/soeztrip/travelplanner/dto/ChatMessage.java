@@ -19,6 +19,5 @@ public class ChatMessage {
     private String sender;
     private Long userId;
     private MessageType type;
-    private Long messageId;
     private Date timeStamp;
 }
