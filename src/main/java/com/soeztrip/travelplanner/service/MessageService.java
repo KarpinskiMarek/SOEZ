@@ -8,13 +8,15 @@ import org.springframework.stereotype.Service;
 @Service
 public class MessageService {
 
-    public static MessageHistoryDto MessageMapper(Message message){
+    public static MessageHistoryDto MessageMapper(Message message) {
         MessageHistoryDto messageHistoryDto = new MessageHistoryDto();
         messageHistoryDto.setMessageId(message.getId());
         messageHistoryDto.setContent(message.getContent());
         messageHistoryDto.setTimeStamp(message.getTimestamp());
         messageHistoryDto.setChatRoomId(message.getId());
         messageHistoryDto.setUserId(message.getUser().getId());
+        messageHistoryDto.setFirstName(message.getUser().getFirstName());
+        messageHistoryDto.setLastName(message.getUser().getLastName());
 
         return messageHistoryDto;
     }
