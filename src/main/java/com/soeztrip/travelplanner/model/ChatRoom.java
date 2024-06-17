@@ -1,7 +1,9 @@
 package com.soeztrip.travelplanner.model;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -31,6 +33,7 @@ public class ChatRoom {
     private List<UserEntity> users;
 
     @OneToMany(mappedBy = "chatRoom")
+    @JsonIgnore
     private List<Message> messages;
 
     public ChatRoom(Long id, Trip trip, List<UserEntity> users, List<Message> messages) {

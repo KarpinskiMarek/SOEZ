@@ -1,5 +1,6 @@
-package com.soeztrip.travelplanner.service;
+package com.soeztrip.travelplanner.config;
 
+import com.soeztrip.travelplanner.service.WeatherService;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -17,7 +18,7 @@ public class AppConfig {
     private String apiKey;
 
     @Bean
-    public WeatherService myWeatherService(RestTemplate restTemplate,@Value("${weather.api.key}") String apiKey) {
+    public WeatherService myWeatherService(RestTemplate restTemplate, @Value("${weather.api.key}") String apiKey) {
         return new WeatherService(restTemplate, apiKey);
     }
 

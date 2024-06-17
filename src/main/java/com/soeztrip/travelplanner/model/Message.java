@@ -1,12 +1,13 @@
 package com.soeztrip.travelplanner.model;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.security.Timestamp;
 import java.util.Date;
 
 @Data
@@ -21,6 +22,7 @@ public class Message {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "chatroom_id")
+    @JsonIgnore
     private ChatRoom chatRoom;
 
     @ManyToOne
@@ -30,4 +32,15 @@ public class Message {
     private String content;
 
     private Date timestamp;
+
+    @Override
+    public String toString() {
+        return "Message{" +
+                "id=" + id +
+                ", chatRoom=" + chatRoom +
+                ", user=" + user +
+                ", content='" + content + '\'' +
+                ", timestamp=" + timestamp +
+                '}';
+    }
 }
