@@ -15,8 +15,7 @@ public class MessageService {
         messageHistoryDto.setTimeStamp(message.getTimestamp());
         messageHistoryDto.setChatRoomId(message.getId());
         messageHistoryDto.setUserId(message.getUser().getId());
-        messageHistoryDto.setFirstName(message.getUser().getFirstName());
-        messageHistoryDto.setLastName(message.getUser().getLastName());
+        messageHistoryDto.setSender(message.getUser().getFirstName()+" "+message.getUser().getLastName());
 
         return messageHistoryDto;
     }

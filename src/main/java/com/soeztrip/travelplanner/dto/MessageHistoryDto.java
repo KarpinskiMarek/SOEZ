@@ -17,6 +17,5 @@ public class MessageHistoryDto {
     private Date timeStamp;
     private Long chatRoomId;
     private Long userId;
-    private String firstName;
-    private String lastName;
+    private String sender;
 }
