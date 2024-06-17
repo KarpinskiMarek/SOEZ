@@ -14,6 +14,7 @@ import java.util.Date;
 @AllArgsConstructor
 @NoArgsConstructor
 public class ChatMessage {
+    private Long messageId;
     private String content;
     private String sender;
     private Long userId;

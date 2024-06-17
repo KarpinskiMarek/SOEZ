@@ -57,7 +57,6 @@ public class ChatRoomController {
         Message savedMessage = messageRepository.save(message);
         chatMessage.setMessageId(savedMessage.getId());
         chatMessage.setTimeStamp(savedMessage.getTimestamp());
-
         messagingTemplate.convertAndSend("/topic/chatroom/" + chatRoomId, chatMessage);
 
     }
