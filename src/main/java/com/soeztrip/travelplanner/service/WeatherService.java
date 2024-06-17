@@ -3,7 +3,6 @@ package com.soeztrip.travelplanner.service;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.soeztrip.travelplanner.dto.WeatherDTO;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
@@ -47,6 +46,7 @@ public class WeatherService {
 
         return null;
     }
+
     private int extractTemperatureFromWeatherData(JsonNode rootNode) {
         JsonNode mainNode = rootNode.get("main");
         if (mainNode != null) {
