@@ -51,7 +51,6 @@ public class TripController {
         this.ticketService = ticketService;
         this.weatherService = weatherService;
         this.fileService = fileService;
-
     }
 
     @GetMapping("/trips")

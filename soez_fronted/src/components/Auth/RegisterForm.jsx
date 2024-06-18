@@ -59,9 +59,7 @@ const RegisterForm = () => {
             newErrors.password = "Invalid password (6-20 characters)";
         }
 
-        setErrors(newErrors);
-        console.log("Errors:", newErrors);
-
+        setErrors(newErrors);    
         return Object.keys(newErrors).length === 0;
     }
 

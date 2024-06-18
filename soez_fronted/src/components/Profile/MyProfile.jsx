@@ -1,7 +1,7 @@
 import { Avatar, Container, TextField, Box, styled, Paper, Button, IconButton, Typography, Divider, Grid } from "@mui/material";
 import EditIcon from '@mui/icons-material/Edit';
 import React, { useEffect, useState } from "react";
-import { arrayBufferToBase64, getCurrentUserData, getProfilePhoto, setProfilePhoto } from "../../services/ProfileService";
+import { arrayBufferToBase64, getCurrentUserData, getProfilePhoto, getProfileStats, setProfilePhoto } from "../../services/ProfileService";
 
 const ProfilePicture = styled(Avatar)(({ theme }) => ({
     width: '100px',
@@ -79,6 +79,8 @@ const MyProfile = () => {
         email: ''
     });
 
+    const [usersStats, setUserStats] = useState({});
+
     const handleProfilePictureClick = () => {
         document.getElementById('profilePictureInput').click();
     };
@@ -136,6 +138,13 @@ const MyProfile = () => {
         }
     };
 
+    const fetchUserStats = async (id) => {
+        const stats = await getProfileStats(id);
+        if (stats) {
+            setUserStats(stats);
+        }
+    }
+
     const fetchUserProfilePicture = async (id) => {
         const response = await getProfilePhoto(id);
         if (response && response.data) {
@@ -153,6 +162,7 @@ const MyProfile = () => {
     useEffect(() => {
         if (formData && formData.id) {
             fetchUserProfilePicture(formData.id);
+            fetchUserStats(formData.id);
         }
     }, [formData]);
     
@@ -242,19 +252,19 @@ const MyProfile = () => {
                     <Grid container justifyContent="center" alignItems="center" spacing={2}>
                         <Grid item>
                             <StatItem>
-                                <Typography variant="h4">10</Typography>
+                                <Typography variant="h4">{usersStats.trips}</Typography>
                                 <Typography variant="body2">Trips</Typography>
                             </StatItem>
                         </Grid>
                         <Grid item>
                             <StatItem>
-                                <Typography variant="h4">24</Typography>
+                                <Typography variant="h4">{usersStats.places}</Typography>
                                 <Typography variant="body2">Places</Typography>
                             </StatItem>
                         </Grid>
                         <Grid item>
                             <StatItem>
-                                <Typography variant="h4">5</Typography>
+                                <Typography variant="h4">{usersStats.friends}</Typography>
                                 <Typography variant="body2">Friends</Typography>
                             </StatItem>
                         </Grid>

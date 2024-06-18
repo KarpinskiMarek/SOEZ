@@ -20,4 +20,5 @@ public class ChatMessage {
     private Long userId;
     private MessageType type;
     private Date timeStamp;
+    private Long messageId;
 }

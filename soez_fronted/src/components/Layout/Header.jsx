@@ -104,6 +104,7 @@ const Header = ({ isUserLoggedIn, navigate }) => {
     await Logout();
     setLoggedIn(false);
     setAnchorElUser(null);
+    setProfilePicture(null);
     navigate('/')
   }
 

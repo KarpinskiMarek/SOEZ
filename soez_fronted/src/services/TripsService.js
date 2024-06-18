@@ -64,7 +64,29 @@ export const addPersonToTrip = async (tripId, email) => {
     } catch (error) {
         console.error("Error while adding friend to trip")
     }
-} 
+}
+
+export const setTripPhoto = async (tripId, tripPhoto) => {
+    try {
+        const formData = new FormData();
+        formData.append('photo', tripPhoto);
+        return await request("POST", `/trips/${tripId}/photo`, formData, {
+            'Content-Type': 'multipart/form-data'
+        });
+    } catch (error) {
+        console.error("Error while setting trip photo", error);
+    }
+}
+
+export const getTripPhoto = async (idTrip) => {
+    try {
+        return await request("GET", `/trips/${idTrip}/photo`, {}, {}, {
+            responseType: 'arraybuffer'
+        });
+    } catch (error) {
+        console.error("Error while getting trip photo", error);
+    }
+}
 
 export const formatDate = (timestamp) => {
     const date = new Date(timestamp);
@@ -81,3 +103,4 @@ export const formatDateInput = (timestamp) => {
     const year = date.getFullYear();
     return `${year}-${month}-${day}`;
 }
+
