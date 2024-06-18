@@ -32,7 +32,7 @@ public class ChatRoom {
     )
     private List<UserEntity> users;
 
-    @OneToMany(mappedBy = "chatRoom")
+    @OneToMany(mappedBy = "chatRoom", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonIgnore
     private List<Message> messages;
 

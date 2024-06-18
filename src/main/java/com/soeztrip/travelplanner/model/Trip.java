@@ -37,7 +37,7 @@ public class Trip {
     @JsonIgnore
     private List<Place> places = new ArrayList<>();
 
-    @OneToOne(mappedBy = "trip", cascade = CascadeType.ALL)
+    @OneToOne(mappedBy = "trip", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonIgnore
     private ChatRoom chatRoom;
 

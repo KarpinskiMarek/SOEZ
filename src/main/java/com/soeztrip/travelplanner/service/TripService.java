@@ -58,6 +58,10 @@ public class TripService {
     }
 
     public void deleteTrip(Long id) {
+        String requesterRole = tripRoleService.checkUserRole(id);
+        if (!"OWNER".equals(requesterRole)) {
+            throw new RuntimeException("Only the trip owner can delete trip");
+        }
         Trip trip = this.tripRepository.findById(id).orElseThrow();
         List<Place> placesList = trip.getPlaces();
         if (placesList != null && !placesList.isEmpty()) {
