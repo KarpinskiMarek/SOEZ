@@ -1,7 +1,7 @@
 import { Avatar, Container, TextField, Box, styled, Paper, Button, IconButton, Typography, Divider, Grid } from "@mui/material";
 import EditIcon from '@mui/icons-material/Edit';
 import React, { useEffect, useState } from "react";
-import { arrayBufferToBase64, getCurrentUserData, getProfileData, getProfilePhoto, setProfilePhoto } from "../../services/ProfileService";
+import { arrayBufferToBase64, getCurrentUserData, getProfileData, getProfilePhoto, getProfileStats, setProfilePhoto } from "../../services/ProfileService";
 import { useParams } from "react-router-dom";
 
 const ProfilePicture = styled(Avatar)(({ theme }) => ({
@@ -80,6 +80,8 @@ const UserProfile = () => {
         email: ''
     });
 
+    const [usersStats, setUsersStats] = useState({});
+
     const getUserInitials = (firstName, lastName) => {
         if (!firstName || !lastName) {
             return '';
@@ -114,6 +116,13 @@ const UserProfile = () => {
             setProfilePicture(base64Flag + base64Image);
         }
     };
+
+    const fetchUsersStats = async (id) => {
+        const stats = await getProfileStats(id);
+        if (stats) {
+            setUsersStats(stats);
+        }
+    };
     
 
     useEffect(() => {
@@ -123,6 +132,7 @@ const UserProfile = () => {
     useEffect(() => {
         if (formData && formData.id) {
             fetchUserProfilePicture(formData.id);
+            fetchUsersStats(formData.id);
         }
     }, [formData]);
     
@@ -153,6 +163,7 @@ const UserProfile = () => {
                                 }}
                                 onChange={handleInputChange}
                                 fullWidth
+                                disabled
                             />
                             <TextField
                                 value={formData.lastName}
@@ -167,6 +178,7 @@ const UserProfile = () => {
                                 }}
                                 onChange={handleInputChange}
                                 fullWidth
+                                disabled
                             />
                             <TextField
                                 value={formData.email}
@@ -181,6 +193,7 @@ const UserProfile = () => {
                                 }}
                                 onChange={handleInputChange}
                                 fullWidth
+                                disabled
                             />
                         </TextFieldsBox>
                     </MainBox>
@@ -189,19 +202,19 @@ const UserProfile = () => {
                     <Grid container justifyContent="center" alignItems="center" spacing={2}>
                         <Grid item>
                             <StatItem>
-                                <Typography variant="h4">10</Typography>
+                                <Typography variant="h4">{usersStats.trips}</Typography>
                                 <Typography variant="body2">Trips</Typography>
                             </StatItem>
                         </Grid>
                         <Grid item>
                             <StatItem>
-                                <Typography variant="h4">24</Typography>
+                                <Typography variant="h4">{usersStats.places}</Typography>
                                 <Typography variant="body2">Places</Typography>
                             </StatItem>
                         </Grid>
                         <Grid item>
                             <StatItem>
-                                <Typography variant="h4">5</Typography>
+                                <Typography variant="h4">{usersStats.friends}</Typography>
                                 <Typography variant="body2">Friends</Typography>
                             </StatItem>
                         </Grid>

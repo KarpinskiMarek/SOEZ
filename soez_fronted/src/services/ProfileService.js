@@ -23,7 +23,7 @@ export const getProfilePhoto = async (id) => {
     try {
         return await request("GET", `/users/${id}/profilePicture`, {}, {}, {
             responseType: 'arraybuffer'
-        })
+        });
     } catch(e) {
         console.error("Error while getting profile photo: ", e);
     }
@@ -41,9 +41,10 @@ export const setProfilePhoto = async (id, profilePicture) => {
     }
 }
 
-export const getProfileStats = async () => {
+export const getProfileStats = async (id) => {
     try {
-        
+        const resposne  = await request("GET", `/users/${id}/stats`);
+        return resposne.data;
     } catch(e) {
         console.error("Error while getting profile stats: ", e);
     }

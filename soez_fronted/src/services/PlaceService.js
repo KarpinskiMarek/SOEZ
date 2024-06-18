@@ -40,6 +40,28 @@ export const getPlace = async (placeId) => {
     }
 }
 
+export const setPlacePhoto = async (tripId, placeId, placePhoto) => {
+    try {
+        const formData = new FormData();
+        formData.append('photo', placePhoto);
+        return await request("POST", `/trips/${tripId}/places/${placeId}/photo`, formData, {
+            'Content-Type': 'multipart/form-data'
+        });
+    } catch (error) {
+        console.error("Error while setting place photo", error);
+    }
+}
+
+export const getPlacePhoto = async (idPlace) => {
+    try {
+        return await request("GET", `/place/${idPlace}/photo`, {}, {}, {
+            responseType: 'arraybuffer'
+        });
+    } catch (error) {
+        console.error("Error while gettting place photo", error);
+    }
+}
+
 export const editPlace = async (tripId, placeId, name, arrive, leave, country) => {
     try {
         return await request("PUT", `/trips/${tripId}/places/${placeId}`, {

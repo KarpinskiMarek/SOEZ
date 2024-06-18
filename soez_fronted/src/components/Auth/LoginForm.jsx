@@ -1,8 +1,9 @@
-import { Button, Container, TextField, styled, Box } from "@mui/material";
+import { Button, Container, TextField, styled, Box, Typography } from "@mui/material";
 import React, { useState } from 'react';
 import { useNavigate } from "react-router-dom";
 import { login } from "../../services/AuthenticationService";
 import { setAuthHeader } from "../../services/Authconfig";
+import { isRequired } from "../../services/Validation";
 
 const FormContainer = styled(Container)(({ theme }) => ({
     display: 'flex',
@@ -35,10 +36,20 @@ const LoginForm = () => {
         password: ''
     });
 
+    const [loginError, setLoginError] = useState('');
+
     const navigate = useNavigate();
 
     const validateForm = () => {
-        return true;
+        const newErrors = {};
+        if (!isRequired(formData.username)) {
+            newErrors.username = "User name is required";
+        }
+        if (!isRequired(formData.password)) {
+            newErrors.password = "Password is required";
+        }
+        setErrors(newErrors);
+        return Object.keys(newErrors).length === 0;
     }
 
     const handleChange = (e) => {
@@ -61,6 +72,7 @@ const LoginForm = () => {
                 }
             } catch (error) {
                 console.error("Error while login", error);
+                setLoginError('Invalid login or password');
             }
         }
     }
@@ -68,31 +80,36 @@ const LoginForm = () => {
     return (
         <FormContainer maxWidth="sm">
             <FormBox>
-            <Form onSubmit={handleSubmit}>
-                <TextField 
-                    id="username" 
-                    label="Email..." 
-                    variant="outlined"
-                    onChange={handleChange}
-                    error={!!errors.username}
-                    helperText={errors.username}
-                    sx={{margin: '5px'}}/>
-                <TextField 
-                    id="password" 
-                    type='password' 
-                    label="Password..." 
-                    variant="outlined"
-                    onChange={handleChange}
-                    error={!!errors.username}
-                    helperText={errors.username} 
-                    sx={{margin: '5px'}}/>
-                <Button
-                    type="submit" 
-                    variant="contained" 
-                    sx={{margin: '5px'}}>
+                <Form onSubmit={handleSubmit}>
+                    <TextField
+                        id="username"
+                        label="Email..."
+                        variant="outlined"
+                        onChange={handleChange}
+                        error={!!errors.username}
+                        helperText={errors.username}
+                        sx={{ margin: '5px' }} />
+                    <TextField
+                        id="password"
+                        type='password'
+                        label="Password..."
+                        variant="outlined"
+                        onChange={handleChange}
+                        error={!!errors.password}
+                        helperText={errors.password}
+                        sx={{ margin: '5px' }} />
+                    {loginError && (
+                        <Typography color="error" sx={{ margin: '5px' }}>
+                            {loginError}
+                        </Typography>
+                    )}
+                    <Button
+                        type="submit"
+                        variant="contained"
+                        sx={{ margin: '5px' }}>
                         Login
-                </Button>
-            </Form>
+                    </Button>
+                </Form>
             </FormBox>
         </FormContainer>
     )

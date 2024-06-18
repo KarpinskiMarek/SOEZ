@@ -5,9 +5,10 @@ import { useNavigate, useParams } from "react-router-dom";
 import InfoIcon from '@mui/icons-material/Info';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { editTrip, formatDate, formatDateInput, getTrip } from "../../services/TripsService";
-import { deletePlace, getTripPlaces } from "../../services/PlaceService";
+import { deletePlace, getPlacePhoto, getTripPlaces, setPlacePhoto } from "../../services/PlaceService";
 import { getRandomPhoto } from "../../services/PhotoService";
 import Chat from "../Chat/Chat";
+import { arrayBufferToBase64, getProfilePhoto } from "../../services/ProfileService";
 
 const MainDataContainer = styled(Container)(({ theme }) => ({
     marginTop: '2rem',
@@ -84,7 +85,10 @@ const TripDetails = () => {
     const [places, setPlaces] = useState([]);
     const [page, setPage] = useState(1);
     const itemsPerPage = 9;
+    const [usersPhotos, setUsersPhotos] = useState({});
+    const [placesPhotos, setPlacesPhotos] = useState({});
     const count = Math.ceil(places.length / itemsPerPage);
+
 
     const handlePageChange = (event, value) => {
         setPage(value);
@@ -132,6 +136,34 @@ const TripDetails = () => {
         const places = await getTripPlaces(id);
         if (places) {
             setPlaces(places);
+            for (const place of places) {
+                try {
+                    const photoData = await getPlacePhoto(place.id);
+                    if (photoData && photoData.data) {
+                        const base64Flag = 'data:image/png;base64,';
+                        const base64Image = arrayBufferToBase64(photoData.data);
+                        placesPhotos[place.id] = base64Flag + base64Image;
+                    }
+                } catch (error) {
+                    console.error("Error while getting place photo", error);
+                }
+            }
+            setPlacesPhotos(placesPhotos);
+        }
+    }
+
+    const handlePlacePhotoChange = async (event, tripId, placeId) => {
+        const file = event.target.files[0];
+        console.log(file);
+        if (file) {
+            try {
+                const response = await setPlacePhoto(tripId, placeId, file);
+                if (response && response.status === 200) {
+                    window.location.reload();
+                }
+            } catch (error) {
+                console.error("Error while setting place photo");
+            }
         }
     }
 
@@ -149,6 +181,15 @@ const TripDetails = () => {
                 endingDate: formatDateInput(tripData.endingDate)
             });
             setParticipants(tripData.participants);
+            for (const participant of tripData.participants) {
+                const photoData = await getProfilePhoto(participant.id);
+                if (photoData) {
+                    const base64Flag = 'data:image/png;base64,';
+                    const base64Image = arrayBufferToBase64(photoData.data);
+                    usersPhotos[participant.id] = base64Flag + base64Image;
+                }
+            }
+            setUsersPhotos(usersPhotos);
             setTripData(tripData);
         }
     }
@@ -273,7 +314,8 @@ const TripDetails = () => {
                                 }
                             >
                                 <ListItemAvatar>
-                                    <Avatar>
+                                    <Avatar src={usersPhotos[participant.id]}>
+                                        {!usersPhotos[participant.id] && `${participant.firstName[0]}${participant.lastName[0]}`}
                                     </Avatar>
                                 </ListItemAvatar>
                                 <ListItemText
@@ -291,7 +333,7 @@ const TripDetails = () => {
                     <Typography sx={{ mt: 4, mb: 2, textDecoration: 'underline' }} variant="h6" align="center">
                         Group chat
                     </Typography>
-                    <Chat chatRoomId={tripData.chatRoomId}/>
+                    <Chat chatRoomId={tripData.chatRoomId} />
                 </ComponentSpace>
             </MainDataContainer>
             <Container maxWidth="sm">
@@ -315,8 +357,15 @@ const TripDetails = () => {
                             <Grid item key={place.id} xs={12} sm={6} md={4}>
                                 <StyledCard>
                                     <StyledCardMedia
-                                        image={getRandomPhoto()}
+                                        image={placesPhotos[place.id] ? placesPhotos[place.id] : getRandomPhoto()}
                                         title="Image title"
+                                        onClick={() => document.getElementById(`tripPhotoInput-${place.id}`).click()}
+                                    />
+                                    <input
+                                        id={`tripPhotoInput-${place.id}`}
+                                        type="file"
+                                        style={{display: 'none'}}
+                                        onChange={(event) => handlePlacePhotoChange(event, id, place.id)} 
                                     />
                                     <CardContent>
                                         <Typography gutterBottom variant="h5">
