@@ -40,7 +40,7 @@ public class SecurityConfig {
                         .requestMatchers("/ws/**").permitAll()
                         .anyRequest().authenticated()
                 )
-                .httpBasic(Customizer.withDefaults());//.exceptionHandling((exception)->exception.authenticationEntryPoint(authEntryPoint));
+                .httpBasic(Customizer.withDefaults());
         http.addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
         return http.build();
     }

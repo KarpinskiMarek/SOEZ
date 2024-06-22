@@ -13,6 +13,7 @@ import java.util.Date;
 
 @Component
 public class JwtGenerator {
+
     private static final Key key = Keys.secretKeyFor(SignatureAlgorithm.HS512);
 
     public String generateToken(Authentication authentication) {
@@ -20,14 +21,12 @@ public class JwtGenerator {
         Date currentDate = new Date();
         Date expireDate = new Date(currentDate.getTime() + SecurityConstants.JWT_EXPIRATION);
 
-        String token = Jwts.builder()
+        return Jwts.builder()
                 .setSubject(email)
                 .setIssuedAt(new Date())
                 .setExpiration(expireDate)
                 .signWith(key, SignatureAlgorithm.HS512)
                 .compact();
-        System.out.println("New token: " + token);
-        return token;
     }
 
     public String getUsernameFromJWT(String token) {
