@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from "react";
-import { Container, IconButton, List, ListItem, ListItemAvatar, Avatar, ListItemText, styled, Paper, Box, TextField, Button, Typography, Grid, Card, CardMedia, CardContent, CardActions, Pagination } from "@mui/material";
+import { Container, IconButton, List, MenuItem, ListItem, ListItemAvatar, Avatar, ListItemText, styled, Paper, Box, TextField, Button, Typography, Grid, Card, CardMedia, CardContent, CardActions, Pagination } from "@mui/material";
 import EditIcon from '@mui/icons-material/Edit';
 import { useNavigate, useParams } from "react-router-dom";
 import InfoIcon from '@mui/icons-material/Info';
 import DeleteIcon from '@mui/icons-material/Delete';
-import { editTrip, formatDate, formatDateInput, getTrip } from "../../services/TripsService";
+import { deletePersonFromTrip, editTrip, formatDate, formatDateInput, getTrip, setTripRole } from "../../services/TripsService";
 import { deletePlace, getPlacePhoto, getTripPlaces, setPlacePhoto } from "../../services/PlaceService";
 import { getRandomPhoto } from "../../services/PhotoService";
 import Chat from "../Chat/Chat";
@@ -75,6 +75,21 @@ function generate(element) {
         }),
     );
 }
+
+const roles = [
+    {
+        value: 'OWNER',
+        label: 'Owner',
+    },
+    {
+        value: 'MANAGER',
+        label: 'Manager',
+    },
+    {
+        value: 'PARTICIPANT',
+        label: 'Participant',
+    }
+];
 
 const TripDetails = () => {
 
@@ -219,6 +234,32 @@ const TripDetails = () => {
         }
     }
 
+    const handleRemoveParticipant = async (tripId, email) => {
+        try {
+            await deletePersonFromTrip(tripId, email);
+            setParticipants(prevParticipants => prevParticipants.filter(participant => participant.email !== email));
+        } catch (error) {
+            console.error("Error while deleting participant", error);
+        }
+    };
+
+    const handleRoleChange = async (participantId, value, email) => {
+        setParticipants(prevParticipants =>
+            prevParticipants.map(participant =>
+                participant.id === participantId ? { ...participant, role: value } : participant
+            )
+        );
+        try {
+            const response = await setTripRole(id, email, value);
+            if (response && response.status === 200) {
+                window.location.reload();
+            }
+        } catch (error) {
+            console.error("Error while setting role", error);
+        }
+
+    };
+
     return (
         <>
             <MainDataContainer maxWidth="sm">
@@ -304,10 +345,10 @@ const TripDetails = () => {
                                 key={participant.id}
                                 secondaryAction={
                                     <Box>
-                                        <IconButton edge="end" aria-label="delete" sx={{ marginRight: '5px' }} onClick={() => navigate(`/users/profile/${participant.id}`)}>
+                                        <IconButton edge="end" aria-label="info" sx={{ marginRight: '5px' }} onClick={() => navigate(`/users/profile/${participant.id}`)}>
                                             <InfoIcon />
                                         </IconButton>
-                                        <IconButton edge="end" aria-label="delete">
+                                        <IconButton edge="end" aria-label="delete" onClick={() => handleRemoveParticipant(id, participant.email)}>
                                             <DeleteIcon />
                                         </IconButton>
                                     </Box>
@@ -319,8 +360,24 @@ const TripDetails = () => {
                                     </Avatar>
                                 </ListItemAvatar>
                                 <ListItemText
-                                    primary={`${participant.firstName} ${participant.lastName}`}
-                                    secondary={secondary ? 'Secondary text' : null}
+                                    primary={`${participant.firstName.toUpperCase()} ${participant.lastName.toUpperCase()}`}
+                                    primaryTypographyProps={{ fontWeight: 'bold' }}
+                                    secondary={
+                                        <TextField
+                                            sx={{ marginTop: '8px', width: '130px' }}
+                                            id={`outlined-select-role-${participant.id}`}
+                                            select
+                                            value={participant.role || 'PARTICIPANT'}
+                                            onChange={(e) => handleRoleChange(participant.id, e.target.value, participant.email)}
+                                            size="small"
+                                        >
+                                            {roles.map((option) => (
+                                                <MenuItem key={option.value} value={option.value}>
+                                                    {option.label}
+                                                </MenuItem>
+                                            ))}
+                                        </TextField>
+                                    }
                                 />
                             </ListItem>
                         ))}
@@ -364,8 +421,8 @@ const TripDetails = () => {
                                     <input
                                         id={`tripPhotoInput-${place.id}`}
                                         type="file"
-                                        style={{display: 'none'}}
-                                        onChange={(event) => handlePlacePhotoChange(event, id, place.id)} 
+                                        style={{ display: 'none' }}
+                                        onChange={(event) => handlePlacePhotoChange(event, id, place.id)}
                                     />
                                     <CardContent>
                                         <Typography gutterBottom variant="h5">
