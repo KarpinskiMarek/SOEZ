@@ -62,7 +62,15 @@ export const addPersonToTrip = async (tripId, email) => {
             email: email
         })
     } catch (error) {
-        console.error("Error while adding friend to trip")
+        console.error("Error while adding friend to trip", error)
+    }
+}
+
+export const deletePersonFromTrip = () => {
+    try {
+        
+    } catch (error) {
+        console.error("Error while deleting person from trip", error);
     }
 }
 
