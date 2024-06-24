@@ -66,11 +66,24 @@ export const addPersonToTrip = async (tripId, email) => {
     }
 }
 
-export const deletePersonFromTrip = () => {
+export const deletePersonFromTrip = async (id, email) => {
     try {
-        
+        return await request("PUT", `/trips/${id}/removePerson`, {
+            email: email
+        });
     } catch (error) {
         console.error("Error while deleting person from trip", error);
+    }
+}
+
+export const setTripRole = async (tripId, email, role) => {
+    try {
+        return await request("PUT", `/trips/${tripId}/changeRole`, {
+            email: email,
+            role: role
+        });
+    } catch (error) {
+        console.error("Error while setting role", error);
     }
 }
 

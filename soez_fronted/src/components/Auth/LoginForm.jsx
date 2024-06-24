@@ -78,40 +78,43 @@ const LoginForm = () => {
     }
 
     return (
-        <FormContainer maxWidth="sm">
-            <FormBox>
-                <Form onSubmit={handleSubmit}>
-                    <TextField
-                        id="username"
-                        label="Email..."
-                        variant="outlined"
-                        onChange={handleChange}
-                        error={!!errors.username}
-                        helperText={errors.username}
-                        sx={{ margin: '5px' }} />
-                    <TextField
-                        id="password"
-                        type='password'
-                        label="Password..."
-                        variant="outlined"
-                        onChange={handleChange}
-                        error={!!errors.password}
-                        helperText={errors.password}
-                        sx={{ margin: '5px' }} />
-                    {loginError && (
-                        <Typography color="error" sx={{ margin: '5px' }}>
-                            {loginError}
-                        </Typography>
-                    )}
-                    <Button
-                        type="submit"
-                        variant="contained"
-                        sx={{ margin: '5px' }}>
-                        Login
-                    </Button>
-                </Form>
-            </FormBox>
-        </FormContainer>
+        <>
+            
+            <FormContainer maxWidth="sm">
+                <FormBox>
+                    <Form onSubmit={handleSubmit}>
+                        <TextField
+                            id="username"
+                            label="Email..."
+                            variant="outlined"
+                            onChange={handleChange}
+                            error={!!errors.username}
+                            helperText={errors.username}
+                            sx={{ margin: '5px' }} />
+                        <TextField
+                            id="password"
+                            type='password'
+                            label="Password..."
+                            variant="outlined"
+                            onChange={handleChange}
+                            error={!!errors.password}
+                            helperText={errors.password}
+                            sx={{ margin: '5px' }} />
+                        {loginError && (
+                            <Typography color="error" sx={{ margin: '5px' }}>
+                                {loginError}
+                            </Typography>
+                        )}
+                        <Button
+                            type="submit"
+                            variant="contained"
+                            sx={{ margin: '5px' }}>
+                            Login
+                        </Button>
+                    </Form>
+                </FormBox>
+            </FormContainer>
+        </>
     )
 
 }
