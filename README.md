@@ -24,7 +24,7 @@ To install this app on the local environment please follow this steps:
  - **Password:** root
 6) Create new query on **soez_db**
 7) Drag and drop **postgres_seed.sql** and run query
-8) Enter localhost:3000 and start using the app!
+8) Enter `localhost:3000` and start using the app!
 
 ### Some functionalities might not be working becouse of api keys!
 ### Please contact the authors for support
