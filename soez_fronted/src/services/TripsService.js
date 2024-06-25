@@ -56,6 +56,15 @@ export const deleteTrip = async (id) => {
     }
 }
 
+export const getCurrentUserRole = async (id) => {
+    try {
+        const response = await request("GET", `/trips/${id}/role`);
+        return response.data;
+    } catch (error) {
+        console.error("Error while getting role", error);
+    }
+}
+
 export const addPersonToTrip = async (tripId, email) => {
     try {
         return await request("PUT", `/trips/${tripId}/addPerson`, {

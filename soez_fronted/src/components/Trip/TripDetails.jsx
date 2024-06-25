@@ -4,7 +4,7 @@ import EditIcon from '@mui/icons-material/Edit';
 import { useNavigate, useParams } from "react-router-dom";
 import InfoIcon from '@mui/icons-material/Info';
 import DeleteIcon from '@mui/icons-material/Delete';
-import { deletePersonFromTrip, editTrip, formatDate, formatDateInput, getTrip, setTripRole } from "../../services/TripsService";
+import { deletePersonFromTrip, editTrip, formatDate, formatDateInput, getCurrentUserRole, getTrip, setTripRole } from "../../services/TripsService";
 import { deletePlace, getPlacePhoto, getTripPlaces, setPlacePhoto } from "../../services/PlaceService";
 import { getRandomPhoto } from "../../services/PhotoService";
 import Chat from "../Chat/Chat";
@@ -102,6 +102,7 @@ const TripDetails = () => {
     const itemsPerPage = 9;
     const [usersPhotos, setUsersPhotos] = useState({});
     const [placesPhotos, setPlacesPhotos] = useState({});
+    const [currentUserRole, setCurrentUserRole] = useState(null);
     const count = Math.ceil(places.length / itemsPerPage);
 
 
@@ -167,6 +168,11 @@ const TripDetails = () => {
         }
     }
 
+    const fetchCurrentUserRole = async () => {
+        const data = await getCurrentUserRole(id);
+        setCurrentUserRole(data);
+    }
+
     const handlePlacePhotoChange = async (event, tripId, placeId) => {
         const file = event.target.files[0];
         console.log(file);
@@ -183,6 +189,7 @@ const TripDetails = () => {
     }
 
     useEffect(() => {
+        fetchCurrentUserRole();
         fetchPlaces();
     }, [])
 
@@ -330,8 +337,13 @@ const TripDetails = () => {
                             </Button>
                         </Box>
                     ) : (
-                        <Button variant="contained" endIcon={<EditIcon />} onClick={handleEditClick}>
-                            Edit
+                        <Button 
+                            variant="contained" 
+                            endIcon={<EditIcon />} 
+                            onClick={handleEditClick}
+                            disabled={currentUserRole !== 'OWNER' && currentUserRole !== 'MANAGER'}
+                        >
+                             Edit
                         </Button>
                     )}
                 </ComponentSpace>
@@ -348,7 +360,12 @@ const TripDetails = () => {
                                         <IconButton edge="end" aria-label="info" sx={{ marginRight: '5px' }} onClick={() => navigate(`/users/profile/${participant.id}`)}>
                                             <InfoIcon />
                                         </IconButton>
-                                        <IconButton edge="end" aria-label="delete" onClick={() => handleRemoveParticipant(id, participant.email)}>
+                                        <IconButton 
+                                        edge="end" 
+                                        aria-label="delete" 
+                                        onClick={() => handleRemoveParticipant(id, participant.email)}
+                                        disabled={currentUserRole !== 'OWNER' && currentUserRole !== 'MANAGER'}
+                                        >
                                             <DeleteIcon />
                                         </IconButton>
                                     </Box>
@@ -367,6 +384,7 @@ const TripDetails = () => {
                                             sx={{ marginTop: '8px', width: '130px' }}
                                             id={`outlined-select-role-${participant.id}`}
                                             select
+                                            disabled={currentUserRole !== 'OWNER'}
                                             value={participant.role || 'PARTICIPANT'}
                                             onChange={(e) => handleRoleChange(participant.id, e.target.value, participant.email)}
                                             size="small"
@@ -382,7 +400,12 @@ const TripDetails = () => {
                             </ListItem>
                         ))}
                     </List>
-                    <Button variant="contained" sx={{ margin: '10px' }} onClick={() => navigate(`/trips/${id}/add-friend`)}>
+                    <Button 
+                    variant="contained" 
+                    sx={{ margin: '10px' }} 
+                    onClick={() => navigate(`/trips/${id}/add-friend`)}
+                    disabled={currentUserRole !== 'OWNER' && currentUserRole !== 'MANAGER'}
+                    >
                         Add participant
                     </Button>
                 </ComponentSpace>
@@ -400,7 +423,12 @@ const TripDetails = () => {
                 <div>
                     <Grid container spacing={2} justifyContent={"center"}>
                         <Grid item>
-                            <Button variant="contained" color="primary" onClick={() => navigate(`/trips/${id}/places/new`)}>
+                            <Button 
+                            variant="contained" 
+                            color="primary" 
+                            onClick={() => navigate(`/trips/${id}/places/new`)}
+                            disabled={currentUserRole !== 'OWNER' && currentUserRole !== 'MANAGER'}
+                            >
                                 Add new place
                             </Button>
                         </Grid>
