@@ -2,6 +2,9 @@ package com.soeztrip.travelplanner.controller;
 
 import com.soeztrip.travelplanner.dto.*;
 import com.soeztrip.travelplanner.model.Place;
+import com.soeztrip.travelplanner.model.Trip;
+import com.soeztrip.travelplanner.model.UserEntity;
+import com.soeztrip.travelplanner.model.UserTrip;
 import com.soeztrip.travelplanner.repository.PlaceRepository;
 import com.soeztrip.travelplanner.repository.UserRepository;
 import com.soeztrip.travelplanner.service.*;
@@ -74,6 +77,14 @@ public class TripController {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Place not found");
         }
         return ResponseEntity.ok(placeService.getPlace(id));
+    }
+
+    @GetMapping("/trips/{idTrip}/role")
+    public ResponseEntity<?> getRole(@PathVariable Long idTrip){
+        if (!tripService.tripExists(idTrip)) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Trip not found");
+        }
+        return ResponseEntity.ok().body(this.tripService.getRole(idTrip));
     }
 
     @GetMapping("/tickets/{id}/download")
@@ -261,6 +272,11 @@ public class TripController {
         }
         if (!userRepository.existsByEmail(dto.getEmail())) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found");
+        }
+        UserEntity user = this.userRepository.findByEmail(dto.getEmail()).orElseThrow();
+        Trip trip = this.tripService.getTrip(id);
+        if(this.tripService.getUserTrip(user,trip)){
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User already assigned to the trip");
         }
         try {
             tripService.addParticipant(id, dto.getEmail());

@@ -57,6 +57,10 @@ public class TripService {
 
     }
 
+    public String getRole(Long tripId){
+        return this.tripRoleService.checkUserRole(tripId);
+    }
+
     public void deleteTrip(Long id) {
         String requesterRole = tripRoleService.checkUserRole(id);
         if (!"OWNER".equals(requesterRole)) {
@@ -72,6 +76,9 @@ public class TripService {
         }
         tripRepository.deleteById(id);
 
+    }
+    public Trip getTrip(Long id){
+        return this.tripRepository.findById(id).orElseThrow();
     }
 
     public TripDto findTrip(Long id) {
@@ -191,6 +198,11 @@ public class TripService {
 
     public boolean tripExists(Long id) {
         return tripRepository.existsById(id);
+    }
+
+    public boolean getUserTrip(UserEntity user, Trip trip){
+        UserTrip userTrip = userTripRepository.findByUserAndTrip(user, trip);
+        return userTrip !=null;
     }
 
     public void updateTrip(Long id, TripDto tripDto) {
