@@ -40,6 +40,7 @@ public class Place {
 
     @OneToMany(mappedBy = "place", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonIgnore
+    @Builder.Default
     private List<Ticket> tickets = new ArrayList<>();
 
     public Place(Long id, String name, Date arrive, Date leave, String prompt, String country, String photoFilePath, Trip trip, List<Ticket> transports) {
