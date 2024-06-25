@@ -8,7 +8,7 @@ import FileUploadIcon from '@mui/icons-material/FileUpload';
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { deleteTicket, downloadTicket, editPlace, editPlacePlan, generatePlacePlan, getPlace, getPlaceTickets, getPlaceWeather, uploadTicket } from "../../services/PlaceService";
-import { formatDateInput } from "../../services/TripsService";
+import { formatDateInput, getCurrentUserRole } from "../../services/TripsService";
 import { getWeatherIconPath } from "../../services/WeatherIconService";
 import Map from "../Maps/MyMap";
 
@@ -82,6 +82,7 @@ const PlaceDetails = () => {
     const [isEditing, setIsEditing] = useState(false);
     const [dense, setDense] = React.useState(false);
     const [secondary, setSecondary] = React.useState(false);
+    const [currentUserRole, setCurrentUserRole] = useState(null);
     const [formData, setFormData] = useState({
         name: '',
         arrive: '',
@@ -136,6 +137,11 @@ const PlaceDetails = () => {
         }
     };
 
+    const fetchCurrentUserRole = async () => {
+        const data = await getCurrentUserRole(tripId);
+        setCurrentUserRole(data);
+    }
+
     const fetchTickets = async () => {
         const response = await getPlaceTickets(placeId);
         if (response && response.data) {
@@ -157,6 +163,7 @@ const PlaceDetails = () => {
     };
 
     useEffect(() => {
+        fetchCurrentUserRole();
         fetchPlace();
         fetchWeather();
         fetchTickets();
@@ -324,7 +331,7 @@ const PlaceDetails = () => {
                             </Button>
                         </Box>
                     ) : (
-                        <Button variant="contained" endIcon={<EditIcon />} onClick={handleEditClick}>
+                        <Button variant="contained" endIcon={<EditIcon />} onClick={handleEditClick} disabled={currentUserRole !== 'OWNER' && currentUserRole !== 'MANAGER'}>
                             Edit
                         </Button>
                     )}
@@ -355,13 +362,14 @@ const PlaceDetails = () => {
                         fullWidth
                     />
                     <Box sx={{ display: 'flex', gap: '10px', margin: '2rem' }}>
-                        <Button variant="contained" onClick={handleEditPlan} endIcon={<EditIcon />}>
+                        <Button variant="contained" onClick={handleEditPlan} endIcon={<EditIcon />} disabled={currentUserRole !== 'OWNER' && currentUserRole !== 'MANAGER'}>
                             Edit
                         </Button>
-                        <Button variant="outlined" onClick={handleGeneratePlan} endIcon={<SmartToyIcon />}>
+                        <Button variant="outlined" onClick={handleGeneratePlan} endIcon={<SmartToyIcon />} disabled={currentUserRole !== 'OWNER' && currentUserRole !== 'MANAGER'}>
                             Generate
-                        </Button>
+                        </Button> 
                     </Box>
+                    <Typography align="center">Generating plan might take a few seconds</Typography>
                 </ComponentSpace>
                 <ComponentSpace>
                     <Typography sx={{ mt: 4, mb: 2, textDecoration: 'underline' }} variant="h6" align="center">
