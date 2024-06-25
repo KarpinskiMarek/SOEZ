@@ -42,9 +42,11 @@ public class UserEntity {
             joinColumns = @JoinColumn(name = "user_id", referencedColumnName = "id"),
             inverseJoinColumns = @JoinColumn(name = "role_id", referencedColumnName = "id")
     )
+    @Builder.Default
     private List<Role> roles = new ArrayList<>();
 
     @OneToMany(mappedBy = "user")
+    @Builder.Default
     private List<UserTrip> userTrips = new ArrayList<>();
 
 
@@ -54,10 +56,12 @@ public class UserEntity {
             joinColumns = @JoinColumn(name = "user_id"),
             inverseJoinColumns = @JoinColumn(name = "friend_id")
     )
+    @Builder.Default
     private Set<UserEntity> friendList = new HashSet<>();
 
 
     @ManyToMany(mappedBy = "users")
+    @Builder.Default
     private Set<ChatRoom> chatRooms = new HashSet<>();
 
 

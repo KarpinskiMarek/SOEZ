@@ -31,10 +31,12 @@ public class Trip {
 
     @OneToMany(mappedBy = "trip", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonIgnore
+    @Builder.Default
     private List<UserTrip> userTrips = new ArrayList<>();
 
     @OneToMany(mappedBy = "trip", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonIgnore
+    @Builder.Default
     private List<Place> places = new ArrayList<>();
 
     @OneToOne(mappedBy = "trip", cascade = CascadeType.ALL, orphanRemoval = true)
