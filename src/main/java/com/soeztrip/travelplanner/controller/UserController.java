@@ -19,6 +19,7 @@ import java.net.URI;
 
 
 @Controller
+@CrossOrigin(origins = "*")
 public class UserController {
 
     private UserService userService;

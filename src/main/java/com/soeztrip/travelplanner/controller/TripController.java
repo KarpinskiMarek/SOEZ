@@ -4,7 +4,6 @@ import com.soeztrip.travelplanner.dto.*;
 import com.soeztrip.travelplanner.model.Place;
 import com.soeztrip.travelplanner.model.Trip;
 import com.soeztrip.travelplanner.model.UserEntity;
-import com.soeztrip.travelplanner.model.UserTrip;
 import com.soeztrip.travelplanner.repository.PlaceRepository;
 import com.soeztrip.travelplanner.repository.UserRepository;
 import com.soeztrip.travelplanner.service.*;
@@ -28,7 +27,7 @@ import java.net.MalformedURLException;
 import java.util.List;
 
 @Controller
-@CrossOrigin(origins = "http://localhost:3000")
+@CrossOrigin(origins = "*")
 public class TripController {
 
     private TripService tripService;
@@ -80,7 +79,7 @@ public class TripController {
     }
 
     @GetMapping("/trips/{idTrip}/role")
-    public ResponseEntity<?> getRole(@PathVariable Long idTrip){
+    public ResponseEntity<?> getRole(@PathVariable Long idTrip) {
         if (!tripService.tripExists(idTrip)) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Trip not found");
         }
@@ -114,8 +113,9 @@ public class TripController {
         }
         return ResponseEntity.ok().body(this.placeService.getTickets(id));
     }
+
     @GetMapping("/trips/{idTrip}/photo")
-    public ResponseEntity<?>getTripPhoto(@PathVariable Long idTrip) throws MalformedURLException {
+    public ResponseEntity<?> getTripPhoto(@PathVariable Long idTrip) throws MalformedURLException {
         if (!tripService.tripExists(idTrip)) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Trip not found");
         }
@@ -124,8 +124,9 @@ public class TripController {
                 .contentType(MediaType.IMAGE_PNG)
                 .body(resource);
     }
+
     @GetMapping("/place/{idPlace}/photo")
-    public ResponseEntity<?>getPlacePhoto(@PathVariable Long idPlace) throws MalformedURLException {
+    public ResponseEntity<?> getPlacePhoto(@PathVariable Long idPlace) throws MalformedURLException {
         if (!placeService.placeExists(idPlace)) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Place not found");
         }
@@ -215,18 +216,18 @@ public class TripController {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Place not found");
         }
         try {
-            String photoFilePath = fileService.savePlaceFile(idTrip,idPlace, photo);
+            String photoFilePath = fileService.savePlaceFile(idTrip, idPlace, photo);
             placeService.updatePlacePhoto(idPlace, photoFilePath);
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
         return ResponseEntity.ok().body("Place photo has been uploaded successfully");
     }
-      
-@PostMapping("/trips/{idTrip}/places/{idPlace}/prompt")
+
+    @PostMapping("/trips/{idTrip}/places/{idPlace}/prompt")
     public ResponseEntity<?> addPrompt(@PathVariable Long idTrip,
                                        @PathVariable Long idPlace,
-                                       @RequestBody PlaceDto dto){
+                                       @RequestBody PlaceDto dto) {
         if (!tripService.tripExists(idTrip)) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Trip not found");
         }
@@ -275,7 +276,7 @@ public class TripController {
         }
         UserEntity user = this.userRepository.findByEmail(dto.getEmail()).orElseThrow();
         Trip trip = this.tripService.getTrip(id);
-        if(this.tripService.getUserTrip(user,trip)){
+        if (this.tripService.getUserTrip(user, trip)) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User already assigned to the trip");
         }
         try {
