@@ -1,0 +1,22 @@
+{
+  "groups": [
+    {
+      "name": "openai",
+      "type": "com.soeztrip.travelplanner.OpenAIConfigProperties",
+      "sourceType": "com.soeztrip.travelplanner.OpenAIConfigProperties"
+    }
+  ],
+  "properties": [
+    {
+      "name": "openai.o-p-e-n-a-i-a-p-i-k-e-y",
+      "type": "java.lang.String",
+      "sourceType": "com.soeztrip.travelplanner.OpenAIConfigProperties"
+    },
+    {
+      "name": "openai.o-p-e-n-a-i-a-p-i-u-r-l",
+      "type": "java.lang.String",
+      "sourceType": "com.soeztrip.travelplanner.OpenAIConfigProperties"
+    }
+  ],
+  "hints": []
+}
