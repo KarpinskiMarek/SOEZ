@@ -25,7 +25,6 @@ const Form = styled('form')(({ theme }) => ({
 }));
 
 const LoginForm = () => {
-
     const [formData, setFormData] = useState({
         username: '',
         password: ''
@@ -50,7 +49,7 @@ const LoginForm = () => {
         }
         setErrors(newErrors);
         return Object.keys(newErrors).length === 0;
-    }
+    };
 
     const handleChange = (e) => {
         const { id, value } = e.target;
@@ -66,20 +65,21 @@ const LoginForm = () => {
             console.log('Dane poprawne');
             try {
                 const response = await login(formData.username, formData.password);
+                console.log(response);
                 if (response && response.status === 200) {
                     setAuthHeader(response.data.accessToken);
                     navigate("/trips");
+                } else {
+                    console.log('Response status:', response.status);
                 }
             } catch (error) {
-                console.error("Error while login", error);
                 setLoginError('Invalid login or password');
             }
         }
-    }
+    };
 
     return (
         <>
-            
             <FormContainer maxWidth="sm">
                 <FormBox>
                     <Form onSubmit={handleSubmit}>
@@ -90,16 +90,18 @@ const LoginForm = () => {
                             onChange={handleChange}
                             error={!!errors.username}
                             helperText={errors.username}
-                            sx={{ margin: '5px' }} />
+                            sx={{ margin: '5px' }}
+                        />
                         <TextField
                             id="password"
-                            type='password'
+                            type="password"
                             label="Password..."
                             variant="outlined"
                             onChange={handleChange}
                             error={!!errors.password}
                             helperText={errors.password}
-                            sx={{ margin: '5px' }} />
+                            sx={{ margin: '5px' }}
+                        />
                         {loginError && (
                             <Typography color="error" sx={{ margin: '5px' }}>
                                 {loginError}
@@ -108,15 +110,15 @@ const LoginForm = () => {
                         <Button
                             type="submit"
                             variant="contained"
-                            sx={{ margin: '5px' }}>
+                            sx={{ margin: '5px' }}
+                        >
                             Login
                         </Button>
                     </Form>
                 </FormBox>
             </FormContainer>
         </>
-    )
-
-}
+    );
+};
 
 export default LoginForm;
